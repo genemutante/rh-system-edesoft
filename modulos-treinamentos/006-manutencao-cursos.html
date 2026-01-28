@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Cursos | Enterprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../.estilos-treinamentos/cadastro-style.css">
+    
+    <style>
+        /* =========================================================
+           ESTILOS DE SEGURANÇA & UI
+           ========================================================= */
+        .admin-only { display: none !important; }
+        body.is-admin .admin-only { display: inline-flex !important; }
+
+        /* Badge no Cabeçalho */
+        .viewer-badge {
+            display: none; align-items: center; gap: 6px;
+            background-color: #fff7ed; color: #c2410c; 
+            border: 1px solid #ffedd5;
+            font-size: 11px; font-weight: 600; 
+            padding: 4px 12px; border-radius: 100px;
+            margin-left: 16px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Ícones Profissionais na Tabela */
+        .btn-icon-action {
+            width: 32px; height: 32px; 
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #64748b; 
+            transition: all 0.2s;
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+        .btn-icon-action svg { width: 16px; height: 16px; stroke-width: 2; }
+        
+        /* Hover Effects */
+        .btn-icon-action:hover { border-color: #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .btn-icon-action.edit:hover { color: #f59e0b; border-color: #fde68a; background: #fffbeb; }
+
+        /* Esconde botões para visitantes */
+        body:not(.is-admin) .btn-edit { display: none !important; }
+        
+        /* Inputs Desabilitados */
+        input:disabled, select:disabled, textarea:disabled {
+            background-color: #f8fafc !important; color: #64748b !important;
+            cursor: not-allowed; border-color: #e2e8f0 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="top-bar">
+        <div style="display: flex; align-items: center;">
+            <h1>Manutenção de Cursos</h1>
+            
+            <div id="viewerWarning" class="viewer-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span>Modo Leitura</span>
+            </div>
+        </div>
+        <button class="btn-secondary" onclick="window.location.href='../rh-system-edesoft.html'">Dashboard</button>
+    </header>
+
+    <main class="container">
+        
+        <section id="viewList" class="content-view">
+            <div class="actions-container">
+                <div class="toolbar-left">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" placeholder="Buscar curso por nome ou código...">
+                    </div>
+                    <span class="counter-badge">42 Cursos</span>
+                </div>
+
+                <div class="toolbar-right">
+                    <div class="filters-group">
+                        <div class="select-wrapper">
+                            <select><option>Categoria: Todas</option><option>Técnico</option><option>Comportamental</option></select>
+                        </div>
+                    </div>
+                    <div class="vertical-divider"></div>
+                    
+                    <button class="btn-primary-glow admin-only" onclick="alternarTela('viewForm')">+ Novo Curso</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-scroll-area">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">Cód.</th>
+                                <th style="width: 35%">Nome do Curso</th>
+                                <th style="width: 15%">Categoria</th>
+                                <th style="width: 15%">Carga Horária</th>
+                                <th style="width: 15%">Validade (Meses)</th>
+                                <th style="width: 10%; text-align: right;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>TEC-001</td>
+                                <td style="font-weight: 600; color: #334155;">Excel Avançado para Finanças</td>
+                                <td>Técnico</td>
+                                <td>20h</td>
+                                <td>24 Meses</td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon-action btn-edit edit" title="Editar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>CMP-010</td>
+                                <td style="font-weight: 600; color: #334155;">Liderança e Gestão de Pessoas</td>
+                                <td>Comportamental</td>
+                                <td>16h</td>
+                                <td>Indeterminada</td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon-action btn-edit edit" title="Editar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="viewForm" class="content-view" style="display: none;">
+            <div class="form-header"><h2>Cadastro de Curso</h2></div>
+            <div class="form-tabs">
+                <button type="button" class="tab-link active">Dados Gerais</button>
+                <button type="button" class="tab-link">Conteúdo</button>
+                <button type="button" class="tab-link">Requisitos</button>
+            </div>
+            <form id="mainForm" onsubmit="event.preventDefault();">
+                <div class="tab-content active">
+                    <div class="grid-3">
+                        <div class="field span-2"> <label>Nome do Curso</label> <input type="text" required> </div>
+                        <div class="field"> <label>Código Interno</label> <input type="text" placeholder="Ex: TRE-001"> </div>
+                        <div class="field"> <label>Categoria</label> <select><option>Técnico</option><option>Comportamental</option><option>Obrigatório/Legal</option></select> </div>
+                        <div class="field"> <label>Modalidade Padrão</label> <select><option>Presencial</option><option>Online (EAD)</option><option>Híbrido</option></select> </div>
+                        <div class="field"> <label>Fornecedor Padrão</label> <select><option>Interno (RH)</option><option>Udemy</option><option>Consultoria Externa</option></select> </div>
+                        <div class="field sep-line"></div>
+                        <div class="field"> <label>Carga Horária (Horas)</label> <input type="number"> </div>
+                        <div class="field"> <label>Validade (Meses)</label> <input type="number" placeholder="0 para indeterminada"> </div>
+                        <div class="field"> <label>Custo Médio (R$)</label> <input type="text"> </div>
+                        <div class="field span-3"> <label>Descrição Resumida</label> <textarea rows="3" style="height: 60px;"></textarea> </div>
+                    </div>
+                </div>
+            </form>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="alternarTela('viewList')">Cancelar</button>
+                <button type="button" class="btn-primary admin-only">Salvar Curso</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function alternarTela(id) {
+            document.querySelectorAll('.content-view').forEach(el => el.style.display = 'none');
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const sessionRaw = localStorage.getItem('rh_session');
+            if (!sessionRaw) { window.top.location.href = '../login.html'; return; }
+            const session = JSON.parse(sessionRaw);
+
+            if (session.role === 'ADMIN') {
+                document.body.classList.add('is-admin');
+            } else {
+                document.getElementById('viewerWarning').style.display = 'flex';
+                const allInputs = document.querySelectorAll('#mainForm input, #mainForm select, #mainForm textarea');
+                allInputs.forEach(el => el.disabled = true);
+            }
+        });
+    </script>
+</body>
+</html>

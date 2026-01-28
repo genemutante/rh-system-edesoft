@@ -1,1 +1,251 @@
-modulos-treinamentos/001-admin-base-de-dados.html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração de Dados | Enterprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../.estilos-treinamentos/cadastro-style.css">
+    
+    <style>
+        /* =========================================================
+           LAYOUT 100VH (CENTRALIZADO)
+           ========================================================= */
+        html, body {
+            height: 100%; margin: 0; padding: 0;
+            overflow: hidden; /* Sem rolagem na janela */
+            display: flex; flex-direction: column;
+            background-color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* 1. Header Fixo */
+        .top-bar {
+            flex-shrink: 0;
+            height: 56px;
+            background: #ffffff;
+            border-bottom: 1px solid #cbd5e1;
+            display: flex; align-items: center; justify-content: flex-start;
+            padding: 0 24px; gap: 16px;
+            z-index: 50;
+        }
+        .top-bar h1 { 
+            font-size: 16px; font-weight: 700; color: #0f172a; 
+            margin: 0; text-transform: uppercase; letter-spacing: 0.5px; 
+        }
+
+        /* 2. Área Principal (Centralizada) */
+        .main-workspace {
+            flex: 1;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+            overflow-y: auto; 
+        }
+
+        /* 3. Card Central */
+        .admin-card {
+            background: #ffffff;
+            width: 100%; max-width: 500px;
+            border-radius: 8px; border: 1px solid #cbd5e1;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            padding: 0;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            background: #f8fafc;
+        }
+        .card-header h2 { margin: 0; font-size: 14px; font-weight: 700; color: #334155; text-transform: uppercase; }
+
+        .card-body { padding: 24px; }
+
+        .meta-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed #e2e8f0;
+            font-size: 13px; color: #64748b;
+        }
+        .meta-row:last-child { border-bottom: none; }
+        .meta-row strong { color: #0f172a; font-weight: 600; font-size: 14px; }
+
+        .action-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-large {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+            padding: 16px; border: 1px solid #cbd5e1; border-radius: 6px;
+            background: #fff; color: #475569;
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-large:hover {
+            border-color: #3b82f6; color: #3b82f6; background: #eff6ff;
+            transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .btn-large svg { width: 20px; height: 20px; stroke-width: 2; }
+
+        /* Danger Zone */
+        .danger-zone {
+            margin-top: 20px; padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+        }
+        
+        .btn-reset {
+            width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: #fff1f2; color: #e11d48;
+            border: 1px solid #fda4af;
+            padding: 10px; border-radius: 6px;
+            font-size: 12px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-reset:hover { background: #ffe4e6; border-color: #f43f5e; }
+        .btn-reset svg { width: 14px; height: 14px; }
+
+        /* MENSAGEM VAZIA (Sem permissão) */
+        .empty-state-msg {
+            display: none; /* Só aparece se não for admin */
+            text-align: center;
+            font-size: 12px; color: #94a3b8;
+            padding: 20px 0;
+            background: #f8fafc; border-radius: 6px; border: 1px dashed #cbd5e1;
+            margin-top: 20px;
+        }
+
+        /* =========================================================
+           SEGURANÇA
+           ========================================================= */
+        /* Por padrão, esconde ações */
+        .admin-only { display: none !important; }
+        
+        /* Se for Admin, mostra botões e esconde a mensagem de vazio */
+        body.is-admin .admin-only { display: flex !important; }
+        body.is-admin .empty-state-msg { display: none !important; }
+        
+        /* Se NÃO for Admin, mostra a mensagem de vazio */
+        body:not(.is-admin) .empty-state-msg { display: block !important; }
+
+        /* Badge no Header */
+        .viewer-badge {
+            display: none; align-items: center; gap: 6px;
+            background-color: #fff7ed; color: #c2410c; 
+            border: 1px solid #ffedd5;
+            font-size: 11px; font-weight: 600; 
+            padding: 4px 12px; border-radius: 100px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .viewer-badge svg { width: 14px; height: 14px; stroke-width: 2; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+    <header class="top-bar">
+        <h1>Administração de Dados</h1>
+        
+        <div id="viewerWarning" class="viewer-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Modo Leitura</span>
+        </div>
+    </header>
+
+    <div class="main-workspace">
+        <div class="admin-card">
+            
+            <div class="card-header">
+                <h2>Status do Microbanco</h2>
+            </div>
+            
+            <div class="card-body">
+                <div id="metaInfo">
+                    <div class="meta-row"><span>Status</span> <strong>Carregando...</strong></div>
+                </div>
+
+                <div class="empty-state-msg">
+                    🔒 Ações de banco de dados restritas a administradores.
+                </div>
+
+                <div class="action-grid">
+                    <div class="btn-large admin-only" onclick="DBHandler.exportarArquivo()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        <span>Fazer Backup (JSON)</span>
+                    </div>
+                    
+                    <div class="btn-large admin-only" onclick="document.getElementById('fileInput').click()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                        <span>Restaurar Backup</span>
+                        <input type="file" id="fileInput" accept=".json" onchange="DBHandler.importarArquivo(this.files[0], () => location.reload())" style="display:none">
+                    </div>
+                </div>
+
+                <div class="danger-zone admin-only">
+                    <button class="btn-reset" onclick="confirmarReset()">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        Resetar para Padrão de Fábrica
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../.bd-treinamentos/data.js"></script>
+    <script src="../.bd-treinamentos/db-handler.js"></script>
+    
+    <script>
+        // =========================================================
+        // AUTH GUARD & LÓGICA
+        // =========================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const sessionRaw = localStorage.getItem('rh_session');
+            
+            if (!sessionRaw) {
+                window.top.location.href = '../login.html'; 
+                return;
+            }
+
+            const session = JSON.parse(sessionRaw);
+
+            if (session.role === 'ADMIN') {
+                document.body.classList.add('is-admin');
+            } else {
+                const badge = document.getElementById('viewerWarning');
+                if(badge) badge.style.display = 'flex';
+            }
+
+            carregarDadosTela();
+        });
+
+        function carregarDadosTela() {
+            const db = DBHandler.get();
+            const el = document.getElementById('metaInfo');
+            el.innerHTML = `
+                <div class="meta-row"><span>Colaboradores Cadastrados</span> <strong>${db.dados?.colaboradores?.length || 0}</strong></div>
+                <div class="meta-row"><span>Versão da Base</span> <strong>${db.meta?.versao || '1.0'}</strong></div>
+                <div class="meta-row"><span>Última Sincronização</span> <strong>${new Date(db.meta?.dataUltimaModificacao || Date.now()).toLocaleDateString('pt-BR')}</strong></div>
+            `;
+        }
+
+        function confirmarReset() {
+            if (!document.body.classList.contains('is-admin')) {
+                alert("Acesso Negado.");
+                return;
+            }
+
+            if(confirm("ATENÇÃO CRÍTICA:\n\nIsso apagará TODOS os dados cadastrados (colaboradores, turmas, notas) e restaurará o banco de dados inicial.\n\nDeseja continuar?")) {
+                const senha = prompt("Digite 'CONFIRMAR' para apagar tudo:");
+                if (senha === 'CONFIRMAR') {
+                    DBHandler.resetarFabrica();
+                    alert("Sistema resetado com sucesso.");
+                    location.reload();
+                } else {
+                    alert("Ação cancelada.");
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Colaborador - Edesoft</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../.estilos-treinamentos/style.css">
+    <link rel="stylesheet" href="../.estilos-treinamentos/individual-style.css">
+    
+    <style>
+        /* =========================================================
+           SEGURANÇA & UI PROFISSIONAL
+           ========================================================= */
+        
+        /* Elementos exclusivos de Admin */
+        .admin-only { display: none !important; }
+        body.is-admin .admin-only { display: inline-flex !important; }
+
+        /* BADGE DE MODO LEITURA (NO CABEÇALHO) */
+        .viewer-badge {
+            display: none; /* Controlado via JS */
+            align-items: center; 
+            gap: 6px;
+            background-color: #fff7ed; 
+            color: #c2410c; 
+            border: 1px solid #ffedd5;
+            font-size: 11px; 
+            font-weight: 600; 
+            padding: 4px 12px; 
+            border-radius: 100px;
+            margin-left: 16px; /* Afasta do título */
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Ícone da Badge */
+        .viewer-badge svg {
+            width: 14px; 
+            height: 14px;
+            stroke-width: 2;
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateX(-10px); } 
+            to { opacity: 1; transform: translateX(0); } 
+        }
+    </style>
+</head>
+<body class="individual-dashboard">
+
+<header class="page-header">
+    <div style="display: flex; align-items: center;">
+        <h1>Painel de Desenvolvimento Individual</h1>
+        
+        <div id="viewerWarning" class="viewer-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Modo Leitura</span>
+        </div>
+    </div>
+</header>
+
+<nav class="filter-bar">
+    <div class="filter-group-left">
+        <div class="filter-wrapper">
+            <span class="filter-label">Colaborador(a)</span>
+            <input type="search" list="colabList" id="colabFilter" class="filter-select compact combobox" placeholder="Selecionar..." oninput="selecionarColaborador()" onmousedown="forcarListaCompleta(this)">
+            <datalist id="colabList"></datalist>
+        </div>
+		
+        <div id="lenteWrapper" class="filter-wrapper" style="display: none;">
+            <span class="filter-label">Visualizar Requisitos de:</span>
+            <select id="lenteFilter" class="filter-select compact" onchange="renderizarPainel()"></select>
+        </div>
+		
+        <div id="statusFiltroWrapper" class="filter-wrapper" style="display: none;">
+            <span class="filter-label">Filtrar por Status:</span>
+            <select id="statusSelect" class="filter-select compact" onchange="renderizarPainel()">
+                <option value="todos">Todos os Status</option>
+            </select>
+        </div>
+		
+        <div class="filter-wrapper">
+            <span class="filter-label">EXIBIR:</span>
+             <div class="status-toggles" id="typeFilterGroup">
+                <button class="btn-toggle active" data-target="todos">Todos</button>
+                <button class="btn-toggle" data-target="mandatory">Obrigatórios</button>
+                <button class="btn-toggle" data-target="recommended">Recomendados</button>
+                <button class="btn-toggle" data-target="none">Não Obrigatórios</button>
+             </div>
+        </div>
+
+        <div class="filter-wrapper" style="margin-left: auto; border-left: 1px solid #e2e8f0; padding-left: 15px;">
+            <button class="btn-clear" onclick="limparFiltros()" title="Limpar todos os filtros">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    <line x1="2" y1="2" x2="22" y2="22" stroke="red" stroke-width="2"></line> 
+                </svg>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="dashboard-content">
+    
+    <div class="main-column">
+        	
+        <div class="colab-name-card">
+            <div class="card-info-wrapper">
+                <h2 id="displayName">Selecione um colaborador</h2>
+                <span id="displayCargo" class="cargo-badge"></span>
+            </div>
+        
+            <div id="gridSummary" class="grid-summary" style="display: none;">
+                <div class="summary-numbers">
+                    <strong id="lblFiltrados" style="color: #fff; font-size: 18px;">0</strong>
+                    <span style="color: #94a3b8; font-size: 11px; margin: 0 4px;">de</span>
+                    <strong id="lblTotal" style="color: #94a3b8; font-size: 14px;">0</strong>
+                </div>
+                <span class="summary-label">Cursos Listados</span>
+            </div>
+        </div>
+        		
+        <div class="table-container">
+            <table id="individualTable">
+                <thead>
+                    <tr>
+                        <th id="thFuncao" style="width: 27%;">Função</th>
+                        <th id="thCurso" style="width: 37%;">Curso</th>
+                        <th id="thObrig" style="width: 14%;">Obrigatoriedade</th>
+                        <th id="thStatus" style="width: 22%; text-align: center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <aside class="side-panel">
+        
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('tab1', this)">1. Escopo</button>
+            <button class="tab-btn" onclick="switchTab('tab2', this)">2. Gestão</button>
+            <button class="tab-btn" onclick="switchTab('tab3', this)">3. Score</button>
+        </div>
+
+        <div id="tab1" class="tab-content active">
+            <div class="split-layout">
+                <div class="left-stack">
+                    <div class="stack-card b-total">
+                        <div class="stack-text-group">
+                            <span class="stack-val" id="countTotal">0</span>
+                            <span class="stack-lbl">Total Mapeado</span>
+                        </div>
+                        <div class="stack-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        </div>
+                    </div>
+                    <div class="stack-card b-obrig">
+                        <div class="stack-text-group"> <span class="stack-val" id="countObrigatórios">0</span> <span class="stack-lbl">Obrigatórios</span> </div>
+                        <div class="stack-icon-wrapper"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg> </div>
+                    </div>
+                    <div class="stack-card b-recom">
+                        <div class="stack-text-group"> <span class="stack-val" id="countRecomendados">0</span> <span class="stack-lbl">Recomendados</span> </div>
+                        <div class="stack-icon-wrapper"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> </div>
+                    </div>
+                    <div class="stack-card b-none">
+                        <div class="stack-text-group"> <span class="stack-val" id="countNaoObrigatorios">0</span> <span class="stack-lbl">Não Obrigatórios</span> </div>
+                        <div class="stack-icon-wrapper"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg> </div>
+                    </div>
+                </div>
+                
+                <div class="right-text">
+                    <div class="text-content">
+                        <h5 style="color: #fbbf24">O Cenário</h5>
+                        <p id="storyScope">Carregando dados...</p>
+                    </div>
+                    <div class="tab-illustration">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+ 
+        <div id="tab2" class="tab-content">
+            <div class="split-layout">
+                <div class="left-stack" style="width: 170px;"> 
+                    <div class="stack-card b-prio">
+                        <div class="stack-text-group"> <span class="stack-val" id="countPrioritarios">0</span> <span class="stack-lbl">Requisitos (Gap)</span> </div>
+                        <div class="stack-icon-wrapper"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> </div>
+                    </div>
+                    <div class="stack-card b-good">
+                        <div class="stack-text-group"> <span class="stack-val" id="countHomologados">0</span> <span class="stack-lbl">Homologados</span> </div>
+                        <div class="stack-icon-wrapper"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> </div>
+                    </div>
+                    <div class="stack-card b-sched">
+                        <div class="stack-text-group"> <span class="stack-val" id="countInscritos">0</span> <span class="stack-lbl">Inscritos</span> </div>
+                        <div class="stack-icon-wrapper"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14l2 2 4-4"></path></svg> </div>
+                    </div>
+                    <div class="stack-card b-blue">
+                        <div class="stack-text-group"> <span class="stack-val" id="countAgendados">0</span> <span class="stack-lbl">Agendados</span> </div>
+                        <div class="stack-icon-wrapper"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> </div>
+                    </div>
+                    <div class="stack-card b-done">
+                        <div class="stack-text-group"> <span class="stack-val" id="countRealizadosInternos">0</span> <span class="stack-lbl">Treinados</span> </div>
+                        <div class="stack-icon-wrapper"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg> </div>
+                    </div>
+                    <div class="stack-card b-miss">
+                        <div class="stack-text-group"> <span class="stack-val" id="countFaltas">0</span> <span class="stack-lbl">Faltas</span> </div>
+                        <div class="stack-icon-wrapper"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> </div>
+                    </div>
+                </div>
+                
+                <div class="right-text theme-blue">
+                    <div class="text-content">
+                        <h5 style="color: #93c5fd">Status da Gestão</h5>
+                        <p id="storyAgenda">Calculando...</p>
+                    </div>
+                    <div class="tab-illustration">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab3" class="tab-content">
+            <div class="split-layout">
+                <div class="left-stack" style="width: 220px;"> 
+                    <div class="score-main-card" id="scoreCardColor">
+                        <div class="score-header-row">
+                            <span class="score-label">Aderência à Função</span>
+                            <div class="info-trigger">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                <div class="tooltip-box" id="scoreCalculationDetails"></div>
+                            </div>
+                        </div>
+                        <div class="score-big-wrapper">
+                            <span id="scorePercent" class="score-val">0%</span>
+                        </div>
+                        <div class="progress-track small">
+                             <div class="progress-fill" id="progressBar"></div>
+                        </div>
+                        <span class="score-sub" id="scoreSubtext">Calculando...</span>
+                    </div>
+
+                    <div class="stack-card b-alert">
+                         <div class="stack-text-group">
+                            <span class="stack-val c-red" id="countCríticos">0</span>
+                            <span class="stack-lbl c-red">Pendências Críticas</span>
+                        </div>
+                         <div class="stack-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                         </div>
+                    </div>
+
+                    <div class="stack-card b-blue">
+                         <div class="stack-text-group">
+                            <span class="stack-val" id="countEmResolucao">0</span>
+                            <span class="stack-lbl">Já Inscritos / Agendados</span>
+                        </div>
+                         <div class="stack-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                         </div>
+                    </div>
+                </div>
+
+                <div class="right-text theme-indigo">
+                    <div class="text-content">
+                        <h5 style="color: #a5b4fc">Diagnóstico de Competência</h5>
+                        <p id="storyScore">
+                            Selecione um colaborador para visualizar o diagnóstico detalhado de aderência aos requisitos obrigatórios da função.
+                        </p>
+                    </div>
+                    <div class="tab-illustration">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+</main>
+
+<script src="../.bd-treinamentos/data.js"></script>       
+<script src="../.bd-treinamentos/db-handler.js"></script> 
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const sessionRaw = localStorage.getItem('rh_session');
+        
+        // 1. SEM LOGIN? CHUTA
+        if (!sessionRaw) {
+            console.warn("⛔ Acesso negado. Redirecionando...");
+            window.top.location.href = '../login.html'; 
+            return;
+        }
+
+        const session = JSON.parse(sessionRaw);
+
+        // 2. É ADMIN?
+        if (session.role === 'ADMIN') {
+            document.body.classList.add('is-admin');
+        } else {
+            // É VISITANTE? Mostra badge flexível
+            const badge = document.getElementById('viewerWarning');
+            if(badge) badge.style.display = 'flex';
+        }
+    });
+</script>
+
+<script src="../.scripts-treinamentos/individual-script.js"></script>
+</body>
+</html>

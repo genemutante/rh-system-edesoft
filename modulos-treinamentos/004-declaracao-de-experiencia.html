@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Homologação | Enterprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================================
+           RESET & ESTRUTURA 100VH
+           ========================================================= */
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; outline: none; }
+        
+        html, body {
+            height: 100%; margin: 0; padding: 0;
+            overflow: hidden; /* Trava a rolagem da janela principal */
+            display: flex; flex-direction: column;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* --- HEADER FIXO --- */
+        .app-header {
+            height: 56px; flex-shrink: 0;
+            background: #ffffff; border-bottom: 1px solid #cbd5e1;
+            display: flex; align-items: center; padding: 0 24px;
+            justify-content: flex-start; gap: 16px;
+            z-index: 20;
+        }
+        .app-header h1 { font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- WORKSPACE (Área Flexível) --- */
+        .workspace-split {
+            flex: 1; display: flex; 
+            height: calc(100% - 56px); /* Desconta o header */
+            overflow: hidden;
+        }
+
+        /* COLUNA ESQUERDA (SIDEBAR) */
+        .split-sidebar {
+            width: 320px; flex-shrink: 0;
+            background: #ffffff; border-right: 1px solid #cbd5e1;
+            display: flex; flex-direction: column;
+            overflow-y: auto; padding: 20px; gap: 20px;
+            z-index: 10;
+        }
+
+        /* COLUNA DIREITA (CONTEÚDO) */
+        .split-content {
+            flex: 1; display: flex; flex-direction: column;
+            background: #f8fafc; overflow: hidden; position: relative;
+        }
+
+        /* Área de Scroll do Formulário */
+        .form-scroll-surface {
+            flex: 1; overflow-y: auto; padding: 30px 40px;
+            scroll-behavior: smooth;
+        }
+
+        /* Rodapé Fixo */
+        .split-footer {
+            height: 64px; flex-shrink: 0;
+            background: #ffffff; border-top: 1px solid #cbd5e1;
+            display: flex; align-items: center; justify-content: flex-end;
+            padding: 0 30px; gap: 12px;
+        }
+
+        /* =========================================================
+           COMPONENTES DE FORMULÁRIO (ESTILO INTEGRADO)
+           ========================================================= */
+        .input-block { margin-bottom: 16px; }
+        .input-block label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; }
+        .input-block .helper { font-size: 11px; color: #94a3b8; margin-top: 4px; line-height: 1.4; }
+
+        .std-input, .std-select, .std-textarea {
+            width: 100%; padding: 10px 12px;
+            border: 1px solid #cbd5e1; border-radius: 6px;
+            font-size: 13px; color: #1e293b; background: #fff;
+            transition: all 0.2s;
+        }
+        .std-input:focus, .std-select:focus, .std-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .std-textarea { min-height: 120px; resize: vertical; }
+
+        /* CARDS DE OPÇÃO (RADIO) */
+        .option-card { cursor: pointer; display: block; position: relative; }
+        .option-card input { position: absolute; opacity: 0; }
+        .option-card-inner {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px;
+            background: #fff; transition: all 0.2s;
+        }
+        .option-card input:checked + .option-card-inner {
+            border-color: #3b82f6; background-color: #eff6ff;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+        }
+        
+        .icon-wrap { 
+            width: 36px; height: 36px; border-radius: 6px; 
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .icon-wrap svg { width: 18px; height: 18px; }
+        .bg-blue { background: #dbeafe; color: #2563eb; }
+        .bg-orange { background: #ffedd5; color: #ea580c; }
+
+        .opt-text strong { display: block; font-size: 12px; color: #0f172a; margin-bottom: 2px; }
+        .opt-text span { display: block; font-size: 10px; color: #64748b; }
+
+        /* SEÇÃO TÍTULO SIDEBAR */
+        .sidebar-heading {
+            font-size: 10px; font-weight: 800; color: #94a3b8; 
+            text-transform: uppercase; letter-spacing: 1px;
+            padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px;
+        }
+
+        /* GRID DUPLO (No conteúdo principal) */
+        .grid-row { display: flex; gap: 20px; }
+        .grid-col { flex: 1; }
+
+        /* ALERTAS */
+        .alert-box {
+            background: #fffbeb; border-left: 4px solid #f59e0b;
+            padding: 12px 16px; border-radius: 4px; margin-bottom: 20px;
+            font-size: 12px; color: #92400e;
+        }
+
+        /* =========================================================
+           BOTÕES & BADGES
+           ========================================================= */
+        .btn {
+            height: 36px; padding: 0 20px; border-radius: 6px; 
+            font-weight: 600; font-size: 13px; cursor: pointer; border: none;
+            display: inline-flex; align-items: center; justify-content: center; transition: 0.2s;
+        }
+        .btn-ghost { background: transparent; color: #64748b; border: 1px solid #cbd5e1; }
+        .btn-ghost:hover { background: #f1f5f9; color: #0f172a; }
+        .btn-primary { background: #0f172a; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-primary:hover { background: #334155; transform: translateY(-1px); }
+
+        /* Badge de Leitura */
+        .badge-read-mode {
+            display: none; align-items: center; gap: 6px;
+            background-color: #fff7ed; color: #c2410c; border: 1px solid #ffedd5;
+            font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 100px;
+        }
+        .badge-read-mode svg { width: 12px; height: 12px; }
+
+        /* =========================================================
+           SEGURANÇA (ADMIN ONLY)
+           ========================================================= */
+        .admin-only { display: none !important; }
+        body.is-admin .admin-only { display: inline-flex !important; }
+
+        /* Bloqueio de Inputs */
+        input:disabled, select:disabled, textarea:disabled, button:disabled {
+            background-color: #f8fafc !important; color: #94a3b8 !important;
+            cursor: not-allowed !important; border-color: #e2e8f0 !important; opacity: 0.8;
+        }
+        body:not(.is-admin) .option-card { pointer-events: none; opacity: 0.6; filter: grayscale(1); }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <h1>Homologação de Competência</h1>
+        
+        <div id="viewerWarning" class="badge-read-mode">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Modo Leitura</span>
+        </div>
+    </header>
+
+    <div class="workspace-split">
+        
+        <aside class="split-sidebar">
+            
+            <div class="sidebar-section">
+                <div class="sidebar-heading">1. Configuração</div>
+                
+                <div class="input-block">
+                    <label>Colaborador</label>
+                    <select id="selColaborador" class="std-select">
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+
+                <div class="input-block">
+                    <label>Curso / Competência</label>
+                    <select id="selCurso" class="std-select">
+                        <option value="">Selecione o curso...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-heading">2. Tipo de Evidência</div>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <label class="option-card">
+                        <input type="radio" name="tipoComprovacao" value="certificado" checked onclick="toggleForm()">
+                        <div class="option-card-inner">
+                            <div class="icon-wrap bg-blue">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            </div>
+                            <div class="opt-text">
+                                <strong>Certificado Externo</strong>
+                                <span>Curso realizado em outra instituição.</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="option-card">
+                        <input type="radio" name="tipoComprovacao" value="experiencia" onclick="toggleForm()">
+                        <div class="option-card-inner">
+                            <div class="icon-wrap bg-orange">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <div class="opt-text">
+                                <strong>Notório Saber</strong>
+                                <span>Experiência prática comprovada.</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+        </aside>
+
+        <main class="split-content">
+            
+            <div class="form-scroll-surface">
+                <h2 style="font-size: 14px; color: #0f172a; margin: 0 0 24px 0; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0;">
+                    3. Detalhes da Homologação
+                </h2>
+
+                <div id="formCertificado">
+                    <div class="input-block">
+                        <label>Instituição Emissora</label>
+                        <input type="text" id="certInstituicao" class="std-input" placeholder="Ex: Alura, Udemy, Coursera...">
+                    </div>
+
+                    <div class="grid-row">
+                        <div class="grid-col input-block">
+                            <label>Nome no Certificado</label>
+                            <input type="text" id="certNome" class="std-input" placeholder="Nome exato do curso...">
+                        </div>
+                        <div class="grid-col input-block">
+                            <label>Data de Conclusão</label>
+                            <input type="date" id="certData" class="std-input">
+                        </div>
+                    </div>
+
+                    <div class="input-block">
+                        <label>Link de Validação (URL)</label>
+                        <input type="url" id="certLink" class="std-input" placeholder="https://...">
+                        <div class="helper">Cole o link público para visualizar o certificado ou credencial.</div>
+                    </div>
+                </div>
+
+                <div id="formExperiencia" style="display: none;">
+                    <div class="alert-box">
+                        <strong>Processo de Auditoria:</strong> Esta declaração será enviada para validação técnica do gestor da área.
+                    </div>
+
+                    <div class="input-block">
+                        <label>Contexto de Aplicação</label>
+                        <textarea class="std-textarea" placeholder="Descreva em quais projetos ou situações reais você utilizou este conhecimento..."></textarea>
+                    </div>
+
+                    <div class="input-block">
+                        <label>Ferramentas Relacionadas</label>
+                        <input type="text" class="std-input" placeholder="Ex: Jira, Excel, SAP, Python...">
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="checkVerdade">
+                            <span style="font-size: 12px; color: #334155; font-weight: 500;">
+                                Declaro ser verdade que possuo o conhecimento necessário para esta competência.
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <footer class="split-footer">
+                <button class="btn btn-ghost" onclick="history.back()">Cancelar</button>
+                <button class="btn btn-primary" id="btnSubmit">Registrar Homologação</button>
+            </footer>
+
+        </main>
+    </div>
+
+    <script src="../.bd-treinamentos/data.js"></script> 
+    <script src="../.bd-treinamentos/db-handler.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sessionRaw = localStorage.getItem('rh_session');
+            
+            if (!sessionRaw) {
+                window.top.location.href = '../login.html'; 
+                return;
+            }
+
+            const session = JSON.parse(sessionRaw);
+
+            if (session.role === 'ADMIN') {
+                document.body.classList.add('is-admin');
+            } else {
+                const badge = document.getElementById('viewerWarning');
+                if(badge) badge.style.display = 'flex';
+                
+                const allInputs = document.querySelectorAll('input, select, textarea, button.btn-primary');
+                allInputs.forEach(el => {
+                    el.disabled = true;
+                    el.title = "Apenas administradores podem editar";
+                });
+            }
+        });
+    </script>
+
+    <script src="../.scripts-treinamentos/declaracao-script.js"></script>
+</body>
+</html>
