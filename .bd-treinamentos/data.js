@@ -1,0 +1,1 @@
+.bd-treinamentos\data.js
