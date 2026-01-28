@@ -1,0 +1,296 @@
+/* ==========================================================================
+   DESIGN SYSTEM - ENTERPRISE COMPACT & HIGH CONTRAST (v7.0 - Final Fix)
+   ========================================================================== */
+
+:root {
+    /* --- CORES PRINCIPAIS --- */
+    --primary: #4f46e5;       /* Indigo 600 */
+    --primary-hover: #4338ca; /* Indigo 700 */
+    
+    --bg-app: #f1f5f9;        /* Fundo Geral */
+    --bg-panel: #ffffff;      /* Fundo Branco */
+    
+    /* --- BARRAS & DESTAQUES (Onde você apontou as setas) --- */
+    --bar-bg: #1e293b;        /* Slate 800 (Fundo Escuro para Cabeçalhos) */
+    --bar-text: #f8fafc;      /* Texto Claro para Cabeçalhos */
+    --tab-bg: #e2e8f0;        /* Fundo da régua de abas (mais escuro que o branco) */
+    
+    --border-color: #cbd5e1;  /* Borda mais visível (Slate 300) */
+    
+    /* --- TEXTOS --- */
+    --text-main: #0f172a;     /* Slate 900 (Preto suave) */
+    --text-secondary: #334155;/* Slate 700 */
+    
+    /* --- METRICS (Compactas) --- */
+    --radius-md: 4px;
+    --radius-lg: 6px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* RESET RÍGIDO */
+* { box-sizing: border-box; outline: none; font-family: 'Inter', sans-serif; }
+
+html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px; /* Fonte compacta */
+    overflow: hidden;
+}
+
+body { display: flex; flex-direction: column; }
+
+/* ==========================================================================
+   1. TOP BAR (UNIFORMIZADO - LIGHT)
+   ========================================================================== */
+/* HEADER PADRONIZADO (Branco Clean) */
+.top-bar {
+    height: 56px;
+    background: #ffffff; /* Era #1e293b ou variações escuras */
+    color: #1e293b;      /* Texto escuro */
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    padding: 0 32px; 
+    flex-shrink: 0; 
+    z-index: 50;
+    border-bottom: 1px solid #e2e8f0; /* Divisória sutil */
+}
+
+.top-bar h1 { 
+    font-size: 18px; 
+    font-weight: 700; 
+    margin: 0; 
+    color: #1e293b;
+    letter-spacing: -0.5px;
+}
+/* ==========================================================================
+   2. LAYOUT PRINCIPAL
+   ========================================================================== */
+.container {
+    flex: 1; width: 100%; max-width: 1600px; margin: 0 auto;
+    padding: 10px 20px 0px 20px; /* Margens justas */
+    display: flex; flex-direction: column;
+    overflow: hidden; position: relative;
+}
+
+.content-view {
+    display: flex; flex-direction: column; height: 100%;
+    overflow: hidden; padding-bottom: 10px;
+}
+
+/* ==========================================================================
+   3. BARRA DE AÇÕES (FILTROS) - Com mais contraste
+   ========================================================================== */
+.actions-container {
+    background: #ffffff;
+    padding: 12px 16px; /* Padding reduzido */
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    border: 1px solid #94a3b8; /* Borda mais escura para definir a área */
+    border-radius: var(--radius-lg);
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Inputs e Selects da Barra */
+.search-input-wrapper input, .select-wrapper select {
+    background-color: #fff;
+    border: 1px solid #cbd5e1; /* Borda definida */
+    color: var(--text-main);
+    height: 36px; /* Altura padrão */
+    font-size: 13px;
+    border-radius: var(--radius-md);
+}
+.search-input-wrapper input:focus, .select-wrapper select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+/* Layout Interno da Barra */
+.toolbar-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+.search-input-wrapper { position: relative; width: 100%; max-width: 300px; }
+.search-input-wrapper input { width: 100%; padding-left: 32px; padding-right: 10px; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #64748b; width: 14px; }
+
+.counter-badge {
+    font-size: 11px; font-weight: 700; color: var(--primary);
+    background: #e0e7ff; padding: 2px 8px; border-radius: 4px; border: 1px solid #c7d2fe;
+}
+
+.toolbar-right { display: flex; align-items: center; gap: 8px; }
+.filters-group { display: flex; align-items: center; gap: 6px; }
+.select-wrapper { position: relative; min-width: 120px; }
+.select-wrapper select { padding: 0 24px 0 8px; appearance: none; }
+.select-wrapper::after {
+    content: ''; position: absolute; right: 8px; top: 50%; width: 8px; height: 8px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: center; background-size: contain;
+    transform: translateY(-50%); pointer-events: none;
+}
+
+/* Botões */
+.btn-primary-glow {
+    height: 36px; padding: 0 16px; background: var(--primary); color: white;
+    font-weight: 600; border: none; border-radius: var(--radius-md);
+    display: flex; align-items: center; gap: 6px;
+}
+.btn-icon-soft { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #64748b; cursor: pointer; }
+.vertical-divider { width: 1px; height: 20px; background: #cbd5e1; margin: 0 4px; }
+
+/* ==========================================================================
+   4. TABELA (GRID) - CABEÇALHO ESCURO (High Contrast)
+   ========================================================================== */
+.table-container {
+    flex: 1; display: flex; flex-direction: column; min-height: 0;
+    margin-top: 15px; /* Respiro pequeno */
+    background: #ffffff;
+    border: 1px solid #94a3b8; /* Borda externa firme */
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.table-scroll-area { flex: 1; overflow-y: auto; scrollbar-gutter: stable; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+
+/* --- AQUI ESTÁ A MUDANÇA: CABEÇALHO ESCURO --- */
+thead th {
+    position: sticky; top: 0; z-index: 10;
+    background-color: var(--bar-bg); /* FUNDO ESCURO */
+    color: var(--bar-text);          /* TEXTO BRANCO */
+    padding: 10px 16px;
+    text-align: left; font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.03em;
+    border-bottom: 1px solid #0f172a;
+    white-space: nowrap;
+}
+
+tbody td {
+    padding: 8px 16px; /* Padding compacto */
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: var(--text-secondary);
+}
+tbody tr:hover { background-color: #f1f5f9; }
+
+/* Botões da Tabela */
+.actions-cell { display: flex; justify-content: flex-end; gap: 6px; }
+.btn-icon-action {
+    width: 26px; height: 26px; border-radius: 4px; border: 1px solid #cbd5e1;
+    background: white; color: #475569; display: flex; align-items: center; justify-content: center;
+}
+.btn-icon-action:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ==========================================================================
+   5. FORMULÁRIO - BARRA DE ABAS ESCURA
+   ========================================================================== */
+#viewForm {
+    height: 100%; display: flex; flex-direction: column; overflow: hidden;
+    background: var(--bg-panel);
+    border: 1px solid #94a3b8;
+    border-radius: var(--radius-lg);
+}
+
+.form-header {
+    height: 48px; padding: 0 20px;
+    border-bottom: 1px solid #cbd5e1;
+    display: flex; align-items: center; background: #fff;
+    flex-shrink: 0;
+}
+.form-header h2 { font-size: 15px; font-weight: 700; color: var(--text-main); margin: 0; }
+
+/* --- AQUI ESTÁ A MUDANÇA: BARRA DE ABAS --- */
+.form-tabs {
+    height: 42px;
+    background-color: var(--tab-bg); /* FUNDO CINZA ESCURO/DEFINIDO */
+    border-bottom: 1px solid #94a3b8; /* Linha divisória forte */
+    display: flex; align-items: flex-end;
+    padding: 0 20px; gap: 4px; flex-shrink: 0;
+}
+
+.tab-link {
+    padding: 8px 16px; font-size: 12px; font-weight: 600;
+    color: #475569; /* Texto cinza escuro */
+    background: transparent;
+    border: 1px solid transparent; border-bottom: none;
+    border-radius: 4px 4px 0 0; margin-bottom: -1px; cursor: pointer;
+    opacity: 0.8;
+}
+.tab-link:hover { opacity: 1; color: #0f172a; }
+
+/* Aba Ativa: Fica branca para contrastar com o fundo cinza da barra */
+.tab-link.active {
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid #94a3b8;
+    border-bottom-color: #fff; /* Conecta com o conteúdo */
+    border-top: 3px solid var(--primary);
+    opacity: 1;
+}
+
+/* Miolo */
+#mainForm {
+    flex: 1; overflow-y: auto; scrollbar-gutter: stable;
+    display: flex; flex-direction: column; min-height: 0;
+    background: #fff;
+}
+.tab-content { 
+    padding: 20px; /* Padding contido para não gerar rolagem extra */
+    max-width: 100%; 
+}
+
+/* Grid Compacto */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 20px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field.span-2 { grid-column: span 2; }
+.field.span-3 { grid-column: span 3; }
+.field.sep-line { height: 1px; background: #e2e8f0; margin: 8px 0; grid-column: span 3; }
+
+.field label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    color: #475569; /* Label escuro */
+}
+.field input, .field select, .field textarea {
+    height: 34px; padding: 0 10px; font-size: 13px;
+    border: 1px solid #cbd5e1; border-radius: var(--radius-md);
+    color: var(--text-main); background: #fff;
+}
+.field input:focus { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
+.field textarea { height: auto; padding: 8px; }
+
+/* Rodapé */
+.form-actions {
+    height: 56px; background: #f8fafc;
+    border-top: 1px solid #cbd5e1;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding: 0 20px; gap: 12px; flex-shrink: 0;
+}
+.btn-secondary { background: white; border: 1px solid #cbd5e1; color: #334155; height: 36px; padding: 0 16px; font-weight: 600; border-radius: var(--radius-md); }
+.btn-primary { background: var(--primary); border: none; color: white; height: 36px; padding: 0 20px; font-weight: 600; border-radius: var(--radius-md); }
+
+/* ==========================================================================
+   MODO LEITURA (CONSULTA) - Cartões Sólidos
+   ========================================================================== */
+.mode-view input, .mode-view select, .mode-view textarea {
+    background-color: #f1f5f9 !important; /* Cinza sólido */
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important; /* Texto Preto */
+    font-weight: 600 !important;
+    pointer-events: none; appearance: none;
+}
+.mode-view label { color: #64748b; }
+.mode-view #btnSalvar { display: none !important; }
+
+/* ==========================================================================
+   UTILITÁRIOS (Modal / Erro)
+   ========================================================================== */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+.modal-card { background: white; width: 400px; border-radius: 8px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
+.modal-header { background: #fee2e2; padding: 16px 20px; border-bottom: 1px solid #fecaca; display: flex; gap: 10px; align-items: center; }
+.modal-header h3 { margin: 0; color: #991b1b; font-size: 15px; }
+.modal-body { padding: 20px; }
+.modal-actions { padding: 16px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px; }
+.btn-danger-solid { background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; }
+.input-error { border-color: #ef4444 !important; background: #fef2f2 !important; }
+.error-message { color: #dc2626; font-size: 11px; font-weight: 600; }

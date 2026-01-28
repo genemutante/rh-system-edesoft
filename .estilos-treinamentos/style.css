@@ -1,1 +1,907 @@
-.estilos-treinamentos\style.css
+:root {
+    /* --- DIMENSÕES --- */
+    --cell-width: 24px;
+    --row-header-width: 280px;
+    --header-height: 200px;
+    --row-height: 32px; 
+    --bar-thickness: 10px;
+
+    /* --- CORES ESTRUTURAIS --- */
+    --bg-body: #f8fafc;
+    --bg-header: #ffffff;
+    --bg-hover: #f1f5f9;
+    --bg-hover-col: #eff6ff;
+    --border-color: #cbd5e1;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+
+    /* --- PALETA DE OBRIGATORIEDADE (OPÇÃO 4 - SLATE "GESTÃO") --- */
+    --grad-mandatory: linear-gradient(135deg, #475569 0%, #334155 100%); 
+    --color-mandatory: #475569; 
+    --bg-soft-mandatory: #f1f5f9; 
+
+    --grad-recommended: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    --color-recommended: #d97706;
+    --bg-soft-recommended: #fffbeb;
+
+    --color-none: #94a3b8; 
+    --bg-soft-none: #f8fafc; 
+    
+    /* --- PALETA CARGOS --- */
+    --c-red: #ef4444; 
+    --c-black: #1e293b; 
+    --c-grey: #64748b;
+    --c-orange: #f97316; 
+    --c-gold: #eab308; 
+    --c-blue-dark: #1e3a8a;
+    --c-blue-light: #3b82f6; 
+    --c-yellow: #facc15; 
+    --c-purple: #9333ea;
+    --c-green: #15803d; 
+    --c-cyan: #06b6d4;
+    
+    /* --- INTERAÇÃO --- */
+    --crosshair-bg: #fff7ed; 
+    --crosshair-border: #fdba74; 
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0; padding: 0;
+    background-color: var(--bg-body);
+    height: 100vh;
+    display: flex; flex-direction: column;
+    color: var(--text-primary);
+    overflow: hidden;
+    border-top: 8px solid #000;
+}
+
+/* ==========================================================================
+   1. CABEÇALHOS GERAIS & LEGENDA
+   ========================================================================== */
+.page-header { 
+    height: 38px; 
+    background: #000; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; /* Empurra Título p/ esq e Legenda p/ dir */
+    padding: 0 20px; 
+}
+.page-header h1 { 
+    color: #fff; 
+    font-size: 15px; 
+    font-weight: 800; 
+    margin: 0; 
+    letter-spacing: 0.5px; 
+}
+
+/* CONTAINER DA LEGENDA */
+.header-legend {
+    display: flex;
+    align-items: center;
+    gap: 24px; /* Espaço entre os itens */
+}
+
+/* CADA ITEM DA LEGENDA */
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espaço entre bolinha e texto */
+    color: #cbd5e1; /* Cinza claro para o texto */
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* AJUSTE DAS BOLINHAS NA LEGENDA */
+/* Usamos a mesma classe .status-dot para garantir fidelidade visual com a tabela */
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+}
+
+/* Ajuste específico para a bolinha escura aparecer no fundo preto */
+.legend-item .status-dot.O {
+    border: 1px solid rgba(255,255,255,0.3); /* Borda sutil para destacar do preto */
+}
+
+/* ==========================================================================
+   2. BARRA DE FILTROS (COMPACT MODE)
+   ========================================================================== */
+.filter-bar { 
+    height: 60px; /* Reduzido de 80px para 60px */
+    background: #ffffff; 
+    border-bottom: 1px solid #e2e8f0; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 0 20px; 
+    gap: 20px;
+    flex-shrink: 0;
+}
+
+.filter-group-left { 
+    display: flex; 
+    align-items: flex-end; 
+    gap: 10px; /* Menor gap */
+    flex-wrap: nowrap; 
+    flex: 1; 
+    min-width: 0; 
+}
+
+.filter-wrapper { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 3px; /* Menor espaço entre label e input */
+    justify-content: flex-end;
+}
+
+/* LABEL (Rótulo Menor) */
+.filter-label {
+    font-size: 9px; /* Reduzido de 10px */
+    font-weight: 700; 
+    color: #94a3b8; 
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 2px;
+    line-height: 1;
+}
+
+/* INPUTS E SELECTS (COMPACTOS) */
+.filter-select {
+    height: 28px; /* Reduzido de 36px para 28px */
+    padding: 0 8px;
+    border-radius: 4px; /* Raio menor */
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; /* Fonte reduzida */
+    font-weight: 600;
+    color: #334155;
+    background-color: #f1f5f9; 
+    border: 1px solid transparent;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.filter-select:hover { background-color: #e2e8f0; color: #1e293b; }
+.filter-select:focus { background-color: #ffffff; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
+
+/* --- CORREÇÃO CIRÚRGICA: POSIÇÃO DO X E TEXTO --- */
+
+
+/* --- CORREÇÃO FINAL: INPUT COMBOBOX (X + SETA + TEXTO) --- */
+
+input.combobox {
+    /* 1. Garante que a Seta Visível exista */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-size: 12px !important;
+    background-position: right 8px center !important; /* Seta colada na direita (8px) */
+
+    /* 2. PROTEÇÃO DO TEXTO: */
+    /* Cria uma margem interna de 55px na direita. */
+    /* O texto NUNCA vai passar daqui, evitando ficar embaixo do X. */
+    padding-right: 55px !important;
+    
+    /* Se o texto for maior que o espaço, mostra '...' */
+    text-overflow: ellipsis;
+}
+
+/* 3. POSICIONAMENTO DO BOTÃO 'X' */
+input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: searchfield-cancel-button;
+    
+    /* Tira do fluxo do texto e fixa na posição */
+    position: absolute !important;
+    
+    /* Posiciona a 30px da direita (logo à esquerda da seta) */
+    right: 30px !important;
+    top: 50%;
+    transform: translateY(-50%);
+    
+    /* Garante que seja clicável e visível */
+    display: block !important;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0.5; /* Levemente transparente */
+    margin: 0 !important;
+    height: 16px; width: 16px; /* Tamanho fixo de clique */
+}
+input[type="search"]::-webkit-search-cancel-button:hover {
+    opacity: 1;
+}
+
+/* 4. ÁREA DE CLIQUE DA SETA (Para abrir a lista) */
+input.combobox::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 25px; /* Cobre a área da seta visual (8px + margem) */
+    height: 100%;
+    opacity: 0 !important; /* Invisível, mas o clique abre o datalist */
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+}
+
+
+
+/* BUSCA (Lupa ajustada) */
+#textSearch {
+    padding-left: 28px !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 8px center;
+    background-size: 14px; /* Ícone menor */
+}
+
+/* BOTÃO LIMPAR COMPACTO */
+.btn-clear-icon {
+    height: 28px; /* Altura igual inputs */
+    width: 28px;
+    border-radius: 4px;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #94a3b8;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 4px;
+}
+.btn-clear-icon:hover { border-color: #ef4444; color: #ef4444; background-color: #fef2f2; }
+.btn-clear-icon svg { width: 14px; height: 14px; stroke-width: 2.5; }
+
+/* LARGURAS FIXAS (Levemente reduzidas para harmonia) */
+#roleFilter     { width: 250px; }
+#categoryFilter { width: 250px; }
+#statusFilter   { width: 130px; }
+#textSearch     { width: 150px; }
+
+/* ==========================================================================
+   3. LUPA DE FILTROS (ESTILO HUD DARK RED)
+   ========================================================================== */
+
+/* Container Principal */
+.lupafiltros-wrapper {
+    display: flex; 
+    flex-direction: column; 
+    justify-content: flex-end; 
+    gap: 3px; 
+    margin-left: auto; 
+    flex-shrink: 0;
+}
+
+/* Título Superior "LUPA DO FILTRO" */
+.lupafiltros-top-label {
+    font-family: 'Inter', sans-serif; 
+    font-size: 9px; 
+    font-weight: 800; 
+    
+    /* MUDANÇA: Vermelho Bem Escuro (Tom Bordo/Sangue) */
+    color: #991b1b; 
+    
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+    line-height: 1;
+    display: flex; 
+    align-items: center; 
+    gap: 4px; 
+    margin-left: 2px; 
+    margin-bottom: 0;
+    
+    background: transparent; border: none; box-shadow: none; height: auto; padding: 0;
+}
+/* Ícone acompanha a cor do título */
+.lupafiltros-top-label svg { width: 10px; height: 10px; color: #991b1b; }
+
+/* A Caixa (Painel) */
+.lupafiltros-panel {
+    display: flex; 
+    align-items: center; 
+    
+    background-color: #1e293b; /* Fundo Escuro */
+    border: 1px solid #451a03; 
+    border-bottom: 2px solid #fbbf24; /* Mantive o detalhe amarelo embaixo para combinar com o texto de valor */
+    
+    border-radius: 4px; 
+    height: 28px; 
+    padding: 0 12px; 
+    gap: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* Itens Internos */
+.lupafiltros-item { 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    line-height: 1; 
+}
+
+/* Rótulo Pequeno (Ex: CARGO) */
+.lupafiltros-key { 
+    font-size: 7px; 
+    font-weight: 700; 
+    
+    /* MUDANÇA: Branco Puro para contraste máximo */
+    color: #ffffff; 
+    
+    text-transform: uppercase; 
+    margin-bottom: 2px; 
+    opacity: 0.8; /* Leve transparência para não brigar com o valor principal */
+}
+
+/* Valor (Ex: Global) */
+.lupafiltros-val { 
+    font-size: 10px; 
+    font-weight: 800; 
+    
+    /* Mantido Amarelo Ouro para o dado em si (Destaque) */
+    color: #fbbf24 !important; 
+    
+    white-space: nowrap; 
+    max-width: 260px; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+/* Divisória Vertical */
+.lupafiltros-divider { 
+    width: 1px; 
+    height: 16px; 
+    background-color: #475569; 
+}
+
+.hidden { display: none !important; }
+
+/* ==========================================================================
+   4. ESTRUTURA DA TABELA
+   ========================================================================== */
+.table-wrapper { flex: 1; overflow: auto; position: relative; scroll-behavior: smooth; background: #fff; }
+table { border-collapse: separate; border-spacing: 0; width: max-content; }
+th, td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); margin: 0; padding: 0; }
+
+thead th {
+    position: sticky; top: 0; 
+    height: var(--header-height); width: var(--cell-width);
+    z-index: 20; 
+    background: var(--bg-header); vertical-align: bottom; padding: 0; 
+    font-size: 11px; font-weight: 600; color: #0f172a; border-bottom: 3px solid #000; 
+    cursor: pointer; transition: background 0.1s; 
+}
+thead th:hover { background-color: #f8fafc; }
+thead th:hover .vertical-text { color: #ea580c; } 
+.role-wrapper { width: var(--cell-width); height: 100%; position: relative; display: flex; align-items: flex-end; border-top: var(--bar-thickness) solid transparent; box-sizing: border-box; background: #fff; }
+.vertical-text { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; text-align: left; padding: 12px 4px; width: 100%; }
+
+/* --- AJUSTE CRÍTICO PARA TOOLTIP FUNCIONAR (LINHA) --- */
+tbody th {
+    position: sticky; left: 0; 
+    z-index: 10; 
+    width: var(--row-header-width); max-width: var(--row-header-width);
+    background: var(--bg-header); color: var(--text-primary); font-size: 11px; font-weight: 600; 
+    text-align: left; padding: 0 16px; height: var(--row-height); 
+    
+    /* MUDANÇA: Overflow visible permite que o balão saia da caixa */
+    overflow: visible; 
+    
+    border-right: 1px solid var(--border-color); 
+    box-shadow: inset var(--bar-thickness) 0 0 0 var(--cat-color, #ccc); cursor: default; 
+    vertical-align: middle; /* Alinha a div interna */
+}
+
+/* NOVA CLASSE: Para cortar o texto dentro do TH sem cortar o balão */
+.cell-truncate {
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    width: 100%;
+    display: block;
+}
+
+td { width: var(--cell-width); height: var(--row-height); text-align: center; vertical-align: middle; background: #fff; cursor: crosshair; }
+.cell-content { display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; }
+.status-dot { width: 12px; height: 12px; border-radius: 50%; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+.status-dot.O { background: var(--grad-mandatory); box-shadow: 0 2px 4px rgba(71, 85, 105, 0.3); } 
+.status-dot.R { border: 2px solid var(--color-recommended); background: transparent; }
+td:hover .status-dot { transform: scale(1.5); }
+
+/* ==========================================================================
+   5. LUPA DE INSPEÇÃO (TOP LEFT CORNER HUD)
+   ========================================================================== */
+.top-left-corner {
+    position: sticky !important;
+    left: 0 !important;
+    top: 0 !important;
+    z-index: 50 !important;
+    width: var(--row-header-width) !important;
+    height: var(--header-height) !important;
+    background: #f8fafc;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 3px solid #000;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.05); 
+    padding: 0 !important;
+    vertical-align: top !important;
+    overflow: hidden;
+}
+
+.hud-card { position: absolute; inset: 0; display: flex !important; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; border: none; background: transparent; }       
+.hud-top-label { flex: 0 0 40px !important; width: 100%; height: 40px !important; padding: 0 16px; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; background: #1e293b; color: #ffffff; text-transform: uppercase; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.1); z-index: 5; }
+.hud-top-label svg { width: 14px; height: 14px; color: #38bdf8; }
+.hud-scan, .hud-data-state { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; } 
+.hud-scan { display: flex; align-items: center; justify-content: center; color: #cbd5e1; gap: 10px; z-index: 10; }
+.hud-data-state { display: none; }
+
+.hud-body {
+    flex: 1; display: flex; flex-direction: column; justify-content: flex-start !important;
+    align-items: flex-start !important; text-align: left !important; padding: 6px 12px !important; 
+    gap: 2px !important; overflow: hidden; width: 100%; 
+    transition: background-color 0.2s ease; 
+}
+
+.hud-footer { flex: 0 0 40px !important; width: 100%; margin-top: auto; z-index: 10; height: 40px !important; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1px; gap: 8px; margin: 0; padding: 0; transition: background 0.3s ease; }
+.hud-footer svg { width: 16px; height: 16px; }
+
+.hud-group { display: flex; flex-direction: column; align-items: flex-start !important; width: 100%; margin: 0 !important; gap: 2px !important; }
+.hud-label-row { display: flex; align-items: center; gap: 6px; }
+.hud-icon { width: 14px; height: 14px; color: #64748b; display: flex; align-items: center; } 
+.info-label { font-size: 9px !important; font-weight: 700 !important; color: #94a3b8 !important; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px !important; }
+
+.info-value, .role-value {
+    height: auto !important; min-height: 40px !important; width: 100% !important;
+    text-align: left !important; margin: 0 !important; display: -webkit-box !important;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    font-size: 13px !important; line-height: 1.35 !important; font-weight: 800 !important; 
+    color: #0f172a !important; 
+    padding: 0px 12px !important; border-radius: 0 4px 4px 0 !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+    background-color: #f8fafc !important; 
+    border-left: 4px solid #0f172a !important;
+    transition: background-color 0.2s, border-left-color 0.2s;
+}
+
+.role-value { height: 38px !important; font-size: 14px !important; color: #475569 !important; }
+
+/* CORES DINÂMICAS HUD */
+.hud-body.bg-mandatory { background-color: var(--bg-soft-mandatory) !important; }
+.hud-body.bg-mandatory .info-value, .hud-body.bg-mandatory .role-value { background-color: transparent !important; border-left-color: var(--color-mandatory) !important; box-shadow: none !important; }
+.hud-body.bg-recommended { background-color: var(--bg-soft-recommended) !important; }
+.hud-body.bg-recommended .info-value, .hud-body.bg-recommended .role-value { background-color: transparent !important; border-left-color: var(--color-recommended) !important; box-shadow: none !important; }
+.hud-body.bg-none { background-color: var(--bg-soft-none) !important; }
+.hud-body.bg-none .info-value, .hud-body.bg-none .role-value { background-color: transparent !important; border-left-color: var(--color-none) !important; box-shadow: none !important; }
+
+.scan-icon-large { width: 40px; height: 40px; animation: pulse 2s infinite; color: #cbd5e1; }
+.scan-msg { font-size: 12px; font-weight: 500; color: #94a3b8; text-align: center; line-height: 1.5; }
+@keyframes pulse { 0% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.6; transform: scale(1); } }
+.animate-entry { animation: slideUpFade 0.2s ease-out forwards; }
+@keyframes slideUpFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+.status-bg-mandatory { background: var(--grad-mandatory); }
+.status-bg-recommended { background: var(--grad-recommended); }
+.status-bg-none { background: #e2e8f0; color: #94a3b8; border-top: 1px solid #cbd5e1; }
+
+/* ==========================================================================
+   6. CROSSHAIR & SELEÇÃO (PERFORMANCE MODE)
+   ========================================================================== */
+th.hover-col-header, th.selected-col-header { 
+    background-color: #fff7ed !important; 
+    border-bottom: 3px solid var(--c-orange) !important;
+    box-shadow: none !important; 
+    z-index: 100; 
+    transition: all 0.1s ease; 
+}
+
+th.hover-col-header .role-wrapper, th.selected-col-header .role-wrapper { 
+    background: transparent !important; 
+    border-top-color: transparent !important; 
+}
+
+th.hover-col-header .vertical-text, th.selected-col-header .vertical-text { 
+    color: #ea580c !important; 
+    font-weight: 800; 
+}
+
+.hover-col, .selected-col { 
+    background-color: var(--crosshair-bg) !important;
+    border-left: 1px solid var(--crosshair-border) !important; 
+    border-right: 1px solid var(--crosshair-border) !important; 
+}
+
+/* EFEITO DE HOVER NA LINHA (AJUSTE Z-INDEX) */
+tbody tr:hover > td, 
+tbody tr:hover > th { 
+    background-color: var(--crosshair-bg) !important; 
+    border-top: 1px solid var(--crosshair-border) !important; 
+    border-bottom: 1px solid var(--crosshair-border) !important; 
+    position: relative; 
+    z-index: 1; 
+}
+
+/* AJUSTE DO CABEÇALHO LATERAL NO HOVER */
+tbody tr:hover > th { 
+    color: #ea580c !important; 
+    background-color: #fff7ed !important; 
+    border-right: 3px solid var(--c-orange) !important; 
+    /* IMPORTANTE: Z-Index alto para o balão flutuar sobre as células */
+    z-index: 1000 !important; 
+}
+
+tbody tr:hover td.hover-col, tbody tr:hover td.selected-col { 
+    background-color: #ffffff !important; 
+    outline: 2px solid var(--c-orange) !important; 
+    box-shadow: none !important;
+    z-index: 50; 
+    cursor: none; 
+}
+
+/* ==========================================================================
+   7. UTILITÁRIOS
+   ========================================================================== */
+.b-red { border-top-color: var(--c-red); } .b-black { border-top-color: var(--c-black); }
+.b-grey { border-top-color: var(--c-grey); } .b-orange { border-top-color: var(--c-orange); }
+.b-gold { border-top-color: var(--c-gold); } .b-blue-dark { border-top-color: var(--c-blue-dark); }
+.b-blue-light { border-top-color: var(--c-blue-light); } .b-yellow { border-top-color: var(--c-yellow); }
+.b-purple { border-top-color: var(--c-purple); } .b-cyan { border-top-color: var(--c-cyan); }
+.btn-clear-filters { padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155; font-size: 13px; cursor: pointer; transition: all .15s ease; }
+.btn-clear-filters:hover { background: #e2e8f0; } 
+#statusFilter { display: block !important; }
+#statusWrapper { display: flex; flex-direction: column; gap: 4px; }
+
+/* FIXES FINAIS */
+input[list]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
+input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: searchfield-cancel-button !important; display: inline-block !important; cursor: pointer; filter: grayscale(100%) opacity(0.6); margin-left: 8px; }
+input[type="search"]::-webkit-search-cancel-button:hover { filter: grayscale(0%) opacity(1); }
+
+
+
+/* ==========================================================================
+   8. MODAL E FORMULÁRIOS (ADMIN UI)
+   ========================================================================== */
+
+/* Botão Primary (Azul Destaque) */
+.btn-primary {
+    display: flex; align-items: center; gap: 6px;
+    background-color: #0f172a; color: #fff;
+    border: 1px solid #0f172a; border-radius: 6px;
+    padding: 0 16px; height: 36px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.2);
+}
+.btn-primary:hover { background-color: #334155; transform: translateY(-1px); }
+.btn-primary svg { width: 14px; height: 14px; }
+
+.btn-ghost {
+    background: transparent; color: #64748b; border: 1px solid transparent;
+    padding: 0 16px; height: 36px; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.btn-ghost:hover { color: #0f172a; background: #f1f5f9; border-radius: 6px; }
+
+/* Overlay (Fundo Escuro) */
+.modal-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 1; transition: opacity 0.2s;
+}
+.modal-overlay.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+
+/* Card do Modal */
+.modal-card {
+    background: #fff; width: 450px; max-width: 90%;
+    border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden; transform: scale(1); transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-overlay.hidden .modal-card { transform: scale(0.95); }
+
+/* Header */
+.modal-header {
+    padding: 16px 24px; border-bottom: 1px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: center;
+    background: #f8fafc;
+}
+.modal-header h3 { margin: 0; font-size: 14px; font-weight: 800; color: #0f172a; text-transform: uppercase; }
+.btn-close-modal { background: none; border: none; font-size: 18px; color: #94a3b8; cursor: pointer; }
+.btn-close-modal:hover { color: #ef4444; }
+
+/* Body */
+.modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+
+.form-input, .form-textarea {
+    padding: 10px 12px; border-radius: 6px; border: 1px solid #cbd5e1;
+    font-family: 'Inter', sans-serif; font-size: 13px; color: #1e293b; outline: none; transition: all 0.2s;
+}
+.form-input:focus, .form-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+.form-row { display: flex; gap: 16px; }
+.form-group.half { flex: 1; }
+
+/* Color Picker Customizado */
+.color-picker-wrapper {
+    display: flex; align-items: center; gap: 10px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px;
+}
+input[type="color"] {
+    -webkit-appearance: none; border: none; width: 24px; height: 24px; padding: 0; background: none; cursor: pointer;
+}
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+#hexColorDisplay { font-size: 12px; font-weight: 600; color: #64748b; font-family: monospace; }
+
+/* Footer */
+.modal-footer {
+    padding: 16px 24px; border-top: 1px solid #e2e8f0; background: #f8fafc;
+    display: flex; justify-content: flex-end; gap: 12px;
+}
+/* ==========================================================================
+   TOOLTIP DESCRITIVA DO CURSO (CSS PURO)
+   ========================================================================== */
+
+/* O BALÃO DE TEXTO (Invisível por padrão) */
+tbody th[data-tooltip]::after {
+    content: attr(data-tooltip); 
+    position: absolute;
+    left: 100%; 
+    top: 50%;
+    transform: translateY(-50%) translateX(10px); 
+    
+    background-color: #0f172a; 
+    color: #f1f5f9; 
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: left;
+    
+    width: max-content;
+    max-width: 250px; 
+    padding: 8px 12px;
+    border-radius: 6px;
+    
+    z-index: 9999; 
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    pointer-events: none; 
+    white-space: normal; 
+    
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* A SETINHA (Triângulo) */
+tbody th[data-tooltip]::before {
+    content: "";
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(4px);
+    
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent #0f172a transparent transparent; 
+    
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* HOVER */
+tbody th:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(16px); 
+}
+
+tbody th:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(4px);
+}
+
+/* ==========================================================================
+   ATUALIZAÇÃO: ESTILO DA CÉLULA DE CABEÇALHO (Categoria + Curso)
+   ========================================================================== */
+
+/* Ajuste na célula header da linha para permitir flex column */
+.row-header-content {
+    display: flex;
+    flex-direction: column; /* Empilha Categoria e Nome */
+    justify-content: center;
+    align-items: flex-start;
+    height: 100%;
+    width: 100%;
+    padding-right: 20px; /* Espaço para o ícone de info se houver */
+    position: relative;
+}
+
+/* Badge da Categoria */
+.cat-badge {
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: #f1f5f9;
+    color: #64748b;
+    margin-bottom: 4px;
+    border: 1px solid #cbd5e1;
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Nome do Curso */
+.course-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limita a 2 linhas */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Ajuste fino na altura da linha para acomodar 2 linhas de texto */
+:root {
+    --row-height: 22px; /* Aumentei levemente de 32px para 44px para caber a categoria */
+}
+
+/* Mantém o tooltip funcionando */
+tbody th {
+    height: var(--row-height);
+    padding: 0 10px;
+    background: #fff;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    left: 0;
+    z-index: 20;
+    text-align: left;
+    vertical-align: middle;
+}
+
+
+/* ==========================================================================
+   9. SEGURANÇA (MODO ADMIN vs LEITURA)
+   ========================================================================== */
+
+/* Padrão (Leitura): Esconde elementos de admin */
+.admin-only { display: none !important; }
+
+/* Cursor padrão nas linhas (não parece clicável) */
+.row-header-content { cursor: default !important; }
+.row-header-content:hover { background: transparent !important; }
+
+/* --- QUANDO O MODO ADMIN ESTÁ ATIVO (Classe na tag body) --- */
+
+/* Mostra botões de admin */
+body.is-admin .admin-only { display: flex !important; }
+
+/* Ativa cursor e hover nas linhas para indicar edição */
+body.is-admin .row-header-content { cursor: pointer !important; }
+body.is-admin .row-header-content:hover { background-color: #fff7ed !important; border-radius: 4px; }
+
+/* Botão do Cadeado */
+.btn-lock {
+    background: transparent; border: 1px solid #cbd5e1; color: #64748b;
+    width: 36px; height: 36px; border-radius: 6px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+}
+.btn-lock:hover { background: #e2e8f0; color: #0f172a; }
+
+/* Estilo Desbloqueado (Verde) */
+.btn-lock.unlocked {
+    background-color: #dcfce7; border-color: #22c55e; color: #15803d;
+}
+
+/* Ajuste específico para o input de senha */
+#inputSenhaAdmin:focus {
+    border-color: #0f172a; /* Borda escura quando foca */
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+}
+
+/* Animação de "Tremer" quando erra a senha */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+.shake { animation: shake 0.3s ease-in-out; border-color: #ef4444 !important; }
+
+
+/* --- INTERAÇÃO NAS CÉLULAS (EDICÃO DE RELAÇÃO) --- */
+
+/* Quando estiver em modo Admin, a célula vira um botão */
+body.is-admin tbody td {
+    cursor: pointer !important;
+}
+
+/* Feedback visual ao passar o mouse para editar */
+body.is-admin tbody td:hover::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border: 2px dashed #94a3b8; /* Borda tracejada indicando edição */
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* ==========================================================================
+   10. MENU DE CONTEXTO (POPUP DE CÉLULA)
+   ========================================================================== */
+
+.menu-overlay {
+    position: fixed; inset: 0; z-index: 9998; /* Fica atrás do menu, na frente de tudo */
+    background: transparent;
+}
+
+.context-menu {
+    position: absolute; /* Posicionado via JS */
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 6px;
+    z-index: 9999;
+    min-width: 160px;
+    display: flex; flex-direction: column; gap: 2px;
+    
+    /* Animação suave */
+    transform-origin: top left;
+    animation: scaleIn 0.1s ease-out;
+}
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+.context-menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px; font-weight: 600; color: #334155;
+    transition: background 0.1s;
+}
+
+.context-menu-item:hover { background-color: #f1f5f9; color: #0f172a; }
+
+/* Ajuste visual das bolinhas dentro do menu */
+.context-menu-item .status-dot { width: 10px; height: 10px; }
+
+
+/* CAIXA DE AUDITORIA VISUAL */
+.audit-box {
+    background-color: #1e293b; /* Fundo escuro */
+    border-radius: 6px;
+    padding: 12px;
+    font-family: 'Courier New', monospace; /* Fonte de código */
+    font-size: 11px;
+    border: 1px solid #334155;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.audit-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    border-bottom: 1px dashed #334155;
+    padding-bottom: 2px;
+}
+.audit-row:last-child { border-bottom: none; margin-bottom: 0; }
+
+.audit-label { color: #94a3b8; font-weight: 700; }
+.audit-val { color: #22c55e; font-weight: 400; letter-spacing: 0.5px; } /* Verde terminal */
+
+

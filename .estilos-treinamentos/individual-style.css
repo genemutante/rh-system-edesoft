@@ -1,0 +1,728 @@
+/* individual-style.css - Painel Largo (Wide) com Ilustração Fixa */
+
+/* ESTRUTURA GLOBAL */
+/* Garante fonte nos elementos de formulário */
+.individual-dashboard input, 
+.individual-dashboard select, 
+.individual-dashboard button {
+    font-family: 'Inter', sans-serif;
+}
+/* HEADER PADRONIZADO */
+/* HEADER PADRONIZADO */
+.page-header {
+    height: 56px !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    display: flex !important; 
+    align-items: center !important;
+    padding: 0 32px !important;
+    flex-shrink: 0 !important;
+    color: #1e293b !important;
+}
+
+.page-header h1 {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    margin: 0 !important;
+    letter-spacing: -0.5px !important;
+}
+
+/* FILTROS */
+.filter-bar {
+    height: auto !important; min-height: 60px;
+    padding: 8px 20px;
+    display: flex; align-items: center; justify-content: flex-start !important;
+    gap: 15px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
+}
+/* Ajuste fino para os botões de toggle */
+.status-toggles { 
+    display: flex; 
+    gap: 4px; 
+    height: 28px; /* Altura fixa para alinhar com os selects */
+    align-items: center;
+}
+
+.btn-toggle { 
+    padding: 0 12px; /* Largura interna confortável */
+    height: 100%;    /* Ocupa a altura do pai */
+    border: 1px solid #cbd5e1; 
+    background: #f1f5f9; 
+    border-radius: 4px; 
+    
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; 
+    font-weight: 600; 
+    color: #64748b; 
+    
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    white-space: nowrap; /* Impede quebra de texto */
+}
+
+.btn-toggle:hover { 
+    background: #e2e8f0; 
+    color: #334155;
+}
+
+.btn-toggle.active { 
+    background: #1e293b; /* Azul Escuro (Slate 800) */
+    color: white; 
+    border-color: #1e293b; 
+    font-weight: 700;
+}
+input[list].combobox { cursor: pointer; font-size: 11px; }
+
+/* LAYOUT PRINCIPAL (Equilíbrio ajustado para Texto) */
+.dashboard-content {
+    display: flex; padding: 20px; gap: 24px; flex: 1; overflow: hidden;
+}
+
+.main-column {
+    flex: 1; /* Tabela ocupa o espaço restante */
+    display: flex; flex-direction: column; gap: 10px; min-width: 0;
+}
+
+.side-panel {
+    flex: 0 0 560px; /* BEM MAIS LARGO: 560px para leitura perfeita */
+    display: flex; flex-direction: column; gap: 0;
+    background: white; border-radius: 8px; border: 1px solid #e2e8f0;
+    overflow: hidden; 
+}
+
+/* ABAS */
+.tabs-nav {
+    display: flex;
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+}
+.tab-btn {
+    flex: 1;
+    padding: 14px 0;
+    border: none; background: transparent;
+    font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+}
+.tab-btn:hover { background: #e2e8f0; color: #1e293b; }
+.tab-btn.active { background: #fff; color: #1e293b; border-bottom-color: #3b82f6; }
+
+.tab-content {
+    display: none; 
+    padding: 24px; /* Mais padding interno para elegância */
+    height: 100%;
+}
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+
+/* --- LAYOUT DIVIDIDO (STACK + TEXTO) --- */
+.split-layout {
+    display: flex;
+    gap: 20px; /* Gap maior */
+    height: 100%; 
+    align-items: flex-start;
+}
+
+
+/* --- COLUNA ESQUERDA: PILHA DE CARDS (Ajustada para Textos Longos) --- */
+.left-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 165px; /* Aumentado para caber "Não Obrigatórios" */
+    flex-shrink: 0;
+}
+
+.stack-card {
+    background: white;
+    border: 1px solid #f1f5f9;
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start; /* Mantém alinhado à esquerda */
+    height: auto;
+    min-height: 64px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+    transition: all 0.2s ease;
+}
+.stack-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
+
+/* Wrapper do Ícone (Esquerda) */
+.stack-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    
+    order: -1; 
+    margin-right: 12px; /* Um pouco mais de respiro */
+    margin-left: 0;
+}
+
+.stack-icon-wrapper svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+/* Texto (Direita do ícone) */
+.stack-text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    flex: 1;
+}
+
+.stack-val { font-size: 18px; font-weight: 800; color: #0f172a; line-height: 1; margin-bottom: 3px; }
+.stack-lbl { 
+    font-size: 9px; 
+    font-weight: 800; /* Um pouco mais grosso para leitura em tamanho pequeno */
+    color: #64748b; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+}
+
+/* Manutenção das cores (sem alterações aqui) */
+.b-total .stack-icon-wrapper { background-color: #f1f5f9; color: #334155; }
+.b-obrig .stack-icon-wrapper, .b-prio .stack-icon-wrapper, .b-warn .stack-icon-wrapper { background-color: #fef9c3; color: #ca8a04; }
+.b-recom .stack-icon-wrapper { background-color: #ecfeff; color: #0891b2; }
+.b-none .stack-icon-wrapper { background-color: #f8fafc; color: #94a3b8; }
+.b-sched .stack-icon-wrapper, .b-blue .stack-icon-wrapper { background-color: #eff6ff; color: #2563eb; }
+.b-done .stack-icon-wrapper, .b-good .stack-icon-wrapper { background-color: #f0fdf4; color: #16a34a; }
+.b-miss .stack-icon-wrapper, .b-alert .stack-icon-wrapper { background-color: #fef2f2; color: #dc2626; }
+
+
+
+
+
+/* COLUNA DIREITA: TEXTO NARRATIVO */
+/* --- COLUNA DIREITA: TEXTO NARRATIVO (REFINADO) --- */
+.right-text {
+    flex: 1;
+    background: #1e293b;
+    border-radius: 8px;
+    padding: 28px; /* Mais respiro interno */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 300px;
+    position: relative; /* Necessário para o SVG absoluto */
+    overflow: hidden; /* Garante que o SVG não vaze */
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.2); /* Profundidade sutil */
+}
+
+.text-content {
+    position: relative;
+    z-index: 2; /* Texto fica ACIMA da imagem */
+}
+
+/* TÍTULO: Mais discreto e elegante */
+.right-text h5 {
+    margin: 0 0 16px 0;
+    font-size: 11px; /* Reduzido para não brigar */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px; /* Mais espaçamento entre letras */
+    opacity: 0.7;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 12px;
+}
+
+/* TEXTO: Menor, mais leve e com leitura melhor */
+.right-text p {
+    margin: 0;
+    font-size: 13px; /* Tamanho ideal de leitura */
+    line-height: 1.8; /* Entrelinha generosa (o segredo do respiro) */
+    color: #e2e8f0;
+    position: relative;
+    z-index: 2; /* Fica acima da imagem */
+    font-weight: 400;
+    max-width: 95%; /* Evita que o texto bata na borda direita */
+}
+
+.right-text p strong {
+    font-weight: 600;
+    color: #fff;
+}
+
+.right-text.theme-blue { 
+    background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%); 
+}
+
+/* ILUSTRAÇÃO SVG DE FUNDO (ESTILO MARCA D'ÁGUA) */
+.tab-illustration {
+    position: absolute;
+    bottom: -20px;    /* Ancorada bem no canto */
+    right: -20px;     /* Ancorada bem no canto */
+    opacity: 0.05;    /* MUITO SUTIL (Quase invisível, apenas textura) */
+    color: white;
+    transform: rotate(-10deg) scale(1.2); /* Leve rotação */
+    pointer-events: none; /* Não interfere no clique */
+    z-index: 1;
+}
+
+.tab-illustration svg { 
+    width: 220px; /* Bem grande para preencher o fundo */
+    height: 220px; 
+}
+/* Score */
+.progress-container { width: 100%; margin-top: 30px; position: relative; z-index: 2; }
+.progress-label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; font-weight: 700; }
+.progress-track { height: 12px; background: #334155; border-radius: 6px; overflow: hidden; width: 100%; }
+.progress-fill { height: 100%; background: #22c55e; width: 0%; transition: width 1s ease; }
+
+/* Componentes Tabela */
+/* --- HEADER DO COLABORADOR (Com Contador e Layout Flex) --- */
+.colab-name-card {
+    background: #1e293b;
+    padding: 15px 20px; /* Padding confortável */
+    border-radius: 6px;
+    color: white;
+    border-bottom: 3px solid #f59e0b; /* Laranja/Amber */
+    flex-shrink: 0;
+    
+    /* Flexbox para separar Nome (esquerda) e Contador (direita) */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px; /* Garante que não colem se a tela for pequena */
+}
+
+/* Wrapper para o Nome e Cargo (Esquerda) */
+.card-info-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.colab-name-card h2 { 
+    margin: 0; 
+    font-size: 18px; 
+    color: #fbbf24; 
+    line-height: 1.2;
+}
+
+.cargo-badge { 
+    font-size: 11px; 
+    color: #94a3b8; 
+    font-weight: 500; 
+    margin-top: 2px; 
+    display: block; 
+}
+
+/* --- CARD DO CONTADOR (Direita) --- */
+.grid-summary {
+    background: rgba(255, 255, 255, 0.1); /* Fundo vidro sutil */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 6px;
+    
+    /* Flex vertical para alinhar Números em cima e Texto em baixo */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Alinha tudo à direita */
+    justify-content: center;
+    
+    min-width: 130px; /* Largura mínima para não quebrar */
+}
+
+.summary-numbers {
+    display: flex;
+    align-items: baseline; /* Alinha números pela base */
+    gap: 6px; /* Espaço entre "117" e "de 117" */
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+/* Estilos específicos dos números (IDs usados no JS) */
+#lblFiltrados {
+    color: #ffffff; 
+    font-size: 22px; 
+    font-weight: 800;
+}
+
+#lblTotal {
+    color: #94a3b8; /* Cinza para o total */
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.summary-label {
+    font-size: 10px;
+    color: #cbd5e1; /* Texto quase branco */
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+/* --- ESTILOS DA TABELA E CONTAINER --- */
+.table-container { 
+    background: white; 
+    border-radius: 6px; 
+    border: 1px solid #e2e8f0; 
+    overflow-y: auto; 
+    flex: 1; 
+}
+
+#individualTable { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-size: 12px; 
+}
+
+#individualTable thead th { 
+    height: auto !important; 
+    padding: 8px 12px; 
+    position: sticky; 
+    top: 0; 
+    background: #f1f5f9; 
+    color: #475569; 
+    font-size: 10px; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    border-bottom: 2px solid #cbd5e1; 
+    z-index: 10; 
+}
+
+#individualTable td { 
+    padding: 0 12px; 
+    height: 36px !important; 
+    border-bottom: 1px solid #f1f5f9; 
+    vertical-align: middle; 
+}
+
+/* --- STATUS BADGES & TOOLTIPS (Padronizados e Ajustados) --- */
+
+/* Container da Célula */
+.status-cell-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Garante que o container ocupe a célula */
+}
+
+/* O Badge (Etiqueta) Geral - BASE PADRÃO PARA TODOS */
+.status-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    /* Tamanho Fixo para Uniformidade */
+    width: 130px; /* Largura fixa para todos ficarem iguais */
+    min-height: 42px; /* Altura mínima garantida */
+    padding: 6px 4px;
+    
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: help; 
+    position: relative; /* Necessário para o tooltip */
+    transition: all 0.2s ease;
+    text-align: center;
+    line-height: 1.2;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Leve sombra para dar volume */
+}
+
+.status-badge:hover {
+    transform: translateY(-2px); /* Efeito de botão leve */
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+/* --- CORES DOS STATUS (Todos com Borda e Fundo) --- */
+
+/* Verde Esmeralda (Homologado) */
+.st-homologado { background-color: #ecfdf5; color: #047857; border: 1px solid #6ee7b7; }
+
+/* Verde Claro (Treinado) */
+.st-treinado   { background-color: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+
+/* Azul (Inscrito/Agendado) */
+.st-inscrito   { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; }
+
+/* Vermelho (Falta) */
+.st-falta      { background-color: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+/* Cinza (Pendente) - Agora com estilo de botão também */
+.st-pendente   { background-color: #f8fafc; color: #64748b; border: 1px solid #cbd5e1; }
+
+/* Laranja (Expirado/Atrasado) - Atenção: Data passou sem baixa */
+.st-expirado { 
+    background-color: #fff7ed; 
+    color: #c2410c; 
+    border: 1px solid #fdba74; 
+}
+
+/* Subtexto (Datas ou Detalhes) */
+.badge-sub {
+    font-size: 9px;
+    opacity: 0.85;
+    margin-top: 3px;
+    font-weight: 600;
+    white-space: nowrap; /* Evita quebra de linha na data */
+}
+
+
+/* --- TOOLTIP BOX (Conteúdo Interno - Agora Invisível) --- */
+/* Ele guarda o HTML gerado pelo JS, mas não aparece na tabela para não ser cortado */
+.status-badge .tooltip-box {
+    display: none; 
+}
+
+/* --- GLOBAL TOOLTIP (O Balão Flutuante Real) --- */
+/* Este elemento será injetado no corpo da página para flutuar livremente */
+#global-tooltip {
+    position: fixed; /* Fixado na tela, ignora scroll da tabela */
+    z-index: 99999;  /* Sempre no topo de tudo */
+    visibility: hidden;
+    opacity: 0;
+    
+    width: 280px;
+    background-color: #1e293b;
+    color: #f8fafc;
+    text-align: left;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6);
+    
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 1.6;
+    border: 1px solid #475569;
+    
+    pointer-events: none; /* Mouse ignora ele */
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+#global-tooltip.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Título dentro do Tooltip */
+#global-tooltip .tooltip-title {
+    display: block;
+    color: #38bdf8;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 10px;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 6px;
+}
+
+/* --- BOTÃO LIMPAR FILTROS --- */
+.btn-clear {
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-clear:hover {
+    background: #fef2f2; /* Fundo vermelho bem clarinho */
+    border-color: #ef4444;
+    color: #ef4444;
+    transform: rotate(90deg); /* Efeito visual bacana ao passar o mouse */
+}
+
+.btn-clear svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* --- PADRONIZAÇÃO DA BARRA DE FILTROS (ALINHAMENTO E ALTURA) --- */
+
+/* 1. Garante que todos os Wrappers (Label + Campo) ocupem o mesmo espaço vertical */
+.filter-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Alinha tudo pela base */
+    gap: 4px; /* Espaço entre Label e Campo */
+}
+
+/* 2. Label: Tamanho fixo e alinhamento */
+.filter-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+/* 3. INPUTS E SELECTS: Força altura de 32px */
+.filter-select.compact {
+    height: 32px !important; /* Altura Mestra */
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 11px;
+    box-sizing: border-box; /* Garante que borda não aumente tamanho */
+    display: flex;
+    align-items: center;
+}
+
+/* 4. GRUPO DE BOTÕES (EXIBIR): Mesma altura de 32px */
+.status-toggles { 
+    height: 32px !important; /* Iguala aos inputs */
+    display: flex; 
+    gap: 4px; 
+    align-items: center;
+}
+
+/* 5. BOTÕES INDIVIDUAIS: Ocupam 100% da altura do pai */
+.btn-toggle { 
+    height: 100%; 
+    padding: 0 12px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #cbd5e1; /* Borda igual aos inputs */
+    box-sizing: border-box;
+}
+
+/* 6. BOTÃO LIMPAR (O Funil): Quadrado perfeito de 32x32 */
+.btn-clear {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 6px;
+    /* Alinhamento do ícone */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Margem para desgrudar dos botões */
+    margin-top: auto; /* Empurra para baixo para alinhar com inputs */
+}
+
+/* --- ESTILOS DA ABA SCORE --- */
+
+/* Card Principal de Score */
+.score-main-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    min-height: 140px; /* Mais alto para destaque */
+}
+
+/* Label do Topo */
+.score-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+/* O Número Grande */
+.score-val {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1;
+    color: #1e293b;
+}
+
+/* Barra de Progresso Pequena */
+.progress-track.small {
+    height: 6px;
+    margin: 12px 0;
+    background: rgba(0,0,0,0.1);
+}
+
+/* Subtexto (Ex: "Ruim", "Bom") */
+.score-sub {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.05);
+    color: #475569;
+}
+
+/* --- VARIAÇÕES DE COR DO CARD PRINCIPAL --- */
+/* Vermelho (Crítico) */
+.score-main-card.b-alert { border-left: 5px solid #ef4444; }
+.score-main-card.b-alert .score-val { color: #ef4444; }
+.score-main-card.b-alert .progress-fill { background: #ef4444; }
+
+/* Amarelo (Atenção) */
+.score-main-card.b-warn { border-left: 5px solid #eab308; }
+.score-main-card.b-warn .score-val { color: #eab308; }
+.score-main-card.b-warn .progress-fill { background: #eab308; }
+
+/* Verde (Bom) */
+.score-main-card.b-good { border-left: 5px solid #22c55e; }
+.score-main-card.b-good .score-val { color: #22c55e; }
+.score-main-card.b-good .progress-fill { background: #22c55e; }
+
+
+/* --- TEMA ÍNDIGO (Para o Texto da Direita) --- */
+.right-text.theme-indigo {
+    background: linear-gradient(135deg, #3730a3 0%, #312e81 100%); /* Indigo 800 -> 900 */
+}
+
+/* --- SCORE HEADER & INFO ICON --- */
+.score-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px; /* Espaço entre texto e ícone */
+    margin-bottom: 10px;
+}
+
+.score-label {
+    margin-bottom: 0 !important; /* Remove margem antiga pois agora o flex controla */
+}
+
+/* O Ícone (?) */
+.info-trigger {
+    color: #94a3b8;
+    cursor: help;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 4px;
+    border-radius: 50%;
+}
+
+.info-trigger:hover {
+    color: #3b82f6;
+    background: #eff6ff;
+}
+
+.info-trigger svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Esconde o tooltip interno (igual aos badges) */
+.info-trigger .tooltip-box {
+    display: none;
+}
