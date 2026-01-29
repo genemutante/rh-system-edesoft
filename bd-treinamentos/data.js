@@ -31,6 +31,41 @@ const initialConfig = {
     // 1. TABELA: TREINAMENTOS (Catálogo Global)
     // ==========================================================================
     treinamentos: [
+ { 
+                id: 60, 
+                categoria: "EDUCAÇÃO",
+                nome: "Ensino Médio", 
+                color: colors.blueLight,
+                desc: "Fornece a base educacional necessária para compreender conceitos fundamentais e desenvolver as habilidades básicas exigidas pelo mercado."
+            },
+            { 
+                id: 61, 
+                categoria: "EDUCAÇÃO",
+                nome: "Ensino Superior ou Tecnólogo", 
+                color: colors.blueLight,
+                desc: "Capacita o colaborador com conhecimentos avançados em sua área de atuação, preparando-o para desempenhar funções técnicas ou gerenciais."
+            },
+            { 
+                id: 62, 
+                categoria: "EDUCAÇÃO",
+                nome: "Inglês - Técnico", 
+                color: colors.blueLight,
+                desc: "Ensina o inglês técnico necessário para a compreensão de termos e documentos, permitindo uma comunicação eficiente em ambientes de tecnologia."
+            },
+            { 
+                id: 63, 
+                categoria: "EDUCAÇÃO",
+                nome: "MBA", 
+                color: colors.blueLight,
+                desc: "Desenvolve habilidades estratégicas e gerenciais, preparando o colaborador para assumir cargos de liderança e tomar decisões de negócios com embasamento."
+            },
+            { 
+                id: 64, 
+                categoria: "EDUCAÇÃO",
+                nome: "Pós-graduação", 
+                color: colors.blueLight,
+                desc: "Capacita o colaborador com conhecimento especializado, promovendo o crescimento em sua área de atuação e aprimorando suas habilidades técnicas ou de gestão."
+            },
             { 
                 id: 1, 
                 categoria: "ONBOARDING",
@@ -53,13 +88,6 @@ const initialConfig = {
                 desc: "Ensina sobre a importância da imagem pessoal e profissional, ajudando os colaboradores a se alinharem com os padrões culturais da empresa, refletindo confiança e profissionalismo em sua atuação."
             },
             { 
-                id: 4, 
-                categoria: "ÁREAS",
-                nome: "Microcursos intra-áreas", 
-                color: colors.gold,
-                desc: "Oferece treinamentos rápidos e específicos dentro de cada área da empresa, promovendo o aprimoramento contínuo e o compartilhamento de conhecimento entre os membros da área."
-            },
-            { 
                 id: 5, 
                 categoria: "DESENV. PESSOAL",
                 nome: "Leadership", 
@@ -74,19 +102,13 @@ const initialConfig = {
                 desc: "Fornece resumos rápidos de livros, facilitando o acesso ao conhecimento de obras importantes para o desenvolvimento pessoal e profissional."
             },
             { 
-                id: 7, 
-                categoria: "OUTSOURCING",
-                nome: "Service Desk", 
-                color: colors.orange,
-                desc: "Aborda técnicas e ferramentas para atendimento e suporte ao cliente, ajudando a melhorar o serviço e a satisfação dos usuários."
-            },
-            { 
-                id: 8, 
-                categoria: "OUTSOURCING",
-                nome: "Framework Scrum", 
-                color: colors.orange,
-                desc: "Apresenta o framework Scrum, detalhando suas práticas e como implementá-las para melhorar a gestão de projetos ágeis."
-            },
+                id: 76, 
+                categoria: "DESENV. PESSOAL",
+                nome: "Metodologia DISC", 
+                color: colors.red,
+                desc: "Ensina a metodologia DISC, ajudando o colaborador a entender perfis comportamentais para melhorar a comunicação e a gestão de equipes."
+            },        
+
             { 
                 id: 9, 
                 categoria: "OUTSOURCING",
@@ -94,34 +116,8 @@ const initialConfig = {
                 color: colors.orange,
                 desc: "Ensina sobre o gerenciamento logístico no transporte rodoviário, otimizando o fluxo de mercadorias e o desempenho das operações."
             },
-            { 
-                id: 10, 
-                categoria: "OUTSOURCING",
-                nome: "Lógica de Programação", 
-                color: colors.orange,
-                desc: "Introduz conceitos básicos de programação, ajudando o colaborador a desenvolver raciocínio lógico para resolver problemas técnicos."
-            },
-            { 
-                id: 11, 
-                categoria: "OUTSOURCING",
-                nome: "Design de Interfaces", 
-                color: colors.orange,
-                desc: "Explora os princípios de design para a criação de interfaces eficientes e agradáveis, aprimorando a experiência do usuário."
-            },
-            { 
-                id: 12, 
-                categoria: "OUTSOURCING",
-                nome: "Prog. Orientada a Objetos", 
-                color: colors.orange,
-                desc: "Ensina os fundamentos da Programação Orientada a Objetos, capacitando o colaborador a criar soluções de software mais estruturadas e eficientes."
-            },
-            { 
-                id: 13, 
-                categoria: "PROCESSOS",
-                nome: "Mapeamento de Processos", 
-                color: colors.blueLight,
-                desc: "Capacita o colaborador a identificar, documentar e otimizar os processos internos, garantindo maior eficiência e alinhamento com os objetivos estratégicos da empresa e dos clientes."
-            },
+
+
             { 
                 id: 14, 
                 categoria: "QA",
@@ -136,20 +132,14 @@ const initialConfig = {
                 color: colors.green,
                 desc: "Ensina o ciclo completo de qualidade, garantindo que o colaborador acompanhe e assegure a qualidade do produto desde o início até a entrega final."
             },
-            { 
-                id: 16, 
-                categoria: "QA",
-                nome: "Fundamentos em Testes", 
-                color: colors.green,
-                desc: "Apresenta os conceitos básicos de testes de software, capacitando o colaborador a identificar e corrigir defeitos nos produtos desenvolvidos."
-            },
-            { 
-                id: 17, 
-                categoria: "QA",
-                nome: "Ferramentas da Qualidade", 
-                color: colors.green,
-                desc: "Capacita o colaborador a utilizar ferramentas específicas de QA para automatizar e melhorar o processo de controle de qualidade."
-            },
+
+        { 
+            id: 990, 
+            nome: "04 - QA: Analista de Testes x Analista QA", 
+            color: colors.green,
+            desc: "Compara responsabilidades do testador e do analista de qualidade, mostrando como atuam juntos para garantir software confiável."
+        },
+
             { 
                 id: 18, 
                 categoria: "QA",
@@ -157,13 +147,15 @@ const initialConfig = {
                 color: colors.green,
                 desc: "Introduz a carreira de QA, explicando os papéis e responsabilidades, ajudando o colaborador a se orientar e se destacar na área."
             },
+        
             { 
-                id: 19, 
+                id: 16, 
                 categoria: "QA",
-                nome: "Fundamentos da Gestão da Qualidade", 
+                nome: "Introdução ao Teste de Software", 
                 color: colors.green,
-                desc: "Ensina os fundamentos da gestão da qualidade, capacitando o colaborador a implementar e gerenciar processos de qualidade nos projetos."
+                desc: "Apresenta os conceitos básicos de testes de software, capacitando o colaborador a identificar e corrigir defeitos nos produtos desenvolvidos."
             },
+
             { 
                 id: 20, 
                 categoria: "QA",
@@ -185,6 +177,15 @@ const initialConfig = {
                 color: colors.green,
                 desc: "Capacita o colaborador a realizar testes automatizados de APIs utilizando o Robot Framework, melhorando a cobertura e eficiência dos testes."
             },
+
+            { 
+                id: 17, 
+                categoria: "QA",
+                nome: "Ferramentas da Qualidade", 
+                color: colors.green,
+                desc: "Capacita o colaborador a utilizar ferramentas específicas de QA para automatizar e melhorar o processo de controle de qualidade."
+            },
+
             { 
                 id: 23, 
                 categoria: "QA",
@@ -192,13 +193,9 @@ const initialConfig = {
                 color: colors.green,
                 desc: "Explora os conceitos de engenharia de requisitos, preparando o colaborador para coletar e documentar necessidades de clientes de forma eficaz."
             },
-            { 
-                id: 24, 
-                categoria: "QA",
-                nome: "OKR - Objectives and Key Results", 
-                color: colors.green,
-                desc: "Introduz o framework OKR, capacitando o colaborador a definir e acompanhar metas e resultados-chave alinhados com os objetivos estratégicos."
-            },
+
+
+        
             { 
                 id: 25, 
                 categoria: "FERRAMENTAS DIGITAIS",
@@ -255,6 +252,7 @@ const initialConfig = {
                 color: colors.black,
                 desc: "Ensina o uso do Pacote Office (Word, Excel, PowerPoint) para melhorar a produtividade em diversas tarefas administrativas."
             },
+
             { 
                 id: 33, 
                 categoria: "FERRAMENTAS DIGITAIS",
@@ -283,12 +281,36 @@ const initialConfig = {
                 color: colors.black,
                 desc: "Ensina o uso do Trello para organização e gerenciamento de tarefas, facilitando a colaboração e o acompanhamento de projetos."
             },
+
+            { 
+                id: 66, 
+                categoria: "Gestão de Times",
+                nome: "Service Desk", 
+                color: colors.red,
+                desc: "Ensina como gerenciar uma central de serviços de TI, focando no atendimento eficiente e solução de problemas técnicos."
+            },
+        
             { 
                 id: 37, 
                 categoria: "GESTÃO DE TI",
                 nome: "Governança de TI", 
                 color: colors.blueDark,
                 desc: "Capacita o colaborador a implementar e gerenciar estruturas de governança de TI, alinhando a tecnologia aos objetivos do negócio."
+            },
+
+            { 
+                id: 67, 
+                categoria: "Gestão de Times",
+                nome: "ITIL - Overview", 
+                color: colors.red,
+                desc: "Fornece uma visão geral do ITIL, apresentando os principais conceitos e práticas para a gestão de serviços de TI."
+            },
+            { 
+                id: 68, 
+                categoria: "Gestão de Times",
+                nome: "ITIL - Carreiras", 
+                color: colors.red,
+                desc: "Capacita o colaborador a explorar as diferentes carreiras disponíveis no ITIL, auxiliando na definição de trajetórias profissionais."
             },
             { 
                 id: 38, 
@@ -299,64 +321,73 @@ const initialConfig = {
             },
             { 
                 id: 39, 
-                categoria: "GESTÃO DE TI",
+                categoria: "06 - GOVERNANÇA",
                 nome: "COBIT 2019", 
                 color: colors.blueDark,
                 desc: "Apresenta o framework COBIT 2019, capacitando o colaborador a gerenciar e governar a TI dentro das organizações."
             },
             { 
+                id: 71, 
+                categoria: "06 - GOVERNANÇA",
+                nome: "ISO 20000 - Serviços TI", 
+                color: colors.red,
+                desc: "Capacita o colaborador a entender e aplicar as normas da família ISO 20000 para gerenciamento de serviços de TI."
+            },
+            { 
+                id: 72, 
+                categoria: "06 - GOVERNANÇA",
+                nome: "ISO 27000 - Seg. Info.", 
+                color: colors.red,
+                desc: "Ensina a importância da conformidade com as normas da família ISO 27000, preparando o colaborador para garantir a segurança da informação."
+            },
+        
+            { 
                 id: 40, 
                 categoria: "GESTÃO DE TI",
-                nome: "ISO 20000 / 27001 / 42001", 
-                color: colors.blueDark,
-                desc: "Capacita o colaborador a entender e aplicar as principais normas ISO em TI, garantindo conformidade e segurança da informação."
+                nome: "ISO 42000 - Gov. IA", 
+                color: colors.red,
+                desc: "Ensina a importância da família ISO 42000, preparando o colaborador para governança de IA."
             },
-            { 
-                id: 41, 
-                categoria: "GESTÃO DE TI",
-                nome: "AgileShift", 
-                color: colors.blueDark,
-                desc: "Introduz o framework AgileShift, ensinando como gerenciar transformações ágeis em toda a organização."
-            },
+
             { 
                 id: 42, 
-                categoria: "CMMI TEC",
+                categoria: "07 - CMMI TEC",
                 nome: "Areas de Prática do Modelo", 
                 color: colors.grey,
                 desc: "Capacita o colaborador a entender e aplicar as áreas de prática do modelo CMMI, alinhando processos a padrões de qualidade."
             },
             { 
                 id: 43, 
-                categoria: "CMMI TEC",
+                categoria: "07 - CMMI TEC",
                 nome: "Ciclo de Vida de Desenv.", 
                 color: colors.grey,
                 desc: "Ensina o ciclo de vida de desenvolvimento conforme o CMMI, ajudando o colaborador a implementar melhorias contínuas em projetos."
             },
             { 
                 id: 44, 
-                categoria: "CMMI GLOBAL",
+                categoria: "07 - CMMI GLOBAL",
                 nome: "Funções do Grupo EPG", 
                 color: colors.grey,
                 desc: "Explora as funções do Grupo EPG, detalhando o papel desse grupo na implementação e manutenção do modelo CMMI na organização."
             },
             { 
                 id: 45, 
-                categoria: "CMMI GLOBAL",
+                categoria: "07 - CMMI GLOBAL",
                 nome: "Imersão no Modelo", 
                 color: colors.grey,
                 desc: "Oferece uma imersão no modelo CMMI, capacitando o colaborador a entender profundamente suas práticas e benefícios."
             },
             { 
                 id: 46, 
-                categoria: "CMMI GLOBAL",
+                categoria: "07 - CMMI GLOBAL",
                 nome: "Plano de Melhorias", 
                 color: colors.grey,
                 desc: "Apresenta o plano de melhorias da Edesoft, baseado no modelo CMMI, mostrando como a empresa promove a evolução contínua de seus processos."
             },
             { 
                 id: 47, 
-                categoria: "CMMI GLOBAL",
-                nome: "Rotinas Organizacionais", 
+                categoria: "07 - CMMI GLOBAL",
+                nome: "Políticas e Diretrizes", 
                 color: colors.grey,
                 desc: "Ensina as rotinas organizacionais conforme o CMMI, capacitando o colaborador a alinhar as práticas diárias aos objetivos de qualidade."
             },
@@ -381,6 +412,7 @@ const initialConfig = {
                 color: colors.red,
                 desc: "Foca em técnicas de vendas, preparando o colaborador para interagir com clientes de forma assertiva, contribuindo para o aumento de receitas e expansão da base de clientes."
             },
+
             { 
                 id: 51, 
                 categoria: "GESTÃO",
@@ -416,6 +448,10 @@ const initialConfig = {
                 color: colors.gold,
                 desc: "Ensina metodologias e práticas de gestão de projetos, capacitando o colaborador a planejar, executar e monitorar projetos de forma eficaz."
             },
+
+
+
+
             { 
                 id: 56, 
                 categoria: "RH",
@@ -444,41 +480,9 @@ const initialConfig = {
                 color: colors.black,
                 desc: "Ensina os princípios da LGPD, preparando o colaborador para lidar com dados pessoais de forma segura e conforme a legislação vigente."
             },
-            { 
-                id: 60, 
-                categoria: "EDUCAÇÃO",
-                nome: "Ensino Médio", 
-                color: colors.blueLight,
-                desc: "Fornece a base educacional necessária para compreender conceitos fundamentais e desenvolver as habilidades básicas exigidas pelo mercado."
-            },
-            { 
-                id: 61, 
-                categoria: "EDUCAÇÃO",
-                nome: "Ensino Superior ou Tecnólogo", 
-                color: colors.blueLight,
-                desc: "Capacita o colaborador com conhecimentos avançados em sua área de atuação, preparando-o para desempenhar funções técnicas ou gerenciais."
-            },
-            { 
-                id: 62, 
-                categoria: "EDUCAÇÃO",
-                nome: "Inglês - Técnico", 
-                color: colors.blueLight,
-                desc: "Ensina o inglês técnico necessário para a compreensão de termos e documentos, permitindo uma comunicação eficiente em ambientes de tecnologia."
-            },
-            { 
-                id: 63, 
-                categoria: "EDUCAÇÃO",
-                nome: "MBA", 
-                color: colors.blueLight,
-                desc: "Desenvolve habilidades estratégicas e gerenciais, preparando o colaborador para assumir cargos de liderança e tomar decisões de negócios com embasamento."
-            },
-            { 
-                id: 64, 
-                categoria: "EDUCAÇÃO",
-                nome: "Pós-graduação", 
-                color: colors.blueLight,
-                desc: "Capacita o colaborador com conhecimento especializado, promovendo o crescimento em sua área de atuação e aprimorando suas habilidades técnicas ou de gestão."
-            },
+
+
+        
             { 
                 id: 65, 
                 categoria: "ENGENHARIA DADOS",
@@ -487,82 +491,13 @@ const initialConfig = {
                 desc: "Introduz os fundamentos da ciência de dados, capacitando o colaborador a trabalhar com análise e interpretação de grandes volumes de dados."
             },
             { 
-                id: 66, 
-                categoria: "Gestão de Times",
-                nome: "SERVICE DESK", 
-                color: colors.red,
-                desc: "Ensina como gerenciar uma central de serviços de TI, focando no atendimento eficiente e solução de problemas técnicos."
+                id: 13, 
+                categoria: "PROCESSOS",
+                nome: "Mapeamento de Processos", 
+                color: colors.blueLight,
+                desc: "Capacita o colaborador a identificar, documentar e otimizar os processos internos, garantindo maior eficiência e alinhamento com os objetivos estratégicos da empresa e dos clientes."
             },
-            { 
-                id: 67, 
-                categoria: "Gestão de Times",
-                nome: "ITIL - Overview", 
-                color: colors.red,
-                desc: "Fornece uma visão geral do ITIL, apresentando os principais conceitos e práticas para a gestão de serviços de TI."
-            },
-            { 
-                id: 68, 
-                categoria: "Gestão de Times",
-                nome: "ITIL - Carreiras", 
-                color: colors.red,
-                desc: "Capacita o colaborador a explorar as diferentes carreiras disponíveis no ITIL, auxiliando na definição de trajetórias profissionais."
-            },
-            { 
-                id: 69, 
-                categoria: "Gestão de Times",
-                nome: "ITIL 4", 
-                color: colors.red,
-                desc: "Ensina os fundamentos do ITIL 4, preparando o colaborador para aplicar boas práticas de gerenciamento de serviços de TI."
-            },
-            { 
-                id: 70, 
-                categoria: "Gestão de Times",
-                nome: "COBIT 2019", 
-                color: colors.red,
-                desc: "Apresenta o framework COBIT 2019, capacitando o colaborador a gerenciar e governar a TI dentro das organizações."
-            },
-            { 
-                id: 71, 
-                categoria: "Gestão de Times",
-                nome: "FAMÍLIA ISO 20000", 
-                color: colors.red,
-                desc: "Capacita o colaborador a entender e aplicar as normas da família ISO 20000 para gerenciamento de serviços de TI."
-            },
-            { 
-                id: 72, 
-                categoria: "Gestão de Times",
-                nome: "FAMÍLIA ISO 27000", 
-                color: colors.red,
-                desc: "Ensina a importância da conformidade com as normas da família ISO 27000, preparando o colaborador para garantir a segurança da informação."
-            },
-            { 
-                id: 73, 
-                categoria: "Gestão de Times",
-                nome: "Gestão Ágil com SCRUM", 
-                color: colors.red,
-                desc: "Ensina o uso do Scrum para gestão ágil de projetos, capacitando o colaborador a integrar times ágeis e entregar valor continuamente."
-            },
-            { 
-                id: 74, 
-                categoria: "Gestão de Times",
-                nome: "AgileSHIFT", 
-                color: colors.red,
-                desc: "Capacita o colaborador a navegar pelas mudanças organizacionais e adotar práticas ágeis com o framework AgileSHIFT."
-            },
-            { 
-                id: 75, 
-                categoria: "Gestão de Times",
-                nome: "Fundamentos de Projetos", 
-                color: colors.red,
-                desc: "Ensina os conceitos básicos de gestão de projetos, capacitando o colaborador a planejar, executar e monitorar projetos com sucesso."
-            },
-            { 
-                id: 76, 
-                categoria: "Gestão de Times",
-                nome: "Metodologia DISC", 
-                color: colors.red,
-                desc: "Ensina a metodologia DISC, ajudando o colaborador a entender perfis comportamentais para melhorar a comunicação e a gestão de equipes."
-            },
+
             { 
                 id: 77, 
                 categoria: "Melhoria de Processos",
@@ -570,6 +505,7 @@ const initialConfig = {
                 color: colors.cyan,
                 desc: "Ensina o uso do Bizagi Modeler para modelagem de processos de negócios, otimizando fluxos de trabalho."
             },
+        
             { 
                 id: 78, 
                 categoria: "Melhoria de Processos",
@@ -577,6 +513,7 @@ const initialConfig = {
                 color: colors.cyan,
                 desc: "Capacita o colaborador a compreender conceitos básicos de estatística, aplicando-os na análise de dados para melhoria contínua."
             },
+
             { 
                 id: 79, 
                 categoria: "Melhoria de Processos",
@@ -612,13 +549,7 @@ const initialConfig = {
                 color: colors.cyan,
                 desc: "Ensina os conceitos do Lean Seis Sigma Yellow Belt, preparando o colaborador para liderar pequenas melhorias em processos."
             },
-            { 
-                id: 84, 
-                categoria: "Melhoria de Processos",
-                nome: "Map. de Processos", 
-                color: colors.cyan,
-                desc: "Capacita o colaborador a mapear e modelar processos, promovendo uma visão clara dos fluxos de trabalho e suas melhorias."
-            },
+            
             { 
                 id: 85, 
                 categoria: "Melhoria de Processos",
@@ -626,6 +557,8 @@ const initialConfig = {
                 color: colors.cyan,
                 desc: "Apresenta as metodologias MASP e PDCA para resolução de problemas e melhoria contínua, garantindo processos mais eficientes."
             },
+
+        
             { 
                 id: 86, 
                 categoria: "TI - DESENVOLVIMENTO",
@@ -699,7 +632,7 @@ const initialConfig = {
             { 
                 id: 96, 
                 categoria: "TI - DESENVOLVIMENTO",
-                nome: "LOGICA E ALGORITIMOS", 
+                nome: "LÓGICA", 
                 color: colors.blueLight,
                 desc: "Capacita o colaborador a entender lógica de programação e algoritmos, essenciais para resolver problemas complexos."
             },
@@ -759,6 +692,15 @@ const initialConfig = {
                 color: colors.blueLight,
                 desc: "Capacita o colaborador a utilizar Redux para gerenciar o estado de aplicações React de forma eficiente."
             },
+
+            { 
+                id: 1000, 
+                categoria: "TI - DESENVOLVIMENTO",
+                nome: "RESTFULL", 
+                color: colors.blueLight,
+                 desc: "Capacita o colaborador a utilizar APIs RESTful para desenvolver, consumir e integrar serviços, aplicando boas práticas de endpoints, métodos HTTP e padrões de troca de dados."
+            },
+
             { 
                 id: 105, 
                 categoria: "TI - DESENVOLVIMENTO",
@@ -801,6 +743,8 @@ const initialConfig = {
                 color: colors.grey,
                 desc: "Ensina a utilizar o n8n para criar automações de fluxo de trabalho complexas e integradas, otimizando processos operacionais."
             },
+                
+
             { 
                 id: 111, 
                 categoria: "IA",
@@ -13845,3 +13789,4 @@ colaboradores: [
     
     }
 }; // Fim do objeto config
+
