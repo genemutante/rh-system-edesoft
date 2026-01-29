@@ -266,14 +266,8 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
     // --- 2. CORPO (LINHAS DE CURSOS) ---
     let bodyHTML = '';
     
-    const treinamentosSorted = config.treinamentos.sort((a, b) => {
-        const catA = a.categoria || "";
-        const catB = b.categoria || "";
-        if (catA === catB) {
-            return a.nome.localeCompare(b.nome);
-        }
-        return catA.localeCompare(catB);
-    });
+// CÓDIGO NOVO (RESPEITA A ORDEM DO ARQUIVO)
+    const treinamentosSorted = config.treinamentos;
 
     treinamentosSorted.forEach((treino, treinoIndex) => {
         // --- FILTROS ---
@@ -1061,3 +1055,4 @@ function confirmarAcaoSegura() {
     fecharModalConfirmacao();
 
 }
+
