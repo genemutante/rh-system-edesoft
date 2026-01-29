@@ -1,5 +1,5 @@
 // =============================================================================
-// db-handler.js - Camada de Serviço do Supabase
+// db-handler.js - Camada de Serviço do Supabase (VERSÃO FINAL CORRIGIDA)
 // =============================================================================
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -13,29 +13,30 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export const DBHandler = {
 
- // --- 1. LEITURA INICIAL ---
+    // --- 1. LEITURA INICIAL ---
     async carregarDadosIniciais() {
         console.log("🔄 Buscando dados do Supabase...");
         
-        // 1. Busca Treinamentos (Corrigido erro 400)
+        // 1. Busca usando os nomes REAIS das colunas do banco
         const { data: treinosRaw, error: errT } = await supabase
             .from('treinamentos')
-            .select('id, nome, categoria, desc_curta, color, link') // Sem alias na query
+            .select('id, nome, categoria, descricao, cor, link_externo') 
             .order('nome');
             
         if (errT) throw errT;
 
-        // 2. Ajusta os dados para o formato que o script.js espera
+        // 2. Mapeia para o formato que o script.js espera
+        // O script.js usa: .desc, .color, .link
+        // O banco tem: .descricao, .cor, .link_externo
         const treinos = treinosRaw.map(t => ({
             id: t.id,
             nome: t.nome,
             categoria: t.categoria,
-            desc: t.desc_curta, // <--- AQUI FAZEMOS O DE-PARA
-            color: t.color,
-            link: t.link
+            desc: t.descricao,      // <--- Mapeamento aqui
+            color: t.cor,           // <--- Mapeamento aqui
+            link: t.link_externo    // <--- Mapeamento aqui
         }));
 
-        // 3. Busca Cargos
         const { data: cargos, error: errC } = await supabase
             .from('view_matriz_cargos')
             .select('*')
@@ -45,14 +46,16 @@ export const DBHandler = {
 
         return { treinamentos: treinos, cargos: cargos };
     },
+
     // --- 2. GERENCIAR TREINAMENTOS ---
     async salvarTreinamento(treino) {
+        // Prepara o payload usando os nomes REAIS das colunas do banco
         const payload = {
             nome: treino.nome,
             categoria: treino.categoria,
-            desc_curta: treino.desc,
-            link: treino.link,
-            color: treino.color
+            descricao: treino.desc,       // <--- De JS para Banco
+            cor: treino.color,            // <--- De JS para Banco
+            link_externo: treino.link     // <--- De JS para Banco
         };
 
         if (treino.id) {
@@ -103,7 +106,7 @@ export const DBHandler = {
                 
             if (errIns) throw errIns;
         }
-    }, // <--- A VÍRGULA SALVADORA ESTÁ AQUI
+    },
 
     // --- 5. AUTENTICAÇÃO ---
     async validarLogin(username, password) {
@@ -118,4 +121,3 @@ export const DBHandler = {
         return data;
     }
 };
-
