@@ -100,3 +100,17 @@ export const DBHandler = {
     }
 };
 
+
+    // --- 5. AUTENTICAÇÃO ---
+    async validarLogin(username, password) {
+        const { data, error } = await supabase
+            .from('usuarios_sistema')
+            .select('*')
+            .eq('username', username)
+            .eq('password', password) // Busca match exato
+            .maybeSingle(); // Retorna null se não encontrar, sem dar erro
+
+        if (error) throw error;
+        return data; // Retorna o objeto do usuário (com role, nome, etc) ou null
+    }
+// ... (fim do objeto DBHandler)
