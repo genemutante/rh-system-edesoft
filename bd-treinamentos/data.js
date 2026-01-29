@@ -26,9 +26,10 @@ const initialConfig = {
     // --- ADICIONE ESTA LINHA "dados: {" ---
     dados: {
     
-    
+
+
 // ==========================================================================
-    // 1. TABELA: TREINAMENTOS (Catálogo Global Atualizado)
+    // 1. TABELA: TREINAMENTOS (Catálogo Global Ajustado)
     // ==========================================================================
     treinamentos: [
         // --- 00. EDUCAÇÃO ---
@@ -41,29 +42,29 @@ const initialConfig = {
         },
         { 
             id: 61, 
-            categoria: "EDUCAÇÃO", 
-            nome: "00 - EDUCAÇÃO: Ensino Sup./Tec.", 
+            categoria: "00 - EDUCAÇÃO", 
+            nome: "Ensino Sup./Tec.", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador com conhecimentos avançados em sua área de atuação, preparando-o para desempenhar funções técnicas ou gerenciais."
         },
         { 
             id: 62, 
-            categoria: "EDUCAÇÃO", 
-            nome: "00 - EDUCAÇÃO: Inglês - Técnico", 
+            categoria: "00 - EDUCAÇÃO", 
+            nome: "Inglês - Técnico", 
             color: colors.blueLight, 
             desc: "Ensina o inglês técnico necessário para a compreensão de termos e documentos, permitindo uma comunicação eficiente em ambientes de tecnologia."
         },
         { 
             id: 63, 
-            categoria: "EDUCAÇÃO", 
-            nome: "00 - EDUCAÇÃO: MBA", 
+            categoria: "00 - EDUCAÇÃO", 
+            nome: "MBA", 
             color: colors.blueLight, 
             desc: "Desenvolve habilidades estratégicas e gerenciais, preparando o colaborador para assumir cargos de liderança e tomar decisões de negócios com embasamento."
         },
         { 
             id: 64, 
-            categoria: "EDUCAÇÃO", 
-            nome: "00 - EDUCAÇÃO: Pós-graduação", 
+            categoria: "00 - EDUCAÇÃO", 
+            nome: "Pós-graduação", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador com conhecimento especializado, promovendo o crescimento em sua área de atuação e aprimorando suas habilidades técnicas ou de gestão."
         },
@@ -71,22 +72,22 @@ const initialConfig = {
         // --- 01. ONBOARDING ---
         { 
             id: 1, 
-            categoria: "ONBOARDING", 
-            nome: "01 - ONBOARDING: Programas Edesoft", 
+            categoria: "01 - ONBOARDING", 
+            nome: "Programas Edesoft", 
             color: colors.purple, 
-            desc: "Apresenta os programas da Edesoft, permitindo que os colaboradores compreendam as oportunidades de desenvolvimento profissional e pessoal dentro da empresa."
+            desc: "Apresenta os programas da Edesoft, permitindo que os colaboradores compreendam as oportunidades de desenvolvimento profissional e pessoal."
         },
         { 
             id: 2, 
-            categoria: "ONBOARDING", 
-            nome: "01 - ONBOARDING: Rotinas Internas", 
+            categoria: "01 - ONBOARDING", 
+            nome: "Rotinas Internas", 
             color: colors.purple, 
             desc: "Orienta os colaboradores sobre os processos e rotinas da empresa, facilitando sua adaptação ao ambiente de trabalho."
         },
         { 
             id: 3, 
-            categoria: "ONBOARDING", 
-            nome: "01 - ONBOARDING: Imagem & Estilo", 
+            categoria: "01 - ONBOARDING", 
+            nome: "Imagem & Estilo", 
             color: colors.purple, 
             desc: "Ensina sobre a importância da imagem pessoal e profissional, ajudando os colaboradores a se alinharem com os padrões culturais da empresa."
         },
@@ -94,22 +95,22 @@ const initialConfig = {
         // --- 02. DESENV. PESSOAL ---
         { 
             id: 5, 
-            categoria: "DESENV. PESSOAL", 
-            nome: "02 - DESENV. PESSOAL: Leadership", 
+            categoria: "02 - DESENV. PESSOAL", 
+            nome: "Leadership", 
             color: colors.black, 
             desc: "Desenvolve habilidades de liderança, ajudando o colaborador a se tornar um líder eficaz, capaz de influenciar e motivar equipes."
         },
         { 
             id: 6, 
-            categoria: "DESENV. PESSOAL", 
-            nome: "02 - DESENV. PESSOAL: Microbooks", 
+            categoria: "02 - DESENV. PESSOAL", 
+            nome: "Microbooks", 
             color: colors.black, 
             desc: "Fornece resumos rápidos de livros, facilitando o acesso ao conhecimento de obras importantes para o desenvolvimento pessoal e profissional."
         },
         { 
             id: 76, 
-            categoria: "DESENV. PESSOAL", 
-            nome: "02 - DESENV. PESSOAL: Metodologia DISC", 
+            categoria: "02 - DESENV. PESSOAL", 
+            nome: "Metodologia DISC", 
             color: colors.black, 
             desc: "Ensina a metodologia DISC, ajudando o colaborador a entender perfis comportamentais para melhorar a comunicação e a gestão de equipes."
         },
@@ -117,8 +118,8 @@ const initialConfig = {
         // --- 03. OUTSOURCING ---
         { 
             id: 9, 
-            categoria: "OUTSOURCING", 
-            nome: "03 - OUTSOURCING: Logística Rodoviária", 
+            categoria: "03 - OUTSOURCING", 
+            nome: "Logística Rodoviária", 
             color: colors.orange, 
             desc: "Ensina sobre o gerenciamento logístico no transporte rodoviário, otimizando o fluxo de mercadorias e o desempenho das operações."
         },
@@ -126,71 +127,71 @@ const initialConfig = {
         // --- 04. QA (Quality Assurance) ---
         { 
             id: 14, 
-            categoria: "QA", 
-            nome: "04 - QA: Custos da não qualidade", 
+            categoria: "04 - QA", 
+            nome: "Custos da não qualidade", 
             color: colors.green, 
             desc: "Explora os impactos financeiros e operacionais da falta de qualidade no desenvolvimento de software."
         },
         { 
             id: 15, 
-            categoria: "QA", 
-            nome: "04 - QA: Qualidade do Início ao Fim", 
+            categoria: "04 - QA", 
+            nome: "Qualidade do Início ao Fim", 
             color: colors.green, 
             desc: "Ensina o ciclo completo de qualidade, garantindo que o colaborador acompanhe e assegure a qualidade do produto desde o início."
         },
         { 
             id: 99, 
-            categoria: "QA", 
-            nome: "04 - QA: Analista de Testes x Analista QA", 
+            categoria: "04 - QA", 
+            nome: "Analista de Testes x Analista QA", 
             color: colors.green, 
             desc: "Compara responsabilidades do testador e do analista de qualidade, mostrando como atuam juntos para garantir software confiável."
         },
         { 
             id: 18, 
-            categoria: "QA", 
-            nome: "04 - QA: Introdução a Carreira de QA", 
+            categoria: "04 - QA", 
+            nome: "Introdução a Carreira de QA", 
             color: colors.green, 
             desc: "Introduz a carreira de QA, explicando os papéis e responsabilidades, ajudando o colaborador a se orientar na área."
         },
         { 
             id: 16, 
-            categoria: "QA", 
-            nome: "04 - QA: Introdução ao Teste de Software", 
+            categoria: "04 - QA", 
+            nome: "Introdução ao Teste de Software", 
             color: colors.green, 
             desc: "Apresenta os conceitos básicos de testes de software, capacitando o colaborador a identificar e corrigir defeitos."
         },
         { 
             id: 20, 
-            categoria: "QA", 
-            nome: "04 - QA: Robot Framework - Fundamentos", 
+            categoria: "04 - QA", 
+            nome: "Robot Framework - Fundamentos", 
             color: colors.green, 
             desc: "Apresenta os fundamentos do Robot Framework, ajudando o colaborador a iniciar com automação de testes de forma eficaz."
         },
         { 
             id: 21, 
-            categoria: "QA", 
-            nome: "04 - QA: Robot Framework - Avançado", 
+            categoria: "04 - QA", 
+            nome: "Robot Framework - Avançado", 
             color: colors.green, 
             desc: "Aprofunda no uso do Robot Framework para automação avançada de testes, capacitando o colaborador a realizar testes complexos."
         },
         { 
             id: 22, 
-            categoria: "QA", 
-            nome: "04 - QA: Robot Framework - Testes com API", 
+            categoria: "04 - QA", 
+            nome: "Robot Framework - Testes com API", 
             color: colors.green, 
             desc: "Capacita o colaborador a realizar testes automatizados de APIs utilizando o Robot Framework."
         },
         { 
             id: 17, 
-            categoria: "QA", 
-            nome: "04 - QA: Ferramentas da Qualidade", 
+            categoria: "04 - QA", 
+            nome: "Ferramentas da Qualidade", 
             color: colors.green, 
             desc: "Capacita o colaborador a utilizar ferramentas específicas de QA para automatizar e melhorar o processo de controle de qualidade."
         },
         { 
             id: 23, 
-            categoria: "QA", 
-            nome: "04 - QA: Engenharia de Requisitos", 
+            categoria: "04 - QA", 
+            nome: "Engenharia de Requisitos", 
             color: colors.green, 
             desc: "Explora os conceitos de engenharia de requisitos, preparando o colaborador para coletar e documentar necessidades de clientes."
         },
@@ -198,85 +199,85 @@ const initialConfig = {
         // --- 05. FERRAMENTAS DIGITAIS ---
         { 
             id: 25, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Azure DevOps", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Azure DevOps", 
             color: colors.black, 
             desc: "Introduz os fundamentos do DevOps e uso da ferramenta, ajudando o colaborador a integrar desenvolvimento e operações."
         },
         { 
             id: 26, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Banco de Dados", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Banco de Dados", 
             color: colors.black, 
             desc: "Ensina os conceitos essenciais de bancos de dados, preparando o colaborador para trabalhar com armazenamento de dados."
         },
         { 
             id: 27, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Bizagi", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Bizagi", 
             color: colors.black, 
             desc: "Apresenta o Bizagi, uma ferramenta de modelagem de processos de negócios, capacitando o colaborador a otimizar fluxos."
         },
         { 
             id: 28, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Clickup", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Clickup", 
             color: colors.black, 
             desc: "Ensina o uso do Clickup, uma ferramenta de gestão de projetos, para ajudar o colaborador a organizar e gerenciar tarefas."
         },
         { 
             id: 29, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Figma", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Figma", 
             color: colors.black, 
             desc: "Capacita o colaborador no uso do Figma para criação e colaboração em design de interfaces digitais."
         },
         { 
             id: 30, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: GIT", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "GIT", 
             color: colors.black, 
             desc: "Ensina os conceitos e o uso do GIT para controle de versão, fundamental para equipes de desenvolvimento."
         },
         { 
             id: 31, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Minitab", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Minitab", 
             color: colors.black, 
             desc: "Capacita o colaborador a utilizar o Minitab para análise de dados estatísticos, aprimorando a tomada de decisões."
         },
         { 
             id: 32, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Pacote Office", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Pacote Office", 
             color: colors.black, 
             desc: "Ensina o uso do Pacote Office (Word, Excel, PowerPoint) para melhorar a produtividade em diversas tarefas administrativas."
         },
         { 
             id: 33, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Photoshop", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Photoshop", 
             color: colors.black, 
             desc: "Introduz os fundamentos do Photoshop para edição de imagens, ajudando o colaborador a criar gráficos profissionais."
         },
         { 
             id: 34, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Power BI - Básico", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Power BI - Básico", 
             color: colors.black, 
             desc: "Apresenta os conceitos básicos do Power BI para criação de relatórios e visualizações de dados interativos."
         },
         { 
             id: 35, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Power BI - Avançado", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Power BI - Avançado", 
             color: colors.black, 
             desc: "Capacita o colaborador a utilizar o Power BI de forma avançada, permitindo a criação de análises de dados complexas."
         },
         { 
             id: 36, 
-            categoria: "FERRAMENTAS DIGITAIS", 
-            nome: "05 - FERRAMENTAS: Trello", 
+            categoria: "05 - FERRAMENTAS", 
+            nome: "Trello", 
             color: colors.black, 
             desc: "Ensina o uso do Trello para organização e gerenciamento de tarefas, facilitando a colaboração e o acompanhamento de projetos."
         },
@@ -284,64 +285,64 @@ const initialConfig = {
         // --- 06. GOVERNANÇA E GESTÃO DE TI ---
         { 
             id: 7, 
-            categoria: "OUTSOURCING", 
-            nome: "06 - GOVERNANÇA: Service Desk", 
+            categoria: "06 - GOVERNANÇA", 
+            nome: "Service Desk", 
             color: colors.red, 
             desc: "Aborda técnicas e ferramentas para atendimento e suporte ao cliente, ajudando a melhorar o serviço e a satisfação dos usuários."
         },
         { 
             id: 37, 
-            categoria: "GESTÃO DE TI", 
-            nome: "06 - GOVERNANÇA: Governança de TI", 
+            categoria: "06 - GOVERNANÇA", 
+            nome: "Governança de TI", 
             color: colors.red, 
             desc: "Capacita o colaborador a implementar e gerenciar estruturas de governança de TI, alinhando a tecnologia aos objetivos do negócio."
         },
         { 
             id: 67, 
-            categoria: "Gestão de Times", 
-            nome: "06 - GOVERNANÇA: ITIL - Overview", 
+            categoria: "06 - GOVERNANÇA", 
+            nome: "ITIL - Overview", 
             color: colors.red, 
             desc: "Fornece uma visão geral do ITIL, apresentando os principais conceitos e práticas para a gestão de serviços de TI."
         },
         { 
             id: 68, 
-            categoria: "Gestão de Times", 
-            nome: "06 - GOVERNANÇA: ITIL - Carreiras", 
+            categoria: "06 - GOVERNANÇA", 
+            nome: "ITIL - Carreiras", 
             color: colors.red, 
             desc: "Capacita o colaborador a explorar as diferentes carreiras disponíveis no ITIL, auxiliando na definição de trajetórias profissionais."
         },
         { 
             id: 38, 
-            categoria: "GESTÃO DE TI", 
-            nome: "06 - GOVERNANÇA: ITIL 4 Foundation", 
+            categoria: "06 - GOVERNANÇA", 
+            nome: "ITIL 4 Foundation", 
             color: colors.red, 
             desc: "Ensina os fundamentos do ITIL 4, preparando o colaborador para aplicar boas práticas de gerenciamento de serviços de TI."
         },
         { 
             id: 39, 
-            categoria: "GESTÃO DE TI", 
-            nome: "06 - GOVERNANÇA: COBIT 2019", 
+            categoria: "06 - GOVERNANÇA", 
+            nome: "COBIT 2019", 
             color: colors.red, 
             desc: "Apresenta o framework COBIT 2019, capacitando o colaborador a gerenciar e governar a TI dentro das organizações."
         },
         { 
             id: 71, 
-            categoria: "Gestão de Times", 
-            nome: "06 - GOVERNANÇA: ISO 20000 - Serviços TI", 
+            categoria: "06 - GOVERNANÇA", 
+            nome: "ISO 20000 - Serviços TI", 
             color: colors.red, 
             desc: "Capacita o colaborador a entender e aplicar as normas da família ISO 20000 para gerenciamento de serviços de TI."
         },
         { 
             id: 72, 
-            categoria: "Gestão de Times", 
-            nome: "06 - GOVERNANÇA: ISO 27000 - Seg. Info.", 
+            categoria: "06 - GOVERNANÇA", 
+            nome: "ISO 27000 - Seg. Info.", 
             color: colors.red, 
             desc: "Ensina a importância da conformidade com as normas da família ISO 27000, preparando para garantir a segurança da informação."
         },
         { 
             id: 40, 
-            categoria: "GESTÃO DE TI", 
-            nome: "06 - GOVERNANÇA: ISO 42000 - Gov. IA", 
+            categoria: "06 - GOVERNANÇA", 
+            nome: "ISO 42000 - Gov. IA", 
             color: colors.red, 
             desc: "Ensina a importância da família ISO 42000, preparando o colaborador para governança de IA."
         },
@@ -349,43 +350,43 @@ const initialConfig = {
         // --- 07. CMMI ---
         { 
             id: 42, 
-            categoria: "CMMI TEC", 
-            nome: "07 - CMMI TEC: Areas de Prática do Modelo", 
+            categoria: "07 - CMMI TEC", 
+            nome: "Areas de Prática do Modelo", 
             color: colors.grey, 
             desc: "Capacita o colaborador a entender e aplicar as áreas de prática do modelo CMMI, alinhando processos a padrões de qualidade."
         },
         { 
             id: 43, 
-            categoria: "CMMI TEC", 
-            nome: "07 - CMMI TEC: Ciclo de Vida de Desenv.", 
+            categoria: "07 - CMMI TEC", 
+            nome: "Ciclo de Vida de Desenv.", 
             color: colors.grey, 
             desc: "Ensina o ciclo de vida de desenvolvimento conforme o CMMI, ajudando o colaborador a implementar melhorias contínuas em projetos."
         },
         { 
             id: 44, 
-            categoria: "CMMI GLOBAL", 
-            nome: "07 - CMMI GLOBAL: Funções do Grupo EPG", 
+            categoria: "07 - CMMI GLOBAL", 
+            nome: "Funções do Grupo EPG", 
             color: colors.grey, 
             desc: "Explora as funções do Grupo EPG, detalhando o papel desse grupo na implementação e manutenção do modelo CMMI na organização."
         },
         { 
             id: 45, 
-            categoria: "CMMI GLOBAL", 
-            nome: "07 - CMMI GLOBAL: Imersão no Modelo", 
+            categoria: "07 - CMMI GLOBAL", 
+            nome: "Imersão no Modelo", 
             color: colors.grey, 
             desc: "Oferece uma imersão no modelo CMMI, capacitando o colaborador a entender profundamente suas práticas e benefícios."
         },
         { 
             id: 46, 
-            categoria: "CMMI GLOBAL", 
-            nome: "07 - CMMI GLOBAL: Plano de Melhorias", 
+            categoria: "07 - CMMI GLOBAL", 
+            nome: "Plano de Melhorias", 
             color: colors.grey, 
             desc: "Apresenta o plano de melhorias da Edesoft, baseado no modelo CMMI, mostrando a evolução contínua de seus processos."
         },
         { 
             id: 47, 
-            categoria: "CMMI GLOBAL", 
-            nome: "07 - CMMI GLOBAL: Políticas e Diretrizes", 
+            categoria: "07 - CMMI GLOBAL", 
+            nome: "Políticas e Diretrizes", 
             color: colors.grey, 
             desc: "Ensina as rotinas organizacionais conforme o CMMI, capacitando o colaborador a alinhar as práticas diárias aos objetivos de qualidade."
         },
@@ -393,85 +394,85 @@ const initialConfig = {
         // --- 08 a 13. ÁREAS DE NEGÓCIO E GESTÃO ---
         { 
             id: 48, 
-            categoria: "INFRAESTRUTURA", 
-            nome: "08 - INFRAESTRUTURA: Hardware/Redes", 
+            categoria: "08 - INFRAESTRUTURA", 
+            nome: "Hardware/Redes", 
             color: colors.green, 
             desc: "Capacita o colaborador a entender a configuração e manutenção de hardware e redes, garantindo a estabilidade da infraestrutura."
         },
         { 
             id: 49, 
-            categoria: "MARKETING", 
-            nome: "09 - MARKETING: Mídias Sociais", 
+            categoria: "09 - MARKETING", 
+            nome: "Mídias Sociais", 
             color: colors.blueDark, 
             desc: "Ensina estratégias e ferramentas para gerenciar redes sociais, ajudando o colaborador a melhorar a presença online."
         },
         { 
             id: 50, 
-            categoria: "COMERCIAL", 
-            nome: "10 - COMERCIAL: Curso de Vendas", 
+            categoria: "10 - COMERCIAL", 
+            nome: "Curso de Vendas", 
             color: colors.red, 
             desc: "Foca em técnicas de vendas, preparando o colaborador para interagir com clientes de forma assertiva."
         },
         { 
             id: 51, 
-            categoria: "GESTÃO", 
-            nome: "11 - GESTÃO: Departamento Pessoal", 
+            categoria: "11 - GESTÃO", 
+            nome: "Departamento Pessoal", 
             color: colors.gold, 
             desc: "Fornece as habilidades necessárias para lidar com processos de administração de pessoal e conformidade com políticas."
         },
         { 
             id: 52, 
-            categoria: "GESTÃO", 
-            nome: "11 - GESTÃO: Financeira", 
+            categoria: "11 - GESTÃO", 
+            nome: "Financeira", 
             color: colors.gold, 
             desc: "Ensina conceitos e práticas de gestão financeira, capacitando o colaborador a tomar decisões estratégicas."
         },
         { 
             id: 53, 
-            categoria: "GESTÃO", 
-            nome: "11 - GESTÃO: Pessoas", 
+            categoria: "11 - GESTÃO", 
+            nome: "Pessoas", 
             color: colors.gold, 
             desc: "Desenvolve habilidades de liderança e gestão de pessoas, ajudando o colaborador a gerenciar equipes com eficiência."
         },
         { 
             id: 54, 
-            categoria: "GESTÃO", 
-            nome: "11 - GESTÃO: Processos", 
+            categoria: "11 - GESTÃO", 
+            nome: "Processos", 
             color: colors.gold, 
             desc: "Capacita o colaborador a mapear, documentar e otimizar processos internos, melhorando a eficiência."
         },
         { 
             id: 55, 
-            categoria: "GESTÃO", 
-            nome: "11 - GESTÃO: Projetos", 
+            categoria: "11 - GESTÃO", 
+            nome: "Projetos", 
             color: colors.gold, 
             desc: "Ensina metodologias e práticas de gestão de projetos, capacitando o colaborador a planejar e executar projetos."
         },
         { 
             id: 56, 
-            categoria: "RH", 
-            nome: "12 - RH: Administração de Cargos e Salários", 
+            categoria: "12 - RH", 
+            nome: "Administração de Cargos e Salários", 
             color: colors.purple, 
             desc: "Capacita o colaborador a administrar planos de cargos e salários, garantindo uma estrutura salarial justa."
         },
         { 
             id: 57, 
-            categoria: "RH", 
-            nome: "12 - RH: Recrutamento e Seleção", 
+            categoria: "12 - RH", 
+            nome: "Recrutamento e Seleção", 
             color: colors.purple, 
             desc: "Ensina técnicas de recrutamento e seleção, ajudando o colaborador a identificar e contratar talentos."
         },
         { 
             id: 58, 
-            categoria: "LEGISLAÇÃO", 
-            nome: "13 - LEGISLAÇÃO: Leis Trabalhistas", 
+            categoria: "13 - LEGISLAÇÃO", 
+            nome: "Leis Trabalhistas", 
             color: colors.black, 
             desc: "Capacita o colaborador a entender e aplicar as leis trabalhistas, assegurando a conformidade com a legislação."
         },
         { 
             id: 59, 
-            categoria: "LEGISLAÇÃO", 
-            nome: "13 - LEGISLAÇÃO: LGPD", 
+            categoria: "13 - LEGISLAÇÃO", 
+            nome: "LGPD", 
             color: colors.black, 
             desc: "Ensina os princípios da LGPD, preparando o colaborador para lidar com dados pessoais de forma segura."
         },
@@ -479,8 +480,8 @@ const initialConfig = {
         // --- 14. ENGENHARIA DE DADOS ---
         { 
             id: 65, 
-            categoria: "ENGENHARIA DADOS", 
-            nome: "14 - ENGENHARIA DADOS: Fundamentos", 
+            categoria: "14 - ENGENHARIA DADOS", 
+            nome: "Fundamentos", 
             color: colors.yellow, 
             desc: "Introduz os fundamentos da ciência de dados, capacitando o colaborador a trabalhar com análise de grandes volumes de dados."
         },
@@ -488,64 +489,64 @@ const initialConfig = {
         // --- 15. MELHORIA DE PROCESSOS ---
         { 
             id: 13, 
-            categoria: "PROCESSOS", 
-            nome: "15 - PROCESSOS: Mapeamento de Processos", 
+            categoria: "15 - PROCESSOS", 
+            nome: "Mapeamento de Processos", 
             color: colors.cyan, 
             desc: "Capacita o colaborador a mapear e modelar processos, promovendo uma visão clara dos fluxos de trabalho."
         },
         { 
             id: 77, 
-            categoria: "Melhoria de Processos", 
-            nome: "15 - PROCESSOS: Bizagi Modeler", 
+            categoria: "15 - PROCESSOS", 
+            nome: "Bizagi Modeler", 
             color: colors.cyan, 
             desc: "Ensina o uso do Bizagi Modeler para modelagem de processos de negócios, otimizando fluxos de trabalho."
         },
         { 
             id: 78, 
-            categoria: "Melhoria de Processos", 
-            nome: "15 - PROCESSOS: Estatística Básica", 
+            categoria: "15 - PROCESSOS", 
+            nome: "Estatística Básica", 
             color: colors.cyan, 
             desc: "Capacita o colaborador a compreender conceitos básicos de estatística, aplicando-os na análise de dados."
         },
         { 
             id: 79, 
-            categoria: "Melhoria de Processos", 
-            nome: "15 - PROCESSOS: Introdução ao Lean", 
+            categoria: "15 - PROCESSOS", 
+            nome: "Introdução ao Lean", 
             color: colors.cyan, 
             desc: "Introduz os princípios do Lean, capacitando o colaborador a eliminar desperdícios e aumentar a eficiência."
         },
         { 
             id: 80, 
-            categoria: "Melhoria de Processos", 
-            nome: "15 - PROCESSOS: KAIZEN", 
+            categoria: "15 - PROCESSOS", 
+            nome: "KAIZEN", 
             color: colors.cyan, 
             desc: "Apresenta a metodologia Kaizen, ensinando o colaborador a implementar melhorias contínuas em processos."
         },
         { 
             id: 81, 
-            categoria: "Melhoria de Processos", 
-            nome: "15 - PROCESSOS: KPI", 
+            categoria: "15 - PROCESSOS", 
+            nome: "KPI", 
             color: colors.cyan, 
             desc: "Ensina como definir e medir indicadores de desempenho (KPIs), fundamentais para monitorar a performance."
         },
         { 
             id: 82, 
-            categoria: "Melhoria de Processos", 
-            nome: "15 - PROCESSOS: Lean White Belt", 
+            categoria: "15 - PROCESSOS", 
+            nome: "Lean White Belt", 
             color: colors.cyan, 
             desc: "Introduz os fundamentos do Lean Seis Sigma White Belt, capacitando o colaborador a apoiar iniciativas de melhoria."
         },
         { 
             id: 83, 
-            categoria: "Melhoria de Processos", 
-            nome: "15 - PROCESSOS: Lean Yellow Belt", 
+            categoria: "15 - PROCESSOS", 
+            nome: "Lean Yellow Belt", 
             color: colors.cyan, 
             desc: "Ensina os conceitos do Lean Seis Sigma Yellow Belt, preparando o colaborador para liderar pequenas melhorias."
         },
         { 
             id: 85, 
-            categoria: "Melhoria de Processos", 
-            nome: "15 - PROCESSOS: MASP & PDCA", 
+            categoria: "15 - PROCESSOS", 
+            nome: "MASP & PDCA", 
             color: colors.cyan, 
             desc: "Apresenta as metodologias MASP e PDCA para resolução de problemas e melhoria contínua."
         },
@@ -553,169 +554,169 @@ const initialConfig = {
         // --- 16. DESENVOLVIMENTO ---
         { 
             id: 86, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: API", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "API", 
             color: colors.blueLight, 
             desc: "Ensina a criação e consumo de APIs, capacitando o colaborador a desenvolver integrações eficientes."
         },
         { 
             id: 87, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: AWS", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "AWS", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador a utilizar a AWS para desenvolver, implantar e gerenciar soluções na nuvem."
         },
         { 
             id: 88, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: CLOUD", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "CLOUD", 
             color: colors.blueLight, 
             desc: "Introduz os conceitos de computação em nuvem, capacitando o colaborador a trabalhar com infraestrutura escalável."
         },
         { 
             id: 11, 
-            categoria: "OUTSOURCING", 
-            nome: "16 - DESENVOLVIMENTO: AZURE DEVOPS", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "AZURE DEVOPS", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador a usar o Azure DevOps para planejar, automatizar e entregar software com CI/CD."
         },
         { 
             id: 89, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: DJANGO", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "DJANGO", 
             color: colors.blueLight, 
             desc: "Ensina o uso do Django para desenvolvimento web em Python, capacitando a criar aplicações robustas."
         },
         { 
             id: 90, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: DOCKER", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "DOCKER", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador a utilizar Docker para criar, implantar e gerenciar containers."
         },
         { 
             id: 91, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: FLASK", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "FLASK", 
             color: colors.blueLight, 
             desc: "Ensina o uso do Flask para desenvolvimento de aplicações web leves e rápidas em Python."
         },
         { 
             id: 92, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: GIT", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "GIT", 
             color: colors.blueLight, 
             desc: "Apresenta o GIT como ferramenta de controle de versão, capacitando a gerenciar código de forma eficiente."
         },
         { 
             id: 93, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: HTML", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "HTML", 
             color: colors.blueLight, 
             desc: "Ensina os fundamentos de HTML, capacitando o colaborador a criar e estruturar páginas web."
         },
         { 
             id: 94, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: CSS", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "CSS", 
             color: colors.blueLight, 
             desc: "Ensina os fundamentos de CSS, capacitando o colaborador a estilizar páginas web e melhorar a experiência do usuário."
         },
         { 
             id: 95, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: JAVASCRIPT", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "JAVASCRIPT", 
             color: colors.blueLight, 
             desc: "Ensina os fundamentos de JavaScript, capacitando o colaborador a desenvolver aplicações web dinâmicas."
         },
         { 
             id: 96, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: LÓGICA", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "LÓGICA", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador a entender lógica de programação e algoritmos, essenciais para resolver problemas."
         },
         { 
             id: 97, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: MENSAGERIA", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "MENSAGERIA", 
             color: colors.blueLight, 
             desc: "Ensina os conceitos de mensageria, capacitando a implementar sistemas de comunicação assíncrona."
         },
         { 
             id: 98, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: MOBX", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "MOBX", 
             color: colors.blueLight, 
             desc: "Apresenta o MOBX como uma biblioteca de gerenciamento de estado, capacitando a criar aplicações escaláveis."
         },
         { 
             id: 99, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: NODEJS", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "NODEJS", 
             color: colors.blueLight, 
             desc: "Ensina o uso do Node.js para desenvolvimento server-side, capacitando a construir sistemas rápidos."
         },
         { 
             id: 100, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: ORM", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "ORM", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador a utilizar ORMs para simplificar a interação com bancos de dados relacionais."
         },
         { 
             id: 101, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: POO", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "POO", 
             color: colors.blueLight, 
             desc: "Ensina os conceitos de Programação Orientada a Objetos (POO), capacitando a desenvolver soluções estruturadas."
         },
         { 
             id: 102, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: PYTHON", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "PYTHON", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador a utilizar Python para desenvolver scripts e aplicações, otimizando processos."
         },
         { 
             id: 103, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: REACT", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "REACT", 
             color: colors.blueLight, 
             desc: "Ensina o uso do React para construção de interfaces de usuário dinâmicas e escaláveis em aplicações web."
         },
         { 
             id: 104, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: REDUX", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "REDUX", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador a utilizar Redux para gerenciar o estado de aplicações React de forma eficiente."
         },
         { 
             id: 12, 
-            categoria: "OUTSOURCING", 
-            nome: "16 - DESENVOLVIMENTO: RESTFULL", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "RESTFULL", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador a utilizar APIs RESTful para desenvolver, consumir e integrar serviços."
         },
         { 
             id: 105, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: ROADMAPS", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "ROADMAPS", 
             color: colors.blueLight, 
             desc: "Apresenta roadmaps de desenvolvimento, capacitando o colaborador a planejar sua evolução técnica."
         },
         { 
             id: 106, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: SQL", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "SQL", 
             color: colors.blueLight, 
             desc: "Ensina SQL para gerenciamento e consulta de bancos de dados relacionais, capacitando a manipular dados."
         },
         { 
             id: 107, 
-            categoria: "TI - DESENVOLVIMENTO", 
-            nome: "16 - DESENVOLVIMENTO: TYPESCRIPT", 
+            categoria: "16 - DESENVOLVIMENTO", 
+            nome: "TYPESCRIPT", 
             color: colors.blueLight, 
             desc: "Capacita o colaborador a utilizar TypeScript para adicionar tipagem estática ao JavaScript."
         },
@@ -723,22 +724,22 @@ const initialConfig = {
         // --- 17. AUTOMAÇÃO ---
         { 
             id: 108, 
-            categoria: "Automação", 
-            nome: "17 - AUTOMAÇÃO: Básico de Make", 
+            categoria: "17 - AUTOMAÇÃO", 
+            nome: "Básico de Make", 
             color: colors.grey, 
             desc: "Ensina técnicas para criar fluxos de automação eficazes que otimizam processos, integrando ferramentas."
         },
         { 
             id: 109, 
-            categoria: "Automação", 
-            nome: "17 - AUTOMAÇÃO: Básico de Manychat", 
+            categoria: "17 - AUTOMAÇÃO", 
+            nome: "Básico de Manychat", 
             color: colors.grey, 
             desc: "Capacita o colaborador a criar chatbots e automações de atendimento, melhorando o engajamento."
         },
         { 
             id: 110, 
-            categoria: "Automação", 
-            nome: "17 - AUTOMAÇÃO: Básico de n8n", 
+            categoria: "17 - AUTOMAÇÃO", 
+            nome: "Básico de n8n", 
             color: colors.grey, 
             desc: "Ensina a utilizar o n8n para criar automações de fluxo de trabalho complexas e integradas."
         },
@@ -746,54 +747,55 @@ const initialConfig = {
         // --- 18. IA (Inteligência Artificial) ---
         { 
             id: 111, 
-            categoria: "IA", 
-            nome: "18 - IA: Overview", 
+            categoria: "18 - IA", 
+            nome: "Overview", 
             color: colors.yellow, 
             desc: "Fornece uma visão geral sobre Inteligência Artificial, seus conceitos fundamentais e impacto nos negócios."
         },
         { 
             id: 112, 
-            categoria: "IA", 
-            nome: "18 - IA: LLMS", 
+            categoria: "18 - IA", 
+            nome: "LLMS", 
             color: colors.yellow, 
             desc: "Explora os Grandes Modelos de Linguagem (LLMs), explicando como funcionam e suas aplicações práticas."
         },
         { 
             id: 113, 
-            categoria: "IA", 
-            nome: "18 - IA: ENG. DE PROMPT - FUNDAMENTOS", 
+            categoria: "18 - IA", 
+            nome: "ENG. DE PROMPT - FUNDAMENTOS", 
             color: colors.yellow, 
             desc: "Ensina os fundamentos da engenharia de prompt, capacitando o colaborador a interagir com modelos de IA."
         },
         { 
             id: 114, 
-            categoria: "IA", 
-            nome: "18 - IA: ENG. DE PROMPT - CASOS DE USO", 
+            categoria: "18 - IA", 
+            nome: "ENG. DE PROMPT - CASOS DE USO", 
             color: colors.yellow, 
             desc: "Apresenta casos de uso práticos de engenharia de prompt, demonstrando como aplicar a técnica."
         },
         { 
             id: 115, 
-            categoria: "IA", 
-            nome: "18 - IA: ENG. DE CONTEXTO - OVERVIEW", 
+            categoria: "18 - IA", 
+            nome: "ENG. DE CONTEXTO - OVERVIEW", 
             color: colors.yellow, 
             desc: "Introduz a engenharia de contexto, ensinando como fornecer informações relevantes para a IA."
         },
         { 
             id: 116, 
-            categoria: "IA", 
-            nome: "18 - IA: ASSISTENTES DE IA", 
+            categoria: "18 - IA", 
+            nome: "ASSISTENTES DE IA", 
             color: colors.yellow, 
             desc: "Capacita o colaborador a criar e utilizar assistentes de IA para automatizar tarefas e aumentar a produtividade."
         },
         { 
             id: 117, 
-            categoria: "IA", 
-            nome: "18 - IA: AGENTES DE IA", 
+            categoria: "18 - IA", 
+            nome: "AGENTES DE IA", 
             color: colors.yellow, 
             desc: "Ensina sobre agentes de IA autônomos, explorando como eles podem executar tarefas complexas."
         }
     ],
+        
     
         // ==========================================================================
     // 2. TABELA: CARGOS (Regras de Negócio)
@@ -13788,6 +13790,7 @@ colaboradores: [
     
     }
 }; // Fim do objeto config
+
 
 
 
