@@ -22,76 +22,106 @@
         .brand span { color: #3b82f6; }
         .subtitle { color: #64748b; font-size: 14px; margin-bottom: 32px; }
         
-        .input-group { margin-bottom: 16px; text-align: left; }
-        .input-group label { display: block; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase; }
-        input { 
-            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; 
-            font-size: 14px; outline: none; transition: 0.2s; box-sizing: border-box;
+        input {
+            width: 100%; padding: 12px 16px; margin-bottom: 16px;
+            border: 1px solid #cbd5e1; border-radius: 8px;
+            font-size: 14px; box-sizing: border-box;
+            transition: all 0.2s; outline: none;
         }
         input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         
         button {
-            width: 100%; padding: 14px; background: #0f172a; color: #fff; border: none;
-            border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px;
-            margin-top: 16px; transition: 0.2s;
+            width: 100%; padding: 12px; background-color: #0f172a;
+            color: #fff; border: none; border-radius: 8px;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+            margin-top: 8px;
         }
-        button:hover { background: #1e293b; }
-        .footer { margin-top: 24px; font-size: 11px; color: #94a3b8; }
-        .error { color: #ef4444; font-size: 12px; margin-top: 16px; display: none; font-weight: 600;}
+        button:hover { background-color: #1e293b; }
+        
+        .error {
+            color: #ef4444; font-size: 13px; margin-top: 16px;
+            display: none; background: #fef2f2; padding: 10px;
+            border-radius: 6px; border: 1px solid #fee2e2;
+        }
+        
+        .footer {
+            margin-top: 32px; font-size: 12px; color: #94a3b8;
+        }
     </style>
 </head>
 <body>
+
     <div class="login-card">
-        <div class="brand">RH SYSTEM <span>EDESOFT</span></div>
-        <div class="subtitle">Faça login para acessar o portal do colaborador</div>
+        <div class="brand">RH System <span>Edesoft</span></div>
+        <div class="subtitle">Faça login para acessar a matriz</div>
 
         <div class="input-group">
-            <label>Usuário Corporativo</label>
-            <input type="text" id="user" placeholder="ex: admin.rh" autofocus>
-        </div>
-        <div class="input-group">
-            <label>Senha</label>
-            <input type="password" id="pass" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+            <input type="text" id="user" placeholder="Usuário (ex: admin)" autocomplete="off">
+            <input type="password" id="pass" placeholder="Senha" 
+                   onkeypress="if(event.key === 'Enter') login()">
         </div>
 
-        <button onclick="login()">ENTRAR NO SISTEMA</button>
-        <div id="msgError" class="error">Credenciais inválidas.</div>
+        <button id="btnLogin" onclick="login()">ENTRAR NO SISTEMA</button>
+        <div id="msgError" class="error"></div>
 
-        <div class="footer">© 2024 Edesoft • Internal Tools</div>
+        <div class="footer">© 2026 Edesoft • Internal Tools</div>
     </div>
 
-    <script>
-        function login() {
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
+    <script type="module">
+        import { DBHandler } from './db-handler.js';
 
-            // --- LÓGICA DE VALIDAÇÃO ---
-            if (u === 'admin' && p === 'admin') {
-                // SESSÃO ADMIN
-                salvarSessao('Administrador', 'ADMIN');
-            } else if (u === 'user' && p === '123') {
-                // SESSÃO VISITANTE
-                salvarSessao('Colaborador', 'VIEWER');
-            } else {
-                document.getElementById('msgError').style.display = 'block';
+        // Torna a função acessível globalmente para o onclick do botão HTML
+        window.login = async function() {
+            const u = document.getElementById('user').value.trim();
+            const p = document.getElementById('pass').value.trim();
+            const btn = document.getElementById('btnLogin');
+            const errorDiv = document.getElementById('msgError');
+
+            // Reset visual
+            errorDiv.style.display = 'none';
+            btn.textContent = "Verificando...";
+            btn.disabled = true;
+
+            try {
+                // Chama o Supabase através do nosso Handler
+                const usuario = await DBHandler.validarLogin(u, p);
+
+                if (usuario) {
+                    // SUCESSO: Salva sessão e redireciona
+                    salvarSessao(usuario.nome, usuario.role);
+                } else {
+                    // FALHA: Usuário ou senha incorretos
+                    throw new Error("Usuário ou senha incorretos.");
+                }
+
+            } catch (err) {
+                console.error(err);
+                errorDiv.textContent = err.message || "Erro de conexão.";
+                errorDiv.style.display = 'block';
+                btn.textContent = "ENTRAR NO SISTEMA";
+                btn.disabled = false;
             }
-        }
+        };
 
         function salvarSessao(nome, role) {
             const sessao = {
                 user: nome,
-                role: role, // 'ADMIN' ou 'VIEWER'
+                role: role, // Vindo direto do banco ('ADMIN' ou 'VIEWER')
                 token: 'session-' + Date.now()
             };
             localStorage.setItem('rh_session', JSON.stringify(sessao));
             
-            // REDIRECIONA PARA O MENU PRINCIPAL
-            window.location.href = 'rh-system-edesoft.html';
+            // REDIRECIONA
+            window.location.href = 'rh-system-edesoft.html'; // Verifique se o nome do arquivo principal é este mesmo
         }
-        
-        // Se já tiver sessão, redireciona direto (opcional)
-        // if(localStorage.getItem('rh_session')) window.location.href = 'rh-system-edesoft.html';
-    </script>
-</body>
 
+        // Verifica se já está logado ao abrir
+        const sessaoAtual = localStorage.getItem('rh_session');
+        if (sessaoAtual) {
+            // Opcional: Redirecionar automático se já tiver sessão válida
+            // window.location.href = 'rh-system-edesoft.html';
+        }
+    </script>
+
+</body>
 </html>
