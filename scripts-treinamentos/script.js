@@ -1059,4 +1059,5 @@ function confirmarAcaoSegura() {
     }
 
     fecharModalConfirmacao();
+
 }
