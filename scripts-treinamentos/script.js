@@ -106,11 +106,19 @@ function getCargoIdByName(nome) {
 }
 
 function atualizarFiltroHUD(cargoId, categoria, obrigatoriedade) {
+    // Busca os elementos
     const tagRole = document.getElementById('tagRole');
     const tagCat = document.getElementById('tagCategory');
     const tagStatus = document.getElementById('tagStatus');
     const tagStatusContainer = document.getElementById('tagStatusContainer');
     const hudDividerStatus = document.getElementById('hudDividerStatus');
+
+    // --- PROTEÇÃO CONTRA ERRO FATAL ---
+    // Se o HTML ainda não tiver esses elementos, a função para aqui sem quebrar o sistema
+    if (!tagRole || !tagCat || !tagStatus) {
+        console.warn("HUD Elements not found inside atualizarFiltroHUD. Skipping UI update.");
+        return; 
+    }
 
     // 1. Definição do Texto do Cargo
     let roleText = "Todos";
@@ -118,6 +126,8 @@ function atualizarFiltroHUD(cargoId, categoria, obrigatoriedade) {
         const cargoObj = config.cargos.find(c => c.id.toString() === cargoId);
         if (cargoObj) roleText = cargoObj.nome;
     }
+    
+    // Agora é seguro atualizar
     tagRole.textContent = roleText;
     tagRole.style.color = "#3b82f6"; 
 
@@ -136,13 +146,22 @@ function atualizarFiltroHUD(cargoId, categoria, obrigatoriedade) {
     tagStatus.textContent = obrigatoriedadeMap[obrigatoriedade] || "Todas";
     tagStatus.style.color = "#3b82f6"; 
     
-    const labelTitulo = tagStatusContainer ? tagStatusContainer.querySelector('.hud-label') : null;
-    if(labelTitulo) labelTitulo.textContent = "OBRIGATORIEDADE";
+    // Atualiza visibilidade do container se ele existir
+    if (tagStatusContainer && hudDividerStatus) {
+        const labelTitulo = tagStatusContainer.querySelector('.lupafiltros-key'); // Ajustado para classe nova
+        if(labelTitulo) labelTitulo.textContent = "STATUS";
 
-    if (tagStatusContainer) tagStatusContainer.classList.remove('hidden');
-    if (hudDividerStatus) hudDividerStatus.classList.remove('hidden');
+        // Lógica visual: Se estiver filtrando algo, mostra os divisores
+        // (Ajuste conforme seu gosto visual)
+        if (obrigatoriedade !== 'all') {
+            tagStatusContainer.classList.remove('hidden');
+            hudDividerStatus.classList.remove('hidden');
+        } else {
+            tagStatusContainer.classList.add('hidden');
+            hudDividerStatus.classList.add('hidden');
+        }
+    }
 }
-
 function atualizarFiltros(valorCargoClick) {
     // --- LÓGICA DE TOGGLE (LIGAR/DESLIGAR) ---
     // Se a função foi chamada pelo clique na coluna (valorCargoClick existe)
@@ -994,6 +1013,7 @@ async function confirmarAcaoSegura() {
         alert("Erro ao salvar alteração: " + e.message);
     }
 }
+
 
 
 
