@@ -13,17 +13,29 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export const DBHandler = {
 
-    // --- 1. LEITURA INICIAL ---
+ // --- 1. LEITURA INICIAL ---
     async carregarDadosIniciais() {
         console.log("🔄 Buscando dados do Supabase...");
         
-        const { data: treinos, error: errT } = await supabase
+        // 1. Busca Treinamentos (Corrigido erro 400)
+        const { data: treinosRaw, error: errT } = await supabase
             .from('treinamentos')
-            .select('id, nome, categoria, desc:desc_curta, color, link')
+            .select('id, nome, categoria, desc_curta, color, link') // Sem alias na query
             .order('nome');
             
         if (errT) throw errT;
 
+        // 2. Ajusta os dados para o formato que o script.js espera
+        const treinos = treinosRaw.map(t => ({
+            id: t.id,
+            nome: t.nome,
+            categoria: t.categoria,
+            desc: t.desc_curta, // <--- AQUI FAZEMOS O DE-PARA
+            color: t.color,
+            link: t.link
+        }));
+
+        // 3. Busca Cargos
         const { data: cargos, error: errC } = await supabase
             .from('view_matriz_cargos')
             .select('*')
@@ -33,7 +45,6 @@ export const DBHandler = {
 
         return { treinamentos: treinos, cargos: cargos };
     },
-
     // --- 2. GERENCIAR TREINAMENTOS ---
     async salvarTreinamento(treino) {
         const payload = {
@@ -107,3 +118,4 @@ export const DBHandler = {
         return data;
     }
 };
+
