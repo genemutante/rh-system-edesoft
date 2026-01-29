@@ -13,28 +13,28 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export const DBHandler = {
 
-    // --- 1. LEITURA INICIAL ---
+  // --- 1. LEITURA INICIAL ---
     async carregarDadosIniciais() {
         console.log("🔄 Buscando dados do Supabase...");
         
-        // 1. Busca usando os nomes REAIS das colunas do banco
+        // 1. Busca usando os nomes REAIS das colunas
         const { data: treinosRaw, error: errT } = await supabase
             .from('treinamentos')
             .select('id, nome, categoria, descricao, cor, link_externo') 
-            .order('nome');
+            // ORDENAÇÃO DUPLA:
+            .order('categoria', { ascending: true }) // 1º: Agrupa por Categoria (00, 01, 02...)
+            .order('nome', { ascending: true });     // 2º: A-Z dentro da categoria
             
         if (errT) throw errT;
 
         // 2. Mapeia para o formato que o script.js espera
-        // O script.js usa: .desc, .color, .link
-        // O banco tem: .descricao, .cor, .link_externo
         const treinos = treinosRaw.map(t => ({
             id: t.id,
             nome: t.nome,
             categoria: t.categoria,
-            desc: t.descricao,      // <--- Mapeamento aqui
-            color: t.cor,           // <--- Mapeamento aqui
-            link: t.link_externo    // <--- Mapeamento aqui
+            desc: t.descricao,
+            color: t.cor,
+            link: t.link_externo
         }));
 
         const { data: cargos, error: errC } = await supabase
@@ -46,7 +46,7 @@ export const DBHandler = {
 
         return { treinamentos: treinos, cargos: cargos };
     },
-
+    
     // --- 2. GERENCIAR TREINAMENTOS ---
     async salvarTreinamento(treino) {
         // Prepara o payload usando os nomes REAIS das colunas do banco
@@ -121,3 +121,4 @@ export const DBHandler = {
         return data;
     }
 };
+
