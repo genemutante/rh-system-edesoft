@@ -798,60 +798,58 @@ function realizarLogin() {
 // 9. EDIÇÃO DE RELACIONAMENTO (COM CONFIRMAÇÃO)
 // =============================================================================
 
-function alternarRelacao(cargoIndex, treinoId) {
+async function alternarRelacao(cargoIndex, treinoId) {
     // 1. Segurança: Só permite se estiver no Modo Admin
     if (!isAdminMode) return;
 
     const cargo = config.cargos[cargoIndex];
     if (!cargo) return;
 
-    // Garante que os arrays existam
-    if (!cargo.obrigatorios) cargo.obrigatorios = [];
-    if (!cargo.recomendados) cargo.recomendados = [];
+    // 2. Identifica o estado atual nos dados carregados
+    // (Usamos os arrays da memória apenas para saber o estado ATUAL)
+    const isObrig = cargo.obrigatorios && cargo.obrigatorios.includes(treinoId);
+    const isRecom = cargo.recomendados && cargo.recomendados.includes(treinoId);
 
-    // 2. Identifica o estado atual
-    const isObrig = cargo.obrigatorios.includes(treinoId);
-    const isRecom = cargo.recomendados.includes(treinoId);
+    // 3. Determina o PRÓXIMO estado (Lógica de Negócio)
+    let novoStatus = '';
+    let msgConfirmacao = '';
 
-    // 3. Prepara a mensagem de confirmação (Prevê o futuro)
-    let msgConfirmacao = "";
-    
     if (!isObrig && !isRecom) {
-        // Vazio -> Vai virar OBRIGATÓRIO
+        // Se não tem nada -> Vira OBRIGATÓRIO
+        novoStatus = 'mandatory';
         msgConfirmacao = `Deseja tornar este curso OBRIGATÓRIO para ${cargo.nome}?`;
     } 
     else if (isObrig) {
-        // Obrigatório -> Vai virar RECOMENDÁVEL
+        // Se é Obrigatório -> Vira RECOMENDÁVEL
+        novoStatus = 'recommended';
         msgConfirmacao = `Deseja mudar de Obrigatório para RECOMENDÁVEL?`;
     } 
     else if (isRecom) {
-        // Recomendável -> Vai LIMPAR
-        msgConfirmacao = `Deseja REMOVER a obrigatoriedade deste curso para ${cargo.nome}?`;
+        // Se é Recomendável -> Vira NADA (Remove a regra)
+        novoStatus = 'none';
+        msgConfirmacao = `Deseja REMOVER a regra deste curso para ${cargo.nome}?`;
     }
 
-    // 4. A PERGUNTA (O Browser pausa aqui esperando o OK)
-    if (!confirm(msgConfirmacao)) {
-        return; // Se o usuário clicar em "Cancelar", a função para aqui e nada muda.
-    }
+    // 4. Confirmação do Usuário
+    if (!confirm(msgConfirmacao)) return;
 
-    // 5. Se deu OK, aplica a mudança
-    if (!isObrig && !isRecom) {
-        cargo.obrigatorios.push(treinoId);
-    } 
-    else if (isObrig) {
-        cargo.obrigatorios = cargo.obrigatorios.filter(id => id !== treinoId);
-        cargo.recomendados.push(treinoId);
-    } 
-    else if (isRecom) {
-        cargo.recomendados = cargo.recomendados.filter(id => id !== treinoId);
-    }
+    // 5. Operação no Banco de Dados
+    try {
+        // Chama o Handler para fazer o INSERT ou DELETE no Supabase
+        await DBHandler.atualizarRegra(cargo.id, treinoId, novoStatus);
 
-    // 6. Salva e Atualiza a tela
-    persistirDados(`Relação alterada: Cargo ${cargo.nome} (ID ${treinoId})`);
-    atualizarFiltros();
+        // 6. Recarrega os dados do banco para garantir sincronia total
+        const dadosFrescos = await DBHandler.carregarDadosIniciais();
+        config = dadosFrescos;
+
+        // 7. Atualiza a tela mantendo filtros
+        atualizarFiltros();
+
+    } catch (e) {
+        console.error("Erro ao alterar regra:", e);
+        alert("Não foi possível salvar a alteração. Verifique a conexão.");
+    }
 }
-
-
 // =============================================================================
 // 10. LÓGICA DO MENU DE CONTEXTO (EDIÇÃO SEGURA)
 // =============================================================================
@@ -996,6 +994,7 @@ async function confirmarAcaoSegura() {
         alert("Erro ao salvar alteração: " + e.message);
     }
 }
+
 
 
 
