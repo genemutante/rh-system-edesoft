@@ -9,11 +9,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../estilos-treinamentos/style.css">
+    <link rel="stylesheet" href="../.estilos-treinamentos/style.css">
     
     <style>
         /* =========================================================
-           LAYOUT 100VH (TELA ÚNICA FIXA - IDÊNTICO AO REFERÊNCIA)
+           LAYOUT 100VH (TELA ÚNICA FIXA)
            ========================================================= */
         html, body {
             height: 100%; margin: 0; padding: 0;
@@ -60,29 +60,6 @@
             padding-bottom: 20px;
         }
 
-        /* Estilos da Tabela (Garantindo alinhamento) */
-        table {
-            border-collapse: separate; 
-            border-spacing: 0; 
-            width: 100%;
-        }
-        
-        /* Cabeçalho Sticky */
-        thead th {
-            position: sticky; top: 0; z-index: 20;
-            background: #fff; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        
-        /* Primeira Coluna Sticky */
-        tbody th, thead th:first-child {
-            position: sticky; left: 0; z-index: 10;
-            background: #fff;
-            border-right: 1px solid #e2e8f0;
-        }
-        
-        thead th:first-child { z-index: 30; } /* Canto superior esquerdo */
-
         /* =========================================================
            SEGURANÇA & BADGE VISUAL
            ========================================================= */
@@ -121,35 +98,6 @@
         }
         .btn-new-course:hover { background-color: #334155; transform: translateY(-1px); }
 
-        /* Classes Utilitárias do Script (Necessárias para o JS funcionar) */
-        .hidden { display: none !important; }
-        
-        /* Estilos dos Modais (Caso não estejam no CSS externo) */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 100;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .modal-card {
-            background: #fff; padding: 24px; border-radius: 12px; width: 400px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        
-        /* Menu de Contexto */
-        .context-menu {
-            position: absolute; background: #fff; border: 1px solid #cbd5e1;
-            border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            width: 160px; z-index: 95; padding: 4px 0;
-        }
-        .context-menu-item {
-            padding: 8px 12px; font-size: 13px; color: #334155; cursor: pointer;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .context-menu-item:hover { background-color: #f8fafc; }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .status-dot.O { background-color: #ef4444; }
-        .status-dot.R { background-color: #f59e0b; }
-
     </style>
 </head>
 <body>
@@ -184,42 +132,68 @@
     </header>
 
     <nav class="filter-bar">
-        <div class="filter-group-left" style="display: flex; gap: 12px; align-items: center;">
+        <div class="filter-group-left">
             
             <div class="filter-wrapper">
+                <span class="filter-label">Cargo</span>
                 <input type="search" list="roleList" id="roleFilter" class="filter-select combobox" 
-                       placeholder="Filtrar Cargo..." 
+                       placeholder="Todos" 
                        oninput="atualizarFiltros()"
+                       onmousedown="this.setAttribute('data-temp', this.value); this.value=''; atualizarFiltros();"
+                       onblur="if(this.value=='' && this.getAttribute('data-temp')){this.value=this.getAttribute('data-temp');}"
                        onclick="this.value='';">
                <datalist id="roleList"></datalist>
             </div>
 
             <div class="filter-wrapper">
+                <span class="filter-label">Categoria</span>
                 <input type="search" list="catList" id="categoryFilter" class="filter-select combobox" 
-                       placeholder="Categoria..." 
+                       placeholder="Todas" 
                        oninput="atualizarFiltros()"
+                       onmousedown="this.setAttribute('data-temp', this.value); this.value=''; atualizarFiltros();"
+                       onblur="if(this.value=='' && this.getAttribute('data-temp')){this.value=this.getAttribute('data-temp');}"
                        onclick="this.value='';">
                <datalist id="catList"></datalist>
             </div>
 
             <div id="statusWrapper" class="filter-wrapper" style="display: none;">
+                <span class="filter-label">Status</span>
                 <select id="statusFilter" class="filter-select combobox" onchange="atualizarFiltros()" disabled></select>
             </div>
 
             <div class="filter-wrapper">
-                <input type="text" id="textSearch" class="filter-select" placeholder="Busca rápida..." onkeyup="atualizarFiltros()">
+                <span class="filter-label">Busca Rápida</span>
+                <input type="text" id="textSearch" class="filter-select" placeholder="Filtrar..." onkeyup="atualizarFiltros()">
             </div>
             
-            <div class="filter-wrapper" style="margin-left: auto;">
-                <button id="btnClearFilters" class="btn-clear-icon" title="Limpar Filtros" onclick="limparFiltros()" style="border:none; background:none; cursor:pointer;">
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            <div class="filter-wrapper" style="justify-content: flex-end;">
+                <button id="btnClearFilters" class="btn-clear-icon" title="Limpar Filtros" onclick="limparFiltros()">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
         </div>
 
-        <div id="tagStatusContainer" class="hidden">
-            <span id="tagRole"></span><span id="tagCategory"></span><span id="tagStatus"></span>
-            <div id="hudDividerStatus"></div>
+        <div id="filterHUD" class="lupafiltros-wrapper">
+            <div class="lupafiltros-top-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>LUPA DO FILTRO</span>
+            </div>
+            <div class="lupafiltros-panel">
+                <div class="lupafiltros-item">
+                    <span class="lupafiltros-key">CARGO</span>
+                    <span class="lupafiltros-val" id="tagRole">Global</span>
+                </div>
+                <div class="lupafiltros-divider"></div>
+                <div class="lupafiltros-item">
+                    <span class="lupafiltros-key">CATEGORIA</span>
+                    <span class="lupafiltros-val" id="tagCategory">Todas</span>
+                </div>
+                <div id="hudDividerStatus" class="lupafiltros-divider hidden"></div>
+                <div id="tagStatusContainer" class="lupafiltros-item hidden">
+                    <span class="lupafiltros-key">STATUS</span>
+                    <span class="lupafiltros-val" id="tagStatus">Todas</span>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -234,38 +208,54 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h3 id="modalTitle">Novo Treinamento</h3>
+                <button class="btn-close-modal" onclick="fecharModalTreinamento()">✕</button>
             </div>
             <div class="modal-body">
+                
                 <input type="hidden" id="inputHiddenId">
-                <div style="margin-bottom: 12px;">
-                    <label style="display:block; font-size:12px; color:#64748b;">Nome</label>
-                    <input type="text" id="inputNomeTreino" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
+
+                <div class="form-group">
+                    <label>Nome do Treinamento</label>
+                    <input type="text" id="inputNomeTreino" class="form-input" placeholder="Ex: Gestão Ágil 2.0">
                 </div>
-                <div style="margin-bottom: 12px;">
-                    <label style="display:block; font-size:12px; color:#64748b;">Categoria</label>
-                    <input type="text" id="inputCatTreino" list="catListModal" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
+
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <input type="search" 
+                           id="inputCatTreino" 
+                           class="form-input combobox" 
+                           list="catListModal" 
+                           placeholder="Selecione ou digite..."
+                           onmousedown="this.value='';" 
+                           onclick="this.value='';">
                     <datalist id="catListModal"></datalist>
                 </div>
-                <div style="display:flex; gap:12px; margin-bottom: 12px;">
-                    <div style="flex:1">
-                        <label style="display:block; font-size:12px; color:#64748b;">Cor</label>
-                        <input type="color" id="inputCorTreino" value="#3b82f6" style="width:100%; height:38px;">
-                        <span id="hexColorDisplay" style="display:none"></span>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Cor da Etiqueta</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="inputCorTreino" value="#3b82f6">
+                            <span id="hexColorDisplay">#3B82F6</span>
+                        </div>
                     </div>
-                    <div style="flex:1">
-                        <label style="display:block; font-size:12px; color:#64748b;">Link</label>
-                        <input type="text" id="inputLinkTreino" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    <div class="form-group half">
+                        <label>Link (Opcional)</label>
+                        <input type="text" id="inputLinkTreino" class="form-input" placeholder="http://...">
                     </div>
                 </div>
-                <div style="margin-bottom: 12px;">
-                    <label style="display:block; font-size:12px; color:#64748b;">Descrição</label>
-                    <textarea id="inputDescTreino" rows="3" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;"></textarea>
+
+                <div class="form-group">
+                    <label>Descrição Curta</label>
+                    <textarea id="inputDescTreino" class="form-textarea" rows="3" placeholder="O que será abordado..."></textarea>
                 </div>
+
             </div>
-            <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:8px;">
-                <button id="btnExcluirTreino" onclick="excluirTreinamento()" style="display:none; margin-right:auto; color:red; border:none; background:none; cursor:pointer;">Excluir</button>
-                <button onclick="fecharModalTreinamento()" style="border:none; background:none; color:#64748b; cursor:pointer;">Cancelar</button>
-                <button class="btn-primary" onclick="salvarNovoTreinamento()" style="background:#0f172a; color:white; padding:8px 16px; border-radius:6px; border:none; cursor:pointer;">Salvar</button>
+            <div class="modal-footer">
+                <button id="btnExcluirTreino" class="btn-ghost" style="color: #ef4444; margin-right: auto; display: none;" onclick="excluirTreinamento()">Excluir</button>
+                
+                <button class="btn-ghost" onclick="fecharModalTreinamento()">Cancelar</button>
+                <button class="btn-primary" onclick="salvarNovoTreinamento()">Salvar</button>
             </div>
         </div>
     </div>
@@ -281,34 +271,67 @@
             <span class="status-dot" style="border: 1px solid #cbd5e1;"></span> <span>Não Obrigatório</span>
         </div>
     </div>
-    <div id="contextMenuOverlay" class="modal-overlay hidden" style="background:transparent; z-index:90;" onclick="fecharMenuContexto()"></div>
+    <div id="contextMenuOverlay" class="menu-overlay hidden" onclick="fecharMenuContexto()"></div>
 
     <div id="modalConfirmacao" class="modal-overlay hidden">
-        <div class="modal-card">
-            <h3>Confirmar Alteração</h3>
-            <p id="lblChangeDetail" style="margin: 16px 0; color:#64748b; font-size:13px;"></p>
-            
-            <span id="auditTime" style="display:none"></span>
-            <span id="auditIP" style="display:none"></span>
+        <div class="modal-card" style="width: 400px; border-top: 4px solid #f59e0b;">
+            <div class="modal-body" style="padding: 24px;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <div style="width: 48px; height: 48px; background: #fffbeb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #d97706;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </div>
+                    <h3 style="margin: 0; font-size: 16px; color: #1e293b; text-align: center;">Confirmação de Alteração</h3>
+                    <p style="margin: 0; font-size: 13px; color: #64748b; text-align: center; line-height: 1.4;">
+                        Esta ação afetará as regras de conformidade da empresa.<br>
+                        <span id="lblChangeDetail" style="font-weight: 700; color: #0f172a;">De: ... Para: ...</span>
+                    </p>
+                </div>
 
-            <div style="display:flex; justify-content:flex-end; gap:8px;">
-                <button onclick="fecharModalConfirmacao()" style="border:1px solid #cbd5e1; background:none; padding:8px 16px; border-radius:6px; cursor:pointer;">Cancelar</button>
-                <button onclick="confirmarAcaoSegura()" style="background:#d97706; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">Confirmar</button>
+                <div class="audit-box">
+                    <div class="audit-row">
+                        <span class="audit-label">USER ID:</span>
+                        <span class="audit-val">ADMIN_ROOT</span>
+                    </div>
+                    <div class="audit-row">
+                        <span class="audit-label">IP ADDR:</span>
+                        <span class="audit-val" id="auditIP">Detectando...</span>
+                    </div>
+                    <div class="audit-row">
+                        <span class="audit-label">TIMESTAMP:</span>
+                        <span class="audit-val" id="auditTime">--/--/---- --:--:--</span>
+                    </div>
+                    <div class="audit-row">
+                        <span class="audit-label">ACTION:</span>
+                        <span class="audit-val" style="color: #ef4444;">UPDATE_RULESET</span>
+                    </div>
+                </div>
+
+                <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 16px;">
+                    Esta operação será registrada nos logs do sistema.
+                </p>
+            </div>
+
+            <div class="modal-footer" style="justify-content: space-between; background: #f8fafc;">
+                <button class="btn-ghost" onclick="fecharModalConfirmacao()">Cancelar</button>
+                <button class="btn-primary" onclick="confirmarAcaoSegura()" style="background-color: #d97706; border-color: #d97706;">Confirmar Alteração</button>
             </div>
         </div>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <script src="../.bd-treinamentos/data.js"></script>
+    <script src="../.bd-treinamentos/db-handler.js"></script>
 
     <script>
+        // Define a variável global que o script.js usa
+        window.isAdminMode = false;
+
         document.addEventListener('DOMContentLoaded', () => {
             const sessionRaw = localStorage.getItem('rh_session');
             
             // 1. SEM LOGIN? CHUTA PRA FORA
             if (!sessionRaw) {
                 console.warn("⛔ Acesso negado. Redirecionando...");
-                // Ajuste o caminho se seu login estiver na pasta anterior (../login.html) ou na mesma (index.html)
-                window.location.href = 'index.html'; 
+                window.top.location.href = '../login.html'; 
                 return;
             }
 
@@ -317,15 +340,16 @@
             // 2. É ADMIN?
             if (session.role === 'ADMIN') {
                 document.body.classList.add('is-admin');
-                // A variável global window.isAdminMode é definida no script.js ou aqui se precisar
-                // window.isAdminMode = true; 
+                window.isAdminMode = true; // Habilita edição no script.js
             } else {
-                // É VISITANTE? Mostra badge
+                // É VISITANTE? Mostra badge (Flex para alinhar ícone e texto)
                 const badge = document.getElementById('viewerWarning');
                 if(badge) badge.style.display = 'flex';
             }
         });
     </script>
+
+    <script src="../.scripts-treinamentos/script.js"></script>
 
 </body>
 </html>
