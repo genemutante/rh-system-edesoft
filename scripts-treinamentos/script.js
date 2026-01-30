@@ -29,6 +29,20 @@ let tempTreinoId = null;
 window.isAdminMode = false;
 let currentUser = null;
 
+
+// =============================================================================
+// Helper para capturar o IP Real do usuário
+// =============================================================================
+async function obterIPReal() {
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+    } catch (error) {
+        console.error("Erro ao obter IP:", error);
+        return 'Não detectado';
+    }
+}
 // =============================================================================
 // 2. INICIALIZAÇÃO
 // =============================================================================
@@ -744,6 +758,7 @@ window.confirmarAcaoSegura = async function() {
         alert("Erro ao salvar alteração: " + e.message);
     }
 };
+
 
 
 
