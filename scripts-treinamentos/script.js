@@ -995,22 +995,45 @@ window.editarCargoContexto = function() {
     if (tempCargoIndexParaMenu === null) return;
     const cargo = config.cargos[tempCargoIndexParaMenu];
     
+    // 1. Preenche os campos básicos
     document.getElementById('inputHiddenIdCargo').value = cargo.id;
     document.getElementById('inputNomeCargo').value = cargo.nome;
-    
-    // Define a cor (se for uma classe CSS antiga 'b-blue', define um cinza padrão ou mapeie)
-    const corHex = cargo.corClass?.startsWith('#') ? cargo.corClass : '#334155';
-    document.getElementById('inputCorCargo').value = corHex;
-    document.getElementById('hexColorDisplayCargo').textContent = corHex.toUpperCase();
-    
-    document.getElementById('inputLinkCargo').value = cargo.link || '';
     document.getElementById('inputOrdemCargo').value = cargo.ordem || '';
+    document.getElementById('inputLinkCargo').value = cargo.link || '';
+
+    // 2. LÓGICA DE COR SEGURA:
+    // Mapeamento para garantir que classes antigas não virem "preto" no seletor
+    const mapaCoresLegadas = {
+        'b-red': '#ef4444',
+        'b-black': '#1e293b',
+        'b-blue': '#3b82f6',
+        'b-green': '#10b981',
+        'b-orange': '#f97316'
+    };
+
+    let corParaExibir = '#334155'; // Cor padrão de segurança
+
+    if (cargo.corClass && cargo.corClass.startsWith('#')) {
+        // Se já for Hexadecimal no banco, usa ele direto
+        corParaExibir = cargo.corClass;
+    } else if (mapaCoresLegadas[cargo.corClass]) {
+        // Se for classe antiga, converte para o Hex correspondente
+        corParaExibir = mapaCoresLegadas[cargo.corClass];
+    }
+
+    // 3. Aplica ao seletor e ao texto de visualização
+    const inputCor = document.getElementById('inputCorCargo');
+    const displayHex = document.getElementById('hexColorDisplayCargo');
+    
+    if (inputCor && displayHex) {
+        inputCor.value = corParaExibir;
+        displayHex.textContent = corParaExibir.toUpperCase();
+    }
     
     document.getElementById('modalTitleCargo').textContent = "Editar Cargo";
     document.getElementById('modalCargo').classList.remove('hidden');
     window.fecharMenus();
 };
-
 window.excluirCargoContexto = async function() {
     if (tempCargoIndexParaMenu === null) return;
     const cargo = config.cargos[tempCargoIndexParaMenu];
@@ -1057,6 +1080,7 @@ window.fecharMenus = function() {
 
     tempCargoIndexParaMenu = null;
 };
+
 
 
 
