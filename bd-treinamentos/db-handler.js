@@ -1,24 +1,24 @@
 // =============================================================================
-// db-handler.js - Camada de Serviço do Supabase (VERSÃO FINAL CORRIGIDA)
+// db-handler.js - Camada de Serviço do Supabase (VERSÃO FINAL)
 // =============================================================================
 
+// Importa o Supabase direto da CDN
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-// Configuração (Suas chaves)
+// Configuração
 const SUPABASE_URL = 'https://mtblwyrcidrszwvjgxao.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10Ymx3eXJjaWRyc3p3dmpneGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3MTg4NTUsImV4cCI6MjA4NTI5NDg1NX0.6CipXB_HI0t0Gcle3pTlZTe9rqoh-8-EhfxQy-VodH0';
 
-// Cliente Privado
+// Inicializa o Cliente
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export const DBHandler = {
 
-
-// --- 1. LEITURA INICIAL ---
+    // --- 1. LEITURA INICIAL ---
     async carregarDadosIniciais() {
         console.log("🔄 Buscando dados do Supabase...");
         
-        // 1. Busca Treinamentos
+        // A. Busca Treinamentos
         const { data: treinosRaw, error: errT } = await supabase
             .from('treinamentos')
             .select('id, nome, categoria, descricao, cor, link_externo') 
@@ -36,15 +36,14 @@ export const DBHandler = {
             link: t.link_externo
         }));
 
-        // 2. Busca Cargos (ORDENAÇÃO ALTERADA AQUI)
+        // B. Busca Cargos
         const { data: cargosRaw, error: errC } = await supabase
             .from('view_matriz_cargos')
             .select('*')
-            .order('id', { ascending: true }); // <--- MUDANÇA: Ordenar por ID
+            .order('id', { ascending: true });
 
         if (errC) throw errC;
 
-        // Mapeamento de classes de cor
         const cargos = cargosRaw.map(c => ({
             ...c,
             corClass: c.cor_class 
@@ -52,16 +51,15 @@ export const DBHandler = {
 
         return { treinamentos: treinos, cargos: cargos };
     },
-    
+
     // --- 2. GERENCIAR TREINAMENTOS ---
     async salvarTreinamento(treino) {
-        // Prepara o payload usando os nomes REAIS das colunas do banco
         const payload = {
             nome: treino.nome,
             categoria: treino.categoria,
-            descricao: treino.desc,       // <--- De JS para Banco
-            cor: treino.color,            // <--- De JS para Banco
-            link_externo: treino.link     // <--- De JS para Banco
+            descricao: treino.desc,
+            cor: treino.color,
+            link_externo: treino.link
         };
 
         if (treino.id) {
@@ -78,8 +76,12 @@ export const DBHandler = {
         return data;
     },
 
-    // --- 3. EXCLUIR TREINAMENTO ---
+    // --- 3. EXCLUIR TREINAMENTO (COM CASCATA) ---
     async excluirTreinamento(id) {
+        // 1. Remove regras associadas primeiro
+        await supabase.from('matriz_regras').delete().eq('treinamento_id', id);
+
+        // 2. Remove o treinamento
         const { error } = await supabase
             .from('treinamentos')
             .delete()
@@ -88,7 +90,7 @@ export const DBHandler = {
         if (error) throw error;
     },
 
-    // --- 4. ATUALIZAR MATRIZ ---
+    // --- 4. ATUALIZAR REGRA ---
     async atualizarRegra(cargoId, treinoId, novoStatus) {
         // Limpa regra anterior
         const { error: errDel } = await supabase
@@ -98,7 +100,7 @@ export const DBHandler = {
             
         if (errDel) throw errDel;
 
-        // Insere nova regra se necessário
+        // Insere nova regra
         if (novoStatus !== 'none') {
             const tipoBanco = novoStatus === 'mandatory' ? 'OBRIGATORIO' : 'RECOMENDADO';
             
@@ -114,7 +116,23 @@ export const DBHandler = {
         }
     },
 
-    // --- 5. AUTENTICAÇÃO ---
+    // --- 5. REGISTRAR LOG (FALTAVA ISSO) ---
+    async registrarLog(usuario, acao, detalhes) {
+        const { error } = await supabase
+            .from('logs_sistema')
+            .insert({
+                usuario: usuario,
+                acao: acao,
+                detalhes: detalhes,
+                ip: '192.168.1.10'
+            });
+
+        if (error) {
+            console.error("Erro silencioso ao gravar log:", error);
+        }
+    },
+
+    // --- 6. AUTENTICAÇÃO ---
     async validarLogin(username, password) {
         const { data, error } = await supabase
             .from('usuarios_sistema')
@@ -127,4 +145,3 @@ export const DBHandler = {
         return data;
     }
 };
-
