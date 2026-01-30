@@ -181,12 +181,22 @@
             </div>
         </section>
 
-        <section id="viewForm" class="content-view" style="display: none;">
-            <div class="form-header">
-                <h2 id="formTitle">Novo Colaborador</h2>
-                <div style="flex:1"></div>
-                <div class="form-status-badge" style="display:none;" id="formStatusBadge">ATIVO</div>
-            </div>
+<section id="viewForm" class="content-view" style="display: none; flex-direction: column;">
+    <div class="form-header-persistent">
+        <div class="user-identity">
+            <h1 id="headerNome">Nome do Colaborador</h1>
+            <span id="formStatusBadge" class="badge-status">ATIVO</span>
+        </div>
+        
+        <div class="form-actions-top">
+            <button type="button" class="btn-outline" onclick="showView(true)">
+                Voltar
+            </button>
+            <button type="button" class="btn-primary" onclick="salvarDados()">
+                Salvar Alterações
+            </button>
+        </div>
+    </div>
 
             <div class="form-tabs">
                 <button class="tab-link active" onclick="openTab('tabDados', this)">Dados Pessoais</button>
@@ -385,3 +395,4 @@
 </body>
 
 </html>
+
