@@ -89,8 +89,9 @@ function init() {
     atualizarFiltros(); 
 }
 
+
 // =============================================================================
-// 3. RENDERIZAÇÃO
+// 3. RENDERIZAÇÃO DA MATRIZ (Compacta e em 1 Linha)
 // =============================================================================
 function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrigatoriedade) {
     const table = document.getElementById('matrixTable');
@@ -101,7 +102,7 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
     colCache = {}; 
     lastHighlightedCol = null;
 
-    // Cabeçalho
+    // --- A. Cabeçalho (HUD + CARGOS) ---
     let headerHTML = '<tr><th class="top-left-corner"><div class="hud-card">' +
     '<div class="hud-top-label">' + icons.lupa + ' INSPEÇÃO</div>' +
     '<div id="hudScan" class="hud-scan"><div class="scan-icon-large">' + icons.lupa + '</div><div class="scan-msg">Explore a matriz<br>para ver detalhes</div></div>' +
@@ -117,9 +118,10 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
     headerHTML += '</tr>';
     thead.innerHTML = headerHTML;
 
-    // Corpo
+    // --- B. Corpo (LINHAS DE CURSOS COMPACTAS) ---
     let bodyHTML = '';
     config.treinamentos.forEach((treino, treinoIndex) => {
+        // Filtros
         if (filtroCategoria && filtroCategoria !== 'all' && filtroCategoria !== '' && treino.categoria.trim() !== filtroCategoria.trim()) return;
         if (filtroTexto && !treino.nome.toLowerCase().includes(filtroTexto.toLowerCase())) return;
 
@@ -136,6 +138,8 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
             if (filtroObrigatoriedade !== 'all' && tipoReq === filtroObrigatoriedade) linhaPassa = true;
             
             const activeClassCell = (filtroCargo === cargo.id.toString()) ? 'selected-col' : '';
+            
+            // Célula Interativa
             rowCellsHTML += `<td class="${activeClassCell}" data-col="${index}" data-status="${tipoReq}" onclick="abrirMenuContexto(event, ${index}, ${treino.id})">
                                  <div class="cell-content">${ehO ? '<span class="status-dot O"></span>' : (ehR ? '<span class="status-dot R"></span>' : '')}</div>
                              </td>`;
@@ -146,22 +150,20 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
             const badgeColor = treino.color || "#64748b";
             const categoriaDisplay = treino.categoria || "GERAL";
             
-            // --- CORREÇÃO DO LAYOUT (1 LINHA FORÇADA) ---
-            // Mudei a classe para 'row-header-flex' para garantir que CSS antigo não atrapalhe
-            // Adicionei overflow: hidden e white-space: nowrap para evitar quebras
+            // --- AJUSTE DE ALTURA AQUI (De 34px para 28px e padding menor) ---
             bodyHTML += `
             <tr data-row="${treinoIndex}">
-                <th style="--cat-color: ${badgeColor}; background-color: ${badgeColor}15; cursor: pointer; height: 34px; padding: 0;" 
+                <th style="--cat-color: ${badgeColor}; background-color: ${badgeColor}15; cursor: pointer; height: 28px; max-height: 28px; padding: 0;" 
                     data-tooltip="${tooltipText}"
                     onclick="editarTreinamento(${treino.id})">
                     
-                    <div class="row-header-flex" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; height: 100%; padding: 0 12px; width: 100%;">
+                    <div class="row-header-flex" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 6px; height: 100%; padding: 0 10px; width: 100%;">
                         
-                        <div style="background: #ffffff; border: 1px solid ${badgeColor}; color: ${badgeColor}; font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; line-height: 1;">
+                        <div style="background: #ffffff; border: 1px solid ${badgeColor}; color: ${badgeColor}; font-size: 8px; font-weight: 800; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; line-height: 1;">
                             ${categoriaDisplay}
                         </div>
 
-                        <div style="color: #334155; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; text-align: left;">
+                        <div style="color: #334155; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; text-align: left; line-height: 28px;">
                             ${treino.nome}
                         </div>
                     </div>
@@ -172,7 +174,7 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
     });
     tbody.innerHTML = bodyHTML;
     
-    // Cache
+    // Reconstrói Cache para Hover
     const allCells = table.querySelectorAll('[data-col]');
     allCells.forEach(cell => {
         const cIndex = cell.dataset.col;
@@ -672,3 +674,4 @@ function fazerLogout() {
     document.body.classList.remove('is-admin');
     window.location.href = 'index.html'; 
 }
+
