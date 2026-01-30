@@ -129,17 +129,20 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
         if (filtroCargo !== 'all' && cargo.id.toString() !== filtroCargo) return;
         const activeClass = (filtroCargo === cargo.id.toString()) ? 'selected-col-header' : '';
         
-        // Identifica se é Hexadecimal ou classe legada
+        // Identifica se o valor em cor_class é um Hexadecimal (#)
         const isHex = cargo.corClass && cargo.corClass.startsWith('#');
         
         // PADRONIZAÇÃO: Definimos 8px para igualar a altura das bordas originais
         const alturaBorda = "8px"; 
         
-        // Aplicação de Estilo: Padding zero na TH e Height 100% garantem que a borda encoste no topo
+        // Lógica de Estilo:
+        // Se for HEX: Aplicamos a borda colorida via style inline.
+        // Se NÃO for HEX: Deixamos o style sem borda forçada para não anular a classe CSS (b-red, etc).
         const borderStyle = isHex 
             ? `style="border-top: ${alturaBorda} solid ${cargo.corClass} !important; height: 100%; box-sizing: border-box;"` 
-            : `style="border-top: ${alturaBorda} solid transparent; height: 100%; box-sizing: border-box;"`;
+            : `style="height: 100%; box-sizing: border-box;"`;
 
+        // Se for Hex, a classe extra fica vazia. Se não, passamos a classe original.
         const extraClass = isHex ? '' : cargo.corClass;
 
         headerHTML += `
@@ -225,8 +228,6 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
     vincularEventosLupa();
     vincularEventosDestaque();
 }
-
-
 
 // =============================================================================
 // 4. LÓGICA DE FILTROS & HUD
@@ -1056,6 +1057,7 @@ window.fecharMenus = function() {
 
     tempCargoIndexParaMenu = null;
 };
+
 
 
 
