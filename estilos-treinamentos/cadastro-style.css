@@ -1,453 +1,404 @@
-/* ==========================================================================
-   DESIGN SYSTEM - ENTERPRISE COMPACT & HIGH CONTRAST (v7.0 - Final Fix)
-   ========================================================================== */
+/* ============================================================
+   CADASTRO DE COLABORADOR - CSS (FULL)
+   Premissa: 100vh (sem scroll do body). Scroll interno no conteúdo.
+   Ajustes:
+   - min-height:0 em containers flex (habilita scroll interno)
+   - grid-4 (estava sendo usado no HTML e não existia no CSS)
+   - #viewForm/#viewList como flex:1 (evita "corte" de tela)
+   ============================================================ */
 
-:root {
-    /* --- CORES PRINCIPAIS --- */
-    --primary: #4f46e5;       /* Indigo 600 */
-    --primary-hover: #4338ca; /* Indigo 700 */
-    
-    --bg-app: #f1f5f9;        /* Fundo Geral */
-    --bg-panel: #ffffff;      /* Fundo Branco */
-    
-    /* --- BARRAS & DESTAQUES (Onde você apontou as setas) --- */
-    --bar-bg: #1e293b;        /* Slate 800 (Fundo Escuro para Cabeçalhos) */
-    --bar-text: #f8fafc;      /* Texto Claro para Cabeçalhos */
-    --tab-bg: #e2e8f0;        /* Fundo da régua de abas (mais escuro que o branco) */
-    
-    --border-color: #cbd5e1;  /* Borda mais visível (Slate 300) */
-    
-    /* --- TEXTOS --- */
-    --text-main: #0f172a;     /* Slate 900 (Preto suave) */
-    --text-secondary: #334155;/* Slate 700 */
-    
-    /* --- METRICS (Compactas) --- */
-    --radius-md: 4px;
-    --radius-lg: 6px;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-/* RESET RÍGIDO */
-* { box-sizing: border-box; outline: none; font-family: 'Inter', sans-serif; }
+/* ------------------------------
+   Reset / Base
+------------------------------ */
+* { box-sizing: border-box; }
 
 html, body {
-    margin: 0; padding: 0; width: 100%; height: 100%;
-    background-color: var(--bg-app);
-    color: var(--text-main);
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 13px; /* Fonte compacta */
-    overflow: hidden;
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* IMPORTANTÍSSIMO: sem scroll do body */
+  font-family: Arial, sans-serif;
+  background: #eef2f7;
 }
 
-body { display: flex; flex-direction: column; }
+:root {
+  --topbar-h: 56px;
+  --radius: 8px;
+  --border: #cfd8e3;
+  --muted: #6b7a90;
+  --primary: #2f5bea;
+  --primary-soft: #e8edff;
+  --danger: #d64545;
+  --ok: #1f9d55;
+}
 
-/* ==========================================================================
-   1. TOP BAR (UNIFORMIZADO - LIGHT)
-   ========================================================================== */
-/* HEADER PADRONIZADO (Branco Clean) */
+/* ------------------------------
+   Layout principal (100vh)
+------------------------------ */
 .top-bar {
-    height: 56px;
-    background: #ffffff; /* Era #1e293b ou variações escuras */
-    color: #1e293b;      /* Texto escuro */
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between;
-    padding: 0 32px; 
-    flex-shrink: 0; 
-    z-index: 50;
-    border-bottom: 1px solid #e2e8f0; /* Divisória sutil */
+  height: var(--topbar-h);
+  background: #121b2b;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  justify-content: space-between;
 }
 
-.top-bar h1 { 
-    font-size: 18px; 
-    font-weight: 700; 
-    margin: 0; 
-    color: #1e293b;
-    letter-spacing: -0.5px;
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-/* ==========================================================================
-   2. LAYOUT PRINCIPAL
-   ========================================================================== */
+
+.top-left .btn-home {
+  background: #1b2842;
+  border: 1px solid rgba(255,255,255,.12);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.top-mid {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-mid label {
+  font-size: 12px;
+  opacity: .85;
+}
+
+.top-mid select {
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: #fff;
+  padding: 0 10px;
+  font-weight: 600;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-right .user-pill {
+  background: #1b2842;
+  border: 1px solid rgba(255,255,255,.12);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
 .container {
-    flex: 1; width: 100%; max-width: 1600px; margin: 0 auto;
-    padding: 10px 20px 0px 20px; /* Margens justas */
-    display: flex; flex-direction: column;
-    overflow: hidden; position: relative;
+  height: calc(100vh - var(--topbar-h));
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* ✅ habilita overflow interno em filhos flex */
+  width: 100%;
 }
 
+/* ------------------------------
+   Views (Lista / Formulário)
+------------------------------ */
 .content-view {
-    display: flex; flex-direction: column; height: 100%;
-    overflow: hidden; padding-bottom: 10px;
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* ✅ essencial para o scroll interno funcionar em layouts flex */
+  overflow: hidden;
+  padding-bottom: 10px;
 }
 
-/* ==========================================================================
-   3. BARRA DE AÇÕES (FILTROS) - Com mais contraste
-   ========================================================================== */
-.actions-container {
-    background: #ffffff;
-    padding: 12px 16px; /* Padding reduzido */
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 16px;
-    border: 1px solid #94a3b8; /* Borda mais escura para definir a área */
-    border-radius: var(--radius-lg);
-    flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
+/* view list e view form precisam ocupar o espaço restante */
+#viewList {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
-/* Inputs e Selects da Barra */
-.search-input-wrapper input, .select-wrapper select {
-    background-color: #fff;
-    border: 1px solid #cbd5e1; /* Borda definida */
-    color: var(--text-main);
-    height: 36px; /* Altura padrão */
-    font-size: 13px;
-    border-radius: var(--radius-md);
-}
-.search-input-wrapper input:focus, .select-wrapper select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+#viewForm {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
-/* Layout Interno da Barra */
-.toolbar-left { display: flex; align-items: center; gap: 10px; flex: 1; }
-.search-input-wrapper { position: relative; width: 100%; max-width: 300px; }
-.search-input-wrapper input { width: 100%; padding-left: 32px; padding-right: 10px; }
-.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #64748b; width: 14px; }
-
-.counter-badge {
-    font-size: 11px; font-weight: 700; color: var(--primary);
-    background: #e0e7ff; padding: 2px 8px; border-radius: 4px; border: 1px solid #c7d2fe;
+/* ------------------------------
+   Cabeçalhos
+------------------------------ */
+.page-header {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 14px 14px 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.toolbar-right { display: flex; align-items: center; gap: 8px; }
-.filters-group { display: flex; align-items: center; gap: 6px; }
-.select-wrapper { position: relative; min-width: 120px; }
-.select-wrapper select { padding: 0 24px 0 8px; appearance: none; }
-.select-wrapper::after {
-    content: ''; position: absolute; right: 8px; top: 50%; width: 8px; height: 8px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: center; background-size: contain;
-    transform: translateY(-50%); pointer-events: none;
+.page-header h2 {
+  margin: 0;
+  font-size: 18px;
 }
 
-/* Botões */
-.btn-primary-glow {
-    height: 36px; padding: 0 16px; background: var(--primary); color: white;
-    font-weight: 600; border: none; border-radius: var(--radius-md);
-    display: flex; align-items: center; gap: 6px;
+.badge-status {
+  font-weight: 800;
+  font-size: 12px;
+  color: #111;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e8eef6;
+  border: 1px solid var(--border);
 }
-.btn-icon-soft { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #64748b; cursor: pointer; }
-.vertical-divider { width: 1px; height: 20px; background: #cbd5e1; margin: 0 4px; }
 
-/* ==========================================================================
-   4. TABELA (GRID) - CABEÇALHO ESCURO (High Contrast)
-   ========================================================================== */
+/* ------------------------------
+   LISTA (Tabela)
+------------------------------ */
 .table-container {
-    flex: 1; display: flex; flex-direction: column; min-height: 0;
-    margin-top: 15px; /* Respiro pequeno */
-    background: #ffffff;
-    border: 1px solid #94a3b8; /* Borda externa firme */
-    border-radius: var(--radius-lg);
-    overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 0 14px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.table-scroll-area { flex: 1; overflow-y: auto; scrollbar-gutter: stable; }
-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.table-toolbar {
+  padding: 12px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
 
-/* --- AQUI ESTÁ A MUDANÇA: CABEÇALHO ESCURO --- */
+.table-toolbar input, .table-toolbar select {
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 0 10px;
+}
+
+.table-toolbar .btn {
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #f5f7fb;
+  cursor: pointer;
+  padding: 0 12px;
+  font-weight: 700;
+}
+
+.table-toolbar .btn.primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.table-scroll-area {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
 thead th {
-    position: sticky; top: 0; z-index: 10;
-    background-color: var(--bar-bg); /* FUNDO ESCURO */
-    color: var(--bar-text);          /* TEXTO BRANCO */
-    padding: 10px 16px;
-    text-align: left; font-size: 12px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.03em;
-    border-bottom: 1px solid #0f172a;
-    white-space: nowrap;
+  position: sticky;
+  top: 0;
+  background: #f3f6fb;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 800;
+  z-index: 2;
 }
 
 tbody td {
-    padding: 8px 16px; /* Padding compacto */
-    border-bottom: 1px solid #e2e8f0;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    color: var(--text-secondary);
-}
-tbody tr:hover { background-color: #f1f5f9; }
-
-/* Botões da Tabela */
-.actions-cell { display: flex; justify-content: flex-end; gap: 6px; }
-.btn-icon-action {
-    width: 26px; height: 26px; border-radius: 4px; border: 1px solid #cbd5e1;
-    background: white; color: #475569; display: flex; align-items: center; justify-content: center;
-}
-.btn-icon-action:hover { border-color: var(--primary); color: var(--primary); }
-
-/* ==========================================================================
-   5. FORMULÁRIO - BARRA DE ABAS ESCURA
-   ========================================================================== */
-#viewForm {
-    height: 100%; display: flex; flex-direction: column; overflow: hidden;
-    background: var(--bg-panel);
-    border: 1px solid #94a3b8;
-    border-radius: var(--radius-lg);
+  border-bottom: 1px solid #e7edf5;
+  padding: 10px 12px;
 }
 
-.form-header {
-    height: 48px; padding: 0 20px;
-    border-bottom: 1px solid #cbd5e1;
-    display: flex; align-items: center; background: #fff;
-    flex-shrink: 0;
-}
-.form-header h2 { font-size: 15px; font-weight: 700; color: var(--text-main); margin: 0; }
+tbody tr:hover { background: #f8fbff; }
 
-/* --- AQUI ESTÁ A MUDANÇA: BARRA DE ABAS --- */
-.form-tabs {
-    height: 42px;
-    background-color: var(--tab-bg); /* FUNDO CINZA ESCURO/DEFINIDO */
-    border-bottom: 1px solid #94a3b8; /* Linha divisória forte */
-    display: flex; align-items: flex-end;
-    padding: 0 20px; gap: 4px; flex-shrink: 0;
-}
-
-.tab-link {
-    padding: 8px 16px; font-size: 12px; font-weight: 600;
-    color: #475569; /* Texto cinza escuro */
-    background: transparent;
-    border: 1px solid transparent; border-bottom: none;
-    border-radius: 4px 4px 0 0; margin-bottom: -1px; cursor: pointer;
-    opacity: 0.8;
-}
-.tab-link:hover { opacity: 1; color: #0f172a; }
-
-/* Aba Ativa: Fica branca para contrastar com o fundo cinza da barra */
-.tab-link.active {
-    background: #fff;
-    color: var(--primary);
-    border: 1px solid #94a3b8;
-    border-bottom-color: #fff; /* Conecta com o conteúdo */
-    border-top: 3px solid var(--primary);
-    opacity: 1;
+/* ------------------------------
+   FORM (Abas + Conteúdo)
+------------------------------ */
+.tabs {
+  background: #f3f6fb;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 0 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
-/* Miolo */
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  padding: 10px 10px 0;
+  border-bottom: 1px solid var(--border);
+  background: #e8eef6;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  border: 1px solid var(--border);
+  border-bottom: none;
+  background: #e8eef6;
+  padding: 10px 14px;
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.tab-btn.active {
+  background: #fff;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
 #mainForm {
-    flex: 1; overflow-y: auto; scrollbar-gutter: stable;
-    display: flex; flex-direction: column; min-height: 0;
-    background: #fff;
-}
-.tab-content { 
-    padding: 20px; /* Padding contido para não gerar rolagem extra */
-    max-width: 100%; 
+  flex: 1;
+  min-height: 0;  /* ✅ essencial */
+  overflow: auto; /* ✅ scroll interno do formulário */
+  background: #fff;
 }
 
-/* Grid Compacto */
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 20px; }
-.field { display: flex; flex-direction: column; gap: 4px; }
-.field.span-2 { grid-column: span 2; }
-.field.span-3 { grid-column: span 3; }
-.field.sep-line { height: 1px; background: #e2e8f0; margin: 8px 0; grid-column: span 3; }
+.tab-content {
+  display: none;
+  padding: 18px;
+}
+
+.tab-content.active { display: block; }
+
+/* ------------------------------
+   Grid de campos
+------------------------------ */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 20px;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px 20px;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
 
 .field label {
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    color: #475569; /* Label escuro */
+  font-size: 12px;
+  font-weight: 800;
+  color: #1c2a3d;
 }
+
+.field label .req { color: var(--danger); }
+
 .field input, .field select, .field textarea {
-    height: 34px; padding: 0 10px; font-size: 13px;
-    border: 1px solid #cbd5e1; border-radius: var(--radius-md);
-    color: var(--text-main); background: #fff;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 0 10px;
+  outline: none;
 }
-.field input:focus { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
-.field textarea { height: auto; padding: 8px; }
 
-/* Rodapé */
+.field textarea {
+  height: auto;
+  min-height: 84px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.field.span-2 { grid-column: span 2; }
+.field.span-3 { grid-column: span 3; }
+.field.span-4 { grid-column: span 4; }
+
+.sep-line {
+  border-top: 1px dashed #d6deea;
+  margin: 4px 0 2px;
+}
+.sep-line.span-2 { grid-column: span 2; }
+.sep-line.span-3 { grid-column: span 3; }
+.sep-line.span-4 { grid-column: span 4; }
+
+/* ------------------------------
+   Ações do formulário
+------------------------------ */
 .form-actions {
-    height: 56px; background: #f8fafc;
-    border-top: 1px solid #cbd5e1;
-    display: flex; align-items: center; justify-content: flex-end;
-    padding: 0 20px; gap: 12px; flex-shrink: 0;
-}
-.btn-secondary { background: white; border: 1px solid #cbd5e1; color: #334155; height: 36px; padding: 0 16px; font-weight: 600; border-radius: var(--radius-md); }
-.btn-primary { background: var(--primary); border: none; color: white; height: 36px; padding: 0 20px; font-weight: 600; border-radius: var(--radius-md); }
-
-/* ==========================================================================
-   MODO LEITURA (CONSULTA) - Cartões Sólidos
-   ========================================================================== */
-.mode-view input, .mode-view select, .mode-view textarea {
-    background-color: #f1f5f9 !important; /* Cinza sólido */
-    border: 1px solid #cbd5e1 !important;
-    color: #0f172a !important; /* Texto Preto */
-    font-weight: 600 !important;
-    pointer-events: none; appearance: none;
-}
-.mode-view label { color: #64748b; }
-.mode-view #btnSalvar { display: none !important; }
-
-/* ==========================================================================
-   UTILITÁRIOS (Modal / Erro)
-   ========================================================================== */
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-.modal-card { background: white; width: 400px; border-radius: 8px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
-.modal-header { background: #fee2e2; padding: 16px 20px; border-bottom: 1px solid #fecaca; display: flex; gap: 10px; align-items: center; }
-.modal-header h3 { margin: 0; color: #991b1b; font-size: 15px; }
-.modal-body { padding: 20px; }
-.modal-actions { padding: 16px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px; }
-.btn-danger-solid { background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; }
-.input-error { border-color: #ef4444 !important; background: #fef2f2 !important; }
-.error-message { color: #dc2626; font-size: 11px; font-weight: 600; }
-
-
-
-/* ==========================================================================
-   LISTA DE COLABORADORES - BARRA DE AÇÕES & FILTROS (SCOPED OVERRIDES)
-   Motivo: em alguns módulos há CSS global que "achata" inputs/selects e quebra
-   o layout. Essas regras usam maior especificidade para garantir o layout.
-   Escopo: somente dentro da view #viewList.
-   ========================================================================== */
-
-#viewList .actions-container{
-  display:flex !important;
-  justify-content: space-between !important;
-  align-items: flex-end !important;
-  gap: 14px !important;
-  flex-wrap: wrap !important;
-  margin-bottom: 12px !important;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: #f3f6fb;
 }
 
-#viewList .toolbar-left{
-  display:flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-  min-width: 260px !important;
-  flex: 1 1 320px !important;
+.form-actions .left, .form-actions .right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-#viewList .toolbar-right{
-  display:flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 10px !important;
-  flex: 0 1 auto !important;
-  flex-wrap: wrap !important;
+.btn {
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+  cursor: pointer;
+  padding: 0 14px;
+  font-weight: 800;
 }
 
-#viewList .search-input-wrapper{
-  display:flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  width: 100% !important;
+.btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
 }
 
-#viewList .search-icon{
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 10px !important;
-  display:grid !important;
-  place-items:center !important;
-  border: 1px solid rgba(0,0,0,.10) !important;
-  background: #fff !important;
-  flex: 0 0 auto !important;
+.btn.danger {
+  background: #fff0f0;
+  border-color: #f0b4b4;
+  color: #a10f0f;
 }
 
-#viewList #searchBox{
-  width: 100% !important;
-  min-width: 220px !important;
-  height: 34px !important;
-  padding: 0 12px !important;
-  border: 1px solid rgba(0,0,0,.12) !important;
-  border-radius: 10px !important;
-  background: #fff !important;
-  font-size: 13px !important;
-  line-height: 34px !important;
-  outline: none !important;
+.btn.ghost {
+  background: transparent;
 }
 
-#viewList #searchBox:focus{
-  border-color: rgba(45,108,223,.45) !important;
-  box-shadow: 0 0 0 3px rgba(45,108,223,.12) !important;
+/* ------------------------------
+   Responsivo
+------------------------------ */
+@media (max-width: 1100px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .field.span-4, .sep-line.span-4 { grid-column: span 2; }
 }
 
-#viewList .counter-badge{
-  display:inline-flex !important;
-  align-items:center !important;
-  gap: 8px !important;
-  width: fit-content !important;
-  padding: 6px 10px !important;
-  border-radius: 999px !important;
-  background: rgba(255,255,255,.92) !important;
-  border: 1px solid rgba(0,0,0,.10) !important;
-  font-size: 12px !important;
-  color: #0f172a !important;
-}
-
-#viewList .filters-group{
-  display:flex !important;
-  align-items:center !important;
-  gap: 10px !important;
-  flex-wrap: wrap !important;
-}
-
-#viewList .select-wrapper{
-  display:flex !important;
-  align-items:center !important;
-  gap: 8px !important;
-}
-
-#viewList .filter-label{
-  font-size: 12px !important;
-  font-weight: 700 !important;
-  color: #334155 !important;
-  letter-spacing: .2px !important;
-}
-
-#viewList .select-wrapper select{
-  height: 34px !important;
-  padding: 0 10px !important;
-  border-radius: 10px !important;
-  border: 1px solid rgba(0,0,0,.12) !important;
-  background: #fff !important;
-  font-size: 12.5px !important;
-  line-height: 34px !important;
-  min-width: 140px !important;
-  appearance: auto !important; /* mantém setinha nativa e evita reset agressivo */
-}
-
-#viewList .btn-icon-soft{
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 10px !important;
-  border: 1px solid rgba(0,0,0,.12) !important;
-  background: #fff !important;
-  display:grid !important;
-  place-items:center !important;
-}
-
-#viewList .btn-primary-glow{
-  height: 34px !important;
-  padding: 0 12px !important;
-  border-radius: 10px !important;
-  font-size: 12.5px !important;
-  font-weight: 800 !important;
-  border: 1px solid rgba(45,108,223,.35) !important;
-}
-
-#viewList .btn-primary-glow svg{
-  width: 16px !important;
-  height: 16px !important;
-}
-
-/* Quando a largura ficar pequena, mantém o layout legível */
-@media (max-width: 980px){
-  #viewList .actions-container{
-    align-items: flex-start !important;
-  }
-  #viewList .toolbar-right{
-    width: 100% !important;
-    justify-content: flex-start !important;
-  }
-  #viewList .filters-group{
-    width: 100% !important;
-  }
-  #viewList .select-wrapper select{
-    min-width: 180px !important;
-  }
+@media (max-width: 720px) {
+  .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .field.span-2, .field.span-3, .field.span-4,
+  .sep-line.span-2, .sep-line.span-3, .sep-line.span-4 { grid-column: span 1; }
 }
