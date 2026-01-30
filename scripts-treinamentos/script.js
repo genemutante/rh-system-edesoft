@@ -914,8 +914,12 @@ let tempCargoIndexParaMenu = null;
 // --- script.js (Linha ~607) ---
 window.abrirMenuCargo = function(e, index) {
     if (!window.isAdminMode) return;
-    e.preventDefault(); // Impede o menu padrão do Windows
+    e.preventDefault();
     e.stopPropagation();
+
+    // FECHA QUALQUER MENU ABERTO ANTES DE ABRIR O NOVO
+    // Isso evita que o menu fique "preso" no cargo anterior
+    window.fecharMenus();
 
     tempCargoIndexParaMenu = index;
     const menu = document.getElementById('contextMenuHeader');
@@ -924,9 +928,12 @@ window.abrirMenuCargo = function(e, index) {
     if (menu && overlay) {
         menu.style.left = `${e.pageX}px`;
         menu.style.top = `${e.pageY}px`;
-        menu.style.display = 'block'; // Força a exibição caso o CSS falhe
+        menu.style.display = 'block'; 
         menu.classList.remove('hidden');
         overlay.classList.remove('hidden');
+        
+        // Garante que o overlay tenha o evento de fechar
+        overlay.onclick = window.fecharMenus;
     }
 };
 
@@ -968,11 +975,29 @@ window.excluirCargoContexto = async function() {
     }
 };
 
-function fecharMenus() {
-    document.getElementById('contextMenuHeader')?.classList.add('hidden');
-    document.getElementById('contextMenuCell')?.classList.add('hidden');
-    document.getElementById('contextMenuOverlay')?.classList.add('hidden');
-}
+window.fecharMenus = function() {
+    // Esconde Menu de Cargos
+    const menuHeader = document.getElementById('contextMenuHeader');
+    if (menuHeader) {
+        menuHeader.classList.add('hidden');
+        menuHeader.style.display = 'none';
+    }
+
+    // Esconde Menu de Células (Bolinhas O/R)
+    const menuCell = document.getElementById('contextMenuCell');
+    if (menuCell) {
+        menuCell.classList.add('hidden');
+        menuCell.style.display = 'none';
+    }
+
+    // Esconde o Overlay (Camada de clique fora)
+    const overlay = document.getElementById('contextMenuOverlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+
+    tempCargoIndexParaMenu = null;
+};
 
 
 
