@@ -829,6 +829,81 @@ window.confirmarAcaoSegura = async function() {
 
 
 
+// =============================================================================
+// GESTÃO DE CARGOS (MODAL & LOGICA)
+// =============================================================================
+
+window.abrirModalCargo = function() {
+    // Limpa os campos
+    document.getElementById('inputHiddenIdCargo').value = '';
+    document.getElementById('inputNomeCargo').value = '';
+    document.getElementById('inputCorCargo').value = 'default';
+    document.getElementById('inputOrdemCargo').value = '';
+
+    // Mostra o modal
+    const modal = document.getElementById('modalCargo');
+    if(modal) modal.classList.remove('hidden');
+    
+    // Foca no nome
+    setTimeout(() => document.getElementById('inputNomeCargo')?.focus(), 100);
+    
+    // Prepara IP para o log
+    obterIPReal();
+};
+
+window.fecharModalCargo = function() {
+    const modal = document.getElementById('modalCargo');
+    if(modal) modal.classList.add('hidden');
+};
+
+window.salvarNovoCargo = async function() {
+    const id = document.getElementById('inputHiddenIdCargo').value;
+    const nome = document.getElementById('inputNomeCargo').value.trim();
+    const corClass = document.getElementById('inputCorCargo').value;
+    const ordem = document.getElementById('inputOrdemCargo').value;
+
+    if (!nome) { alert("O nome do cargo é obrigatório!"); return; }
+
+    const dadosCargo = { 
+        nome: nome, 
+        corClass: corClass,
+        ordem: ordem ? parseInt(ordem) : null
+    };
+    
+    if (id) dadosCargo.id = parseInt(id);
+
+    // Preparação do Log
+    const nomeUsuario = currentUser && currentUser.user ? currentUser.user : 'Admin';
+    const acaoLog = id ? 'EDITAR_CARGO' : 'CRIAR_CARGO';
+    const msgLog = `Cargo: ${nome} | Classe: ${corClass}`;
+
+    try {
+        // 1. Salva no Banco
+        await DBHandler.salvarCargo(dadosCargo);
+
+        // 2. Grava Log
+        const ipReal = await obterIPReal();
+        await DBHandler.registrarLog(nomeUsuario, acaoLog, msgLog, ipReal);
+
+        // 3. Atualiza Tela
+        const dadosAtualizados = await DBHandler.carregarDadosIniciais();
+        config = dadosAtualizados;
+        if (typeof db !== 'undefined') db.dados = config;
+
+        // Recarrega filtros para o novo cargo aparecer na lista
+        init(); 
+        
+        // Renderiza a matriz (adicionará a nova coluna automaticamente)
+        window.atualizarFiltros(); 
+        
+        window.fecharModalCargo();
+        alert("Cargo salvo com sucesso!");
+
+    } catch (e) {
+        console.error("Erro ao salvar cargo:", e);
+        alert("Erro ao salvar. Verifique se o nome da tabela 'cargos' está correto no db-handler.js");
+    }
+};
 
 
 
