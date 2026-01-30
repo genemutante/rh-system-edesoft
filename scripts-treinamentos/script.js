@@ -153,7 +153,7 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
             // --- AJUSTE DE ALTURA AQUI (De 34px para 28px e padding menor) ---
             bodyHTML += `
             <tr data-row="${treinoIndex}">
-                <th style="--cat-color: ${badgeColor}; background-color: ${badgeColor}15; cursor: pointer; height: 28px; max-height: 28px; padding: 0;" 
+                <th style="--cat-color: ${badgeColor}; background-color: ${badgeColor}15; cursor: pointer; height: 15px; max-height: 15px; padding: 0;" 
                     data-tooltip="${tooltipText}"
                     onclick="editarTreinamento(${treino.id})">
                     
@@ -674,4 +674,5 @@ function fazerLogout() {
     document.body.classList.remove('is-admin');
     window.location.href = 'index.html'; 
 }
+
 
