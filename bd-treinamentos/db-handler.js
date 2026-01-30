@@ -1,203 +1,196 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+/* db-handler.js (global) */
+/* Requer no HTML (ANTES deste arquivo):
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+*/
 
 (function () {
-  // 🔐 Suas credenciais (anon key)
-  const SUPABASE_URL = 'https://mtblwyrcidrszwvjgxao.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10Ymx3eXJjaWRyc3p3dmpneGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3MTg4NTUsImV4cCI6MjA4NTI5NDg1NX0.6CipXB_HI0t0Gcle3pTlZTe9rqoh-8-EhfxQy-VodH0';
+  // ✅ Supabase via CDN global
+  if (!window.supabase || !window.supabase.createClient) {
+    console.error("Supabase JS não encontrado. Verifique o script CDN no HTML.");
+    return;
+  }
 
-  // ✅ Client Supabase (ESM)
-  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+  // 🔐 Credenciais
+  const SUPABASE_URL = "https://mtblwyrcidrszwvjgxao.supabase.co";
+  const SUPABASE_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10Ymx3eXJjaWRyc3p3dmpneGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3MTg4NTUsImV4cCI6MjA4NTI5NDg1NX0.6CipXB_HI0t0Gcle3pTlZTe9rqoh-8-EhfxQy-VodH0";
+
+  // ✅ Cliente único
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   function normalizeError(err) {
     if (!err) return null;
     if (typeof err === "string") return err;
     if (err.message) return err.message;
-    try { return JSON.stringify(err); } catch { return "Erro desconhecido"; }
+    try {
+      return JSON.stringify(err);
+    } catch {
+      return "Erro desconhecido";
+    }
   }
 
   const DBHandler = {
-
     supabaseClient,
 
-    // --- 1. LEITURA INICIAL ---
+    // =========================
+    // 1) LEITURA INICIAL (MATRIZ TREINAMENTOS)
+    // =========================
     async carregarDadosIniciais() {
       console.log("🔄 Buscando dados do Supabase...");
 
-      // 1. Busca Treinamentos
+      // 1. Treinamentos
       const { data: treinosRaw, error: errT } = await supabaseClient
-        .from('treinamentos')
-        .select('id, nome, categoria, descricao, cor, link_externo')
-        .order('categoria', { ascending: true })
-        .order('nome', { ascending: true });
+        .from("treinamentos")
+        .select("id, nome, categoria, descricao, cor, link_externo")
+        .order("categoria", { ascending: true })
+        .order("nome", { ascending: true });
 
-      if (errT) throw new Error(normalizeError(errT));
+      if (errT) throw errT;
 
-      const treinos = (treinosRaw || []).map(t => ({
+      const treinos = (treinosRaw || []).map((t) => ({
         id: t.id,
         nome: t.nome,
         categoria: t.categoria,
         desc: t.descricao,
         color: t.cor,
-        link: t.link_externo
+        link: t.link_externo,
       }));
 
-      // 2. Busca Cargos (Via View ou Tabela)
+      // 2. Cargos (view ou tabela)
       const { data: cargosRaw, error: errC } = await supabaseClient
-        .from('view_matriz_cargos')
-        .select('*')
-        .order('id', { ascending: true });
+        .from("view_matriz_cargos")
+        .select("*")
+        .order("id", { ascending: true });
 
-      if (errC) throw new Error(normalizeError(errC));
+      if (errC) throw errC;
 
-      const cargos = (cargosRaw || []).map(c => ({
+      const cargos = (cargosRaw || []).map((c) => ({
         ...c,
-        corClass: c.cor_class
+        corClass: c.cor_class, // padroniza para o front
       }));
 
       return { treinamentos: treinos, cargos };
     },
 
-    // --- 2. GERENCIAR TREINAMENTOS ---
+    // =========================
+    // 2) TREINAMENTOS
+    // =========================
     async salvarTreinamento(treino) {
       const payload = {
         nome: treino.nome,
         categoria: treino.categoria,
         descricao: treino.desc,
         cor: treino.color,
-        link_externo: treino.link
+        link_externo: treino.link,
       };
 
       if (treino.id) payload.id = treino.id;
 
       const { data, error } = await supabaseClient
-        .from('treinamentos')
+        .from("treinamentos")
         .upsert(payload)
         .select()
         .single();
 
-      if (error) throw new Error(normalizeError(error));
+      if (error) throw error;
       return data;
     },
 
-    // --- 3. EXCLUIR TREINAMENTO ---
     async excluirTreinamento(id) {
-      // Remove regras primeiro (Cascata manual)
-      const { error: errR } = await supabaseClient
-        .from('matriz_regras')
-        .delete()
-        .eq('treinamento_id', id);
+      // Remove regras primeiro (cascata manual)
+      await supabaseClient.from("matriz_regras").delete().eq("treinamento_id", id);
 
-      if (errR) throw new Error(normalizeError(errR));
-
-      const { error } = await supabaseClient
-        .from('treinamentos')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw new Error(normalizeError(error));
+      const { error } = await supabaseClient.from("treinamentos").delete().eq("id", id);
+      if (error) throw error;
     },
 
-    // --- 4. ATUALIZAR MATRIZ ---
     async atualizarRegra(cargoId, treinoId, novoStatus) {
       // Limpa regra anterior
       const { error: errDel } = await supabaseClient
-        .from('matriz_regras')
+        .from("matriz_regras")
         .delete()
         .match({ cargo_id: cargoId, treinamento_id: treinoId });
 
-      if (errDel) throw new Error(normalizeError(errDel));
+      if (errDel) throw errDel;
 
       // Insere nova regra se necessário
-      if (novoStatus !== 'none') {
-        const tipoBanco = novoStatus === 'mandatory' ? 'OBRIGATORIO' : 'RECOMENDADO';
+      if (novoStatus !== "none") {
+        const tipoBanco = novoStatus === "mandatory" ? "OBRIGATORIO" : "RECOMENDADO";
 
-        const { error: errIns } = await supabaseClient
-          .from('matriz_regras')
-          .insert({
-            cargo_id: cargoId,
-            treinamento_id: treinoId,
-            tipo: tipoBanco
-          });
-
-        if (errIns) throw new Error(normalizeError(errIns));
-      }
-    },
-
-    // --- 5. REGISTRAR LOG (AUDITORIA) ---
-    async registrarLog(usuario, acao, detalhes, ip) {
-      const { error } = await supabaseClient
-        .from('logs_sistema')
-        .insert({
-          usuario,
-          acao,
-          detalhes,
-          ip: ip || 'IP não detectado'
+        const { error: errIns } = await supabaseClient.from("matriz_regras").insert({
+          cargo_id: cargoId,
+          treinamento_id: treinoId,
+          tipo: tipoBanco,
         });
 
-      if (error) {
-        console.error("Erro silencioso ao gravar log:", error);
+        if (errIns) throw errIns;
       }
     },
 
-    // --- 6. GERENCIAR CARGOS (CRIAR / EDITAR) ---
+    async registrarLog(usuario, acao, detalhes, ip) {
+      const { error } = await supabaseClient.from("logs_sistema").insert({
+        usuario,
+        acao,
+        detalhes,
+        ip: ip || "IP não detectado",
+      });
+
+      if (error) console.error("Erro silencioso ao gravar log:", error);
+    },
+
+    // =========================
+    // 3) CARGOS
+    // =========================
     async salvarCargo(cargo) {
       const payload = {
         nome: cargo.nome,
         cor_class: cargo.corClass,
-        ordem: cargo.ordem || 99
+        ordem: cargo.ordem || 99,
       };
-
       if (cargo.id) payload.id = cargo.id;
 
       const { data, error } = await supabaseClient
-        .from('cargos')
+        .from("cargos")
         .upsert(payload)
         .select()
         .single();
 
-      if (error) throw new Error(normalizeError(error));
+      if (error) throw error;
       return data;
     },
 
-    // --- 7. EXCLUIR CARGO (COM LIMPEZA DE REGRAS) ---
     async excluirCargo(id) {
       const { error: errRegras } = await supabaseClient
-        .from('matriz_regras')
+        .from("matriz_regras")
         .delete()
-        .eq('cargo_id', id);
+        .eq("cargo_id", id);
 
-      if (errRegras) throw new Error(normalizeError(errRegras));
+      if (errRegras) throw errRegras;
 
-      const { error: errCargo } = await supabaseClient
-        .from('cargos')
-        .delete()
-        .eq('id', id);
-
-      if (errCargo) throw new Error(normalizeError(errCargo));
+      const { error: errCargo } = await supabaseClient.from("cargos").delete().eq("id", id);
+      if (errCargo) throw errCargo;
     },
 
-    // --- 8. AUTENTICAÇÃO ---
+    // =========================
+    // 4) AUTH
+    // =========================
     async validarLogin(username, password) {
       const { data, error } = await supabaseClient
-        .from('usuarios_sistema')
-        .select('*')
-        .eq('username', username)
-        .eq('password', password)
+        .from("usuarios_sistema")
+        .select("*")
+        .eq("username", username)
+        .eq("password", password)
         .maybeSingle();
 
-      if (error) throw new Error(normalizeError(error));
+      if (error) throw error;
       return data;
     },
 
     // =========================
-    // COLABORADORES
+    // 5) COLABORADORES
     // =========================
     async listarColaboradores({ somenteAtivos = false } = {}) {
-      let q = supabaseClient
-        .from("colaboradores")
-        .select("*")
-        .order("nome", { ascending: true });
-
+      let q = supabaseClient.from("colaboradores").select("*").order("nome", { ascending: true });
       if (somenteAtivos) q = q.is("data_demissao", null);
 
       const { data, error } = await q;
@@ -248,11 +241,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
     },
 
     async reativarColaborador(id) {
-      const payload = {
-        data_demissao: null,
-        motivo_demissao: null,
-      };
-      return this.atualizarColaborador(id, payload);
+      return this.atualizarColaborador(id, { data_demissao: null, motivo_demissao: null });
     },
 
     async listarCargos() {
@@ -266,7 +255,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
     },
   };
 
-  // ✅ Expõe no window
+  // ✅ expõe globalmente
   window.supabaseClient = supabaseClient;
   window.DBHandler = DBHandler;
 
