@@ -13,21 +13,20 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export const DBHandler = {
 
-  // --- 1. LEITURA INICIAL ---
+
+// --- 1. LEITURA INICIAL ---
     async carregarDadosIniciais() {
         console.log("🔄 Buscando dados do Supabase...");
         
-        // 1. Busca usando os nomes REAIS das colunas
+        // 1. Busca Treinamentos
         const { data: treinosRaw, error: errT } = await supabase
             .from('treinamentos')
             .select('id, nome, categoria, descricao, cor, link_externo') 
-            // ORDENAÇÃO DUPLA:
-            .order('categoria', { ascending: true }) // 1º: Agrupa por Categoria (00, 01, 02...)
-            .order('nome', { ascending: true });     // 2º: A-Z dentro da categoria
+            .order('categoria', { ascending: true }) 
+            .order('nome', { ascending: true });
             
         if (errT) throw errT;
 
-        // 2. Mapeia para o formato que o script.js espera
         const treinos = treinosRaw.map(t => ({
             id: t.id,
             nome: t.nome,
@@ -37,12 +36,19 @@ export const DBHandler = {
             link: t.link_externo
         }));
 
-        const { data: cargos, error: errC } = await supabase
+        // 2. Busca Cargos (ORDENAÇÃO ALTERADA AQUI)
+        const { data: cargosRaw, error: errC } = await supabase
             .from('view_matriz_cargos')
             .select('*')
-            .order('nome');
+            .order('id', { ascending: true }); // <--- MUDANÇA: Ordenar por ID
 
         if (errC) throw errC;
+
+        // Mapeamento de classes de cor
+        const cargos = cargosRaw.map(c => ({
+            ...c,
+            corClass: c.cor_class 
+        }));
 
         return { treinamentos: treinos, cargos: cargos };
     },
@@ -121,4 +127,5 @@ export const DBHandler = {
         return data;
     }
 };
+
 
