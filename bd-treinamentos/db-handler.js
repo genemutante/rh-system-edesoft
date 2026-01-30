@@ -183,5 +183,103 @@ export const DBHandler = {
         if (error) throw error;
         return data;
     }
+
+// ===============================
+// COLABORADORES (CRUD)
+// ===============================
+async listarColaboradores() {
+  const { data, error } = await supabase
+    .from("colaboradores")
+    .select("*")
+    .order("nome", { ascending: true });
+
+  if (error) {
+    console.error("[Supabase] listarColaboradores:", error);
+    throw error;
+  }
+  return data ?? [];
+},
+
+async listarCargosBasicos() {
+  // Para alimentar o select de cargo_atual_id
+  const { data, error } = await supabase
+    .from("cargos")
+    .select("id, nome")
+    .order("nome", { ascending: true });
+
+  if (error) {
+    console.error("[Supabase] listarCargosBasicos:", error);
+    throw error;
+  }
+  return data ?? [];
+},
+
+async salvarColaborador(payload) {
+  // payload deve estar em snake_case (colunas do banco)
+  // Se id vier vazio, removemos para deixar o banco gerar (se houver identity/sequence)
+  const row = { ...payload };
+
+  if (row.id === "" || row.id === null || row.id === undefined) delete row.id;
+
+  const { data, error } = await supabase
+    .from("colaboradores")
+    .upsert(row, { onConflict: "id" })
+    .select("*")
+    .single();
+
+  if (error) {
+    console.error("[Supabase] salvarColaborador:", error, row);
+    throw error;
+  }
+  return data;
+},
+
+async atualizarColaborador(id, patch) {
+  const { data, error } = await supabase
+    .from("colaboradores")
+    .update(patch)
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) {
+    console.error("[Supabase] atualizarColaborador:", error, { id, patch });
+    throw error;
+  }
+  return data;
+},
+
+async inativarColaborador(id, data_demissao, motivo_demissao = null) {
+  return this.atualizarColaborador(id, {
+    data_demissao,
+    motivo_demissao,
+    atualizado_em: new Date().toISOString(),
+  });
+},
+
+async reativarColaborador(id) {
+  return this.atualizarColaborador(id, {
+    data_demissao: null,
+    motivo_demissao: null,
+    atualizado_em: new Date().toISOString(),
+  });
+},
+
+async excluirColaborador(id) {
+  const { error } = await supabase
+    .from("colaboradores")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("[Supabase] excluirColaborador:", error, { id });
+    throw error;
+  }
+  return true;
+},
+
+
+    
 }; // Fim do objeto DBHandler
+
 
