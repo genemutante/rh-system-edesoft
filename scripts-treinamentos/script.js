@@ -21,7 +21,12 @@ let colCache = {};
 let lastHighlightedCol = null;
 
 // Controle Admin
-let contextoAdmin = { cargoId: null, treinoId: null, acaoPendente: null };
+let contextoAdmin = {
+    cargoId: null,
+    treinoId: null,
+    acaoPendente: null,
+    treinoOriginal: null // Novo: Armazena os dados antes da edição
+};
 let pendingChange = null; 
 let tempCargoIndex = null;
 let tempTreinoId = null;
@@ -321,31 +326,42 @@ window.fecharModalTreinamento = function() {
 window.salvarNovoTreinamento = async function() {
     const idExistente = document.getElementById('inputHiddenId').value;
     const nome = document.getElementById('inputNomeTreino').value.trim();
-    const categoria = document.getElementById('inputCatTreino').value.trim();
+    const categoria = document.getElementById('inputCatTreino').value.trim().toUpperCase();
     const desc = document.getElementById('inputDescTreino').value.trim();
     const link = document.getElementById('inputLinkTreino').value.trim();
     const cor = document.getElementById('inputCorTreino').value;
 
     if (!nome || !categoria) { alert("Preencha Nome e Categoria!"); return; }
 
-    // Prepara objeto
-    const dadosFormulario = { nome, categoria: categoria.toUpperCase(), desc, link, color: cor };
+    const dadosFormulario = { nome, categoria, desc, link, color: cor };
     if (idExistente) dadosFormulario.id = parseInt(idExistente);
 
-    // Dados para o Log
     const nomeUsuario = currentUser && currentUser.user ? currentUser.user : 'Admin';
-    const acaoLog = idExistente ? 'EDITAR_CURSO' : 'CRIAR_CURSO';
-    const detalhesLog = `Curso: ${nome} | Categoria: ${categoria.toUpperCase()}`;
+    let acaoLog = idExistente ? 'EDITAR_CURSO' : 'CRIAR_CURSO';
+    let detalhesLog = "";
+
+    // LÓGICA DE ANTES E DEPOIS
+    if (idExistente && contextoAdmin.treinoOriginal) {
+        const orig = contextoAdmin.treinoOriginal;
+        const alteracoes = [];
+
+        if (orig.nome !== nome) alteracoes.push(`Nome: "${orig.nome}" -> "${nome}"`);
+        if (orig.categoria !== categoria) alteracoes.push(`Cat: "${orig.categoria}" -> "${categoria}"`);
+        if (orig.desc !== desc) alteracoes.push(`Desc: Alterada`);
+        if (orig.link !== link) alteracoes.push(`Link: Alterado`);
+        if (orig.color !== cor) alteracoes.push(`Cor: ${orig.color} -> ${cor}`);
+
+        detalhesLog = alteracoes.length > 0 ? alteracoes.join(" | ") : "Nenhuma alteração detectada nos campos.";
+    } else {
+        detalhesLog = `Novo Curso: ${nome} | Categoria: ${categoria}`;
+    }
 
     try {
-        // 1. Salva no Banco (Operação Principal)
         await DBHandler.salvarTreinamento(dadosFormulario);
         
-        // 2. Captura IP e Grava Log (Auditoria)
         const ipReal = await obterIPReal();
         await DBHandler.registrarLog(nomeUsuario, acaoLog, detalhesLog, ipReal);
 
-        // 3. Atualiza a Tela
         const dadosAtualizados = await DBHandler.carregarDadosIniciais();
         config = dadosAtualizados;
         if (typeof db !== 'undefined') db.dados = config;
@@ -354,43 +370,35 @@ window.salvarNovoTreinamento = async function() {
         window.atualizarFiltros();
         window.fecharModalTreinamento();
         
-        alert(`Sucesso! Curso ${idExistente ? 'atualizado' : 'criado'} e registrado no log.`);
-
+        alert("Salvo com sucesso e registrado no log!");
     } catch (e) {
         console.error(e);
-        alert("Erro ao salvar no banco. Verifique o console.");
+        alert("Erro ao salvar.");
     }
 };
-
 window.editarTreinamento = function(id) {
-    // 1. Segurança: Só abre se for Admin
     if (!window.isAdminMode) return;
 
-    // 2. Busca o treinamento na memória global (config.treinamentos)
     const treino = config.treinamentos.find(t => t.id === id);
     if (!treino) return;
 
-    // 3. Preenche os inputs do modal
+    // Salva uma cópia exata do que está no banco atualmente para comparar depois
+    contextoAdmin.treinoOriginal = { ...treino };
+
     document.getElementById('inputHiddenId').value = treino.id;
     document.getElementById('inputNomeTreino').value = treino.nome;
     document.getElementById('inputCatTreino').value = treino.categoria;
-    document.getElementById('inputDescTreino').value = treino.desc || '';
-    document.getElementById('inputLinkTreino').value = treino.link || '';
-    
-    // 4. Ajusta a cor e o código Hexadecimal visual
-    const cor = treino.color || '#3b82f6';
-    document.getElementById('inputCorTreino').value = cor;
-    const hexDisplay = document.getElementById('hexColorDisplay');
-    if(hexDisplay) hexDisplay.textContent = cor.toUpperCase();
-    
-    // 5. Configura o visual do modal para "Edição"
-    document.getElementById('modalTitle').textContent = "Editar Treinamento";
-    document.getElementById('btnExcluirTreino').style.display = 'block'; // Mostra botão excluir
+    document.getElementById('inputDescTreino').value = treino.desc || "";
+    document.getElementById('inputLinkTreino').value = treino.link || "";
+    document.getElementById('inputCorTreino').value = treino.color || "#3b82f6";
 
-    // 6. Abre o modal
-    window.abrirModalTreinamento();
+    const hexDisplay = document.getElementById('hexColorDisplay');
+    if(hexDisplay) hexDisplay.textContent = (treino.color || "#3b82f6").toUpperCase();
+
+    document.getElementById('modalTitle').textContent = "Editar Treinamento";
+    document.getElementById('btnExcluirTreino').style.display = 'block';
+    document.getElementById('modalTreino').classList.remove('hidden');
     
-    // Dica: Já inicia a busca do IP em segundo plano para o log estar pronto ao salvar
     obterIPReal(); 
 };
 
@@ -796,6 +804,7 @@ window.confirmarAcaoSegura = async function() {
         alert("Erro ao salvar alteração: " + e.message);
     }
 };
+
 
 
 
