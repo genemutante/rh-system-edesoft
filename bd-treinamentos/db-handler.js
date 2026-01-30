@@ -117,14 +117,15 @@ export const DBHandler = {
     },
 
     // --- 5. REGISTRAR LOG (FALTAVA ISSO) ---
-    async registrarLog(usuario, acao, detalhes) {
+// --- 5. REGISTRAR LOG (AUDITORIA) ---
+    async registrarLog(usuario, acao, detalhes, ip) {
         const { error } = await supabase
             .from('logs_sistema')
             .insert({
                 usuario: usuario,
                 acao: acao,
                 detalhes: detalhes,
-                ip: '192.168.1.10'
+                ip: ip || 'Desconhecido' // Usa o IP recebido ou um fallback
             });
 
         if (error) {
@@ -145,3 +146,4 @@ export const DBHandler = {
         return data;
     }
 };
+
