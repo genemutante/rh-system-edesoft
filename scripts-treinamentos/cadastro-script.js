@@ -299,8 +299,13 @@ if (!["view", "edit", "new"].includes(mode)) {
 console.log("🔎 isAdmin:", isAdmin);
 console.log("🔎 currentId:", currentId);
 console.log("🔎 Deve mostrar botão editar?", isAdmin && mode === "view" && currentId);
+const btnEditar = $("btnIrParaEdicao");
   
+console.log("🔧 btn.style BEFORE:", btnEditar?.style.display);
+btnEditar.style.display = "none";
+console.log("🔧 btn.style AFTER:", btnEditar?.style.display);
 
+  
   // badge status
   const badge = $("formStatusBadge");
   if (!currentId) {
@@ -559,6 +564,7 @@ window.buscarCep = async function buscarCep(cep) {
     console.warn("ViaCEP falhou:", e);
   }
 };
+
 
 
 
