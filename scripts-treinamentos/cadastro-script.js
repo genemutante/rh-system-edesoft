@@ -275,6 +275,9 @@ function limparForm() {
 function setModoForm(mode) {
   currentMode = mode;
 
+  console.log("⚙️ Modo atual:", mode);
+
+  
   const isAdmin = document.body.classList.contains("is-admin");
   const podeEditar = isAdmin && (mode === "edit" || mode === "new");
 
@@ -545,3 +548,4 @@ window.buscarCep = async function buscarCep(cep) {
     console.warn("ViaCEP falhou:", e);
   }
 };
+
