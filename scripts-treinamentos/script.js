@@ -142,13 +142,28 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
         });
 
         if (linhaPassa) {
+            const tooltipText = treino.desc ? treino.desc : "Sem descrição disponível.";
             const badgeColor = treino.color || "#64748b";
+            const categoriaDisplay = treino.categoria || "GERAL";
+            
+            // --- CORREÇÃO DO LAYOUT (1 LINHA FORÇADA) ---
+            // Mudei a classe para 'row-header-flex' para garantir que CSS antigo não atrapalhe
+            // Adicionei overflow: hidden e white-space: nowrap para evitar quebras
             bodyHTML += `
             <tr data-row="${treinoIndex}">
-                <th style="--cat-color: ${badgeColor}; background-color: ${badgeColor}15; cursor: pointer;" onclick="editarTreinamento(${treino.id})">
-                    <div class="row-header-content" style="display: flex; gap: 6px; align-items: center; padding: 0 8px;">
-                        <div style="background: #fff; border: 1px solid ${badgeColor}; color: ${badgeColor}; font-size: 8px; font-weight: 800; padding: 3px 8px; border-radius: 100px;">${treino.categoria || "GERAL"}</div>
-                        <div style="background: #fff; color: #1e293b; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 100px; border: 1px solid #cbd5e1; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${treino.nome}</div>
+                <th style="--cat-color: ${badgeColor}; background-color: ${badgeColor}15; cursor: pointer; height: 34px; padding: 0;" 
+                    data-tooltip="${tooltipText}"
+                    onclick="editarTreinamento(${treino.id})">
+                    
+                    <div class="row-header-flex" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; height: 100%; padding: 0 12px; width: 100%;">
+                        
+                        <div style="background: #ffffff; border: 1px solid ${badgeColor}; color: ${badgeColor}; font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; line-height: 1;">
+                            ${categoriaDisplay}
+                        </div>
+
+                        <div style="color: #334155; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; text-align: left;">
+                            ${treino.nome}
+                        </div>
                     </div>
                 </th>
                 ${rowCellsHTML}
@@ -613,6 +628,7 @@ window.confirmarAcaoSegura = async function() {
 // =============================================================================
 // 8. CONTROLE DE SESSÃO
 // =============================================================================
+
 function verificarSessaoInicial() {
     const sessionRaw = localStorage.getItem('rh_session');
     if (sessionRaw) {
