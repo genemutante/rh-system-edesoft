@@ -280,7 +280,8 @@ function setModoForm(mode) {
 
   // botões
   $("btnSalvar").style.display = podeEditar ? "inline-flex" : "none";
-  
+  $("btnIrParaEdicao").style.display =
+    isAdmin && mode === "view" && currentId ? "inline-flex" : "none";
 
   // excluir/desligar/reativar (via modal/botão)
   $("btnExcluir").style.display = "none";
@@ -544,5 +545,3 @@ window.buscarCep = async function buscarCep(cep) {
     console.warn("ViaCEP falhou:", e);
   }
 };
-
-
