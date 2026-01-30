@@ -421,21 +421,27 @@ window.excluirTreinamento = async function() {
     const id = document.getElementById('inputHiddenId').value;
     if (!id) return;
 
-    // Busca o nome do curso ANTES de excluir para colocar no log
+    // Busca o nome para uma mensagem personalizada e log
     const treinoAlvo = config.treinamentos.find(t => t.id == id);
     const nomeCurso = treinoAlvo ? treinoAlvo.nome : "Desconhecido";
 
-    if (confirm(`Tem certeza que deseja EXCLUIR o treinamento "${nomeCurso}" permanentemente?`)) {
+    // --- AJUSTE: ALERTA SOBRE PERDA DE RELACIONAMENTOS ---
+    const mensagemConfirmacao = `⚠️ ATENÇÃO: Você está prestes a excluir o curso "${nomeCurso}".\n\n` +
+                                `Isso removerá permanentemente o curso E TODAS as regras de obrigatoriedade ` +
+                                `definidas para ele na matriz.\n\n` +
+                                `Deseja continuar?`;
+
+    if (confirm(mensagemConfirmacao)) {
         
         const nomeUsuario = currentUser && currentUser.user ? currentUser.user : 'Admin';
         
         try {
-            // 1. Exclui do Banco
+            // 1. Exclui do Banco (DBHandler deve ter a cascata implementada)
             await DBHandler.excluirTreinamento(parseInt(id));
             
-            // 2. Grava Log
+            // 2. Grava Log detalhando a limpeza
             const ipReal = await obterIPReal();
-            const msgLog = `Excluiu permanentemente o curso: ${nomeCurso} (ID: ${id})`;
+            const msgLog = `Exclusão Crítica: Removeu o curso "${nomeCurso}" (ID: ${id}) e todos os seus vínculos na matriz.`;
             await DBHandler.registrarLog(nomeUsuario, 'EXCLUIR_CURSO', msgLog, ipReal);
 
             // 3. Atualiza a Tela
@@ -447,15 +453,16 @@ window.excluirTreinamento = async function() {
             init();
             window.atualizarFiltros();
             
-            alert("Treinamento excluído e registrado no log!");
+            alert("Curso e seus relacionamentos foram excluídos com sucesso!");
 
         } catch (e) {
             console.error("Erro ao excluir:", e);
-            alert("Não foi possível excluir o treinamento.");
+            alert("Não foi possível excluir o treinamento. Verifique o console.");
         }
     }
 };
 
+// --- BLOCO DE AUTOMAÇÃO DE CORES (MANTIDO) ---
 const inputCat = document.getElementById('inputCatTreino');
 const inputCor = document.getElementById('inputCorTreino');
 if (inputCat && inputCor) {
@@ -819,6 +826,7 @@ window.confirmarAcaoSegura = async function() {
         alert("Erro ao salvar alteração: " + e.message);
     }
 };
+
 
 
 
