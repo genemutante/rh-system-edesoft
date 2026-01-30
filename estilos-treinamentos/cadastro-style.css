@@ -661,3 +661,7 @@ tbody tr:hover { background: #f8fbff; }
   background: #b91c1c;
 }
 
+
+#btnIrParaEdicao {
+  display: none !important;
+}
