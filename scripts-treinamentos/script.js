@@ -1,11 +1,8 @@
 // =============================================================================
 // 1. IMPORTAÇÃO E VARIÁVEIS GLOBAIS
 // =============================================================================
-const DBHandler = window.DBHandler;
+import { DBHandler } from "../bd-treinamentos/db-handler.js";
 
-if (!DBHandler) {
-  throw new Error("DBHandler não encontrado. Garanta que db-handler.js foi carregado antes deste script.");
-}
 
 
 const icons = {
@@ -1087,6 +1084,7 @@ window.fecharMenus = function() {
 
     tempCargoIndexParaMenu = null;
 };
+
 
 
 
