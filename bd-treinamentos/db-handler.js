@@ -151,7 +151,7 @@ async excluirTreinamento(id) {
         if (error) throw error;
         return data;
     }
-};
+},
 
 
 // --- 6. GERENCIAR CARGOS (NOVO) ---
@@ -175,4 +175,5 @@ async excluirTreinamento(id) {
 
         if (error) throw error;
         return data;
-    },
+    };
+
