@@ -13,12 +13,7 @@ const icons = {
     filterClear: `<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /><path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18" /></svg>`
 };
 
-// Mapa de Tradução para Logs
-const STATUS_MAP = {
-    'mandatory': 'OBRIGATÓRIO',
-    'recommended': 'RECOMENDÁVEL',
-    'none': 'NÃO OBRIGATÓRIO'
-};
+
 
 let config = { treinamentos: [], cargos: [] };
 let db = { dados: config };
@@ -502,10 +497,116 @@ function limparDestaqueOpt() {
     }
 }
 
+
+
+
+
 // =============================================================================
-// 7. MENU DE CONTEXTO & AUDITORIA (LOG CORRIGIDO)
+// 8. CONTROLE DE SESSÃO
 // =============================================================================
 
+function verificarSessaoInicial() {
+    const sessionRaw = localStorage.getItem('rh_session');
+    if (sessionRaw) {
+        try {
+            currentUser = JSON.parse(sessionRaw);
+            console.log("👤 Usuário logado:", currentUser.user);
+            if (currentUser.role === 'ADMIN') ativarModoAdmin(true);
+        } catch (e) { console.error("Erro ao ler sessão", e); }
+    } else {
+        console.log("👤 Acesso anônimo (Leitura)");
+    }
+}
+
+window.toggleAdminMode = function() {
+    if (currentUser) {
+        if (confirm(`Deseja sair da conta de ${currentUser.user}?`)) fazerLogout();
+    } else {
+        window.location.href = 'login.html'; 
+    }
+};
+
+function ativarModoAdmin(silencioso = false) {
+    window.isAdminMode = true;
+    document.body.classList.add('is-admin');
+    const btn = document.getElementById('btnAdminToggle');
+    const iconClosed = document.getElementById('iconLockClosed');
+    const iconOpen = document.getElementById('iconLockOpen');
+    
+    if (btn) {
+        btn.classList.add('unlocked');
+        btn.title = "Clique para Sair (Logout)";
+        if(iconClosed) iconClosed.style.display = 'none';
+        if(iconOpen) iconOpen.style.display = 'block';
+    }
+}
+
+function fazerLogout() {
+    window.isAdminMode = false;
+    currentUser = null;
+    localStorage.removeItem('rh_session');
+    document.body.classList.remove('is-admin');
+    window.location.href = 'index.html'; 
+}
+
+
+// =============================================================================
+// HELPER: TRADUÇÃO DE STATUS (PARA O LOG)
+// =============================================================================
+const STATUS_MAP = {
+    'mandatory': 'OBRIGATÓRIO',
+    'recommended': 'RECOMENDÁVEL',
+    'none': 'NÃO OBRIGATÓRIO' 
+};
+
+// =============================================================================
+// 9. EDIÇÃO DE RELACIONAMENTO (CLIQUE DUPLO / LÓGICA)
+// =============================================================================
+
+async function alternarRelacao(cargoIndex, treinoId) {
+    if (!window.isAdminMode) return;
+
+    const cargo = config.cargos[cargoIndex];
+    if (!cargo) return;
+
+    // 1. Identifica o estado ATUAL (ANTES)
+    const isObrig = cargo.obrigatorios && cargo.obrigatorios.includes(treinoId);
+    const isRecom = cargo.recomendados && cargo.recomendados.includes(treinoId);
+    
+    let statusAnterior = 'none';
+    if (isObrig) statusAnterior = 'mandatory';
+    else if (isRecom) statusAnterior = 'recommended';
+
+    // 2. Determina o PRÓXIMO estado
+    let novoStatus = '';
+    let msgConfirmacao = '';
+
+    if (statusAnterior === 'none') {
+        novoStatus = 'mandatory';
+        msgConfirmacao = `Definir como <strong style="color:#ef4444">OBRIGATÓRIO</strong>?`;
+    } 
+    else if (statusAnterior === 'mandatory') {
+        novoStatus = 'recommended';
+        msgConfirmacao = `Mudar para <strong style="color:#eab308">RECOMENDÁVEL</strong>?`;
+    } 
+    else if (statusAnterior === 'recommended') {
+        novoStatus = 'none';
+        msgConfirmacao = `<strong>REMOVER</strong> a regra deste curso?`;
+    }
+
+    // 3. Dispara Auditoria com dados completos
+    exibirModalAuditoria(msgConfirmacao, {
+        TIPO: 'RELACAO',
+        cargoIndex: cargoIndex,
+        treinoId: treinoId,
+        statusAnterior: statusAnterior, 
+        novoStatus: novoStatus
+    });
+}
+
+// =============================================================================
+// 10. LÓGICA DO MENU DE CONTEXTO
+// =============================================================================
 window.abrirMenuContexto = function(e, cargoIndex, treinoId) {
     if (!window.isAdminMode) return;
     e.preventDefault(); e.stopPropagation();
@@ -565,6 +666,10 @@ window.selecionarOpcaoRelacao = function(novoStatus) {
     });
 };
 
+
+// =============================================================================
+// 11. CENTRAL DE SEGURANÇA E AUDITORIA (LOG COM NOME)
+// =============================================================================
 function exibirModalAuditoria(mensagemHTML, changeObject) {
     pendingChange = changeObject;
     const lbl = document.getElementById('lblChangeDetail');
@@ -633,54 +738,5 @@ window.confirmarAcaoSegura = async function() {
         alert("Erro ao salvar alteração: " + e.message);
     }
 };
-
-// =============================================================================
-// 8. CONTROLE DE SESSÃO
-// =============================================================================
-
-function verificarSessaoInicial() {
-    const sessionRaw = localStorage.getItem('rh_session');
-    if (sessionRaw) {
-        try {
-            currentUser = JSON.parse(sessionRaw);
-            console.log("👤 Usuário logado:", currentUser.user);
-            if (currentUser.role === 'ADMIN') ativarModoAdmin(true);
-        } catch (e) { console.error("Erro ao ler sessão", e); }
-    } else {
-        console.log("👤 Acesso anônimo (Leitura)");
-    }
-}
-
-window.toggleAdminMode = function() {
-    if (currentUser) {
-        if (confirm(`Deseja sair da conta de ${currentUser.user}?`)) fazerLogout();
-    } else {
-        window.location.href = 'login.html'; 
-    }
-};
-
-function ativarModoAdmin(silencioso = false) {
-    window.isAdminMode = true;
-    document.body.classList.add('is-admin');
-    const btn = document.getElementById('btnAdminToggle');
-    const iconClosed = document.getElementById('iconLockClosed');
-    const iconOpen = document.getElementById('iconLockOpen');
-    
-    if (btn) {
-        btn.classList.add('unlocked');
-        btn.title = "Clique para Sair (Logout)";
-        if(iconClosed) iconClosed.style.display = 'none';
-        if(iconOpen) iconOpen.style.display = 'block';
-    }
-}
-
-function fazerLogout() {
-    window.isAdminMode = false;
-    currentUser = null;
-    localStorage.removeItem('rh_session');
-    document.body.classList.remove('is-admin');
-    window.location.href = 'index.html'; 
-}
-
 
 
