@@ -329,7 +329,7 @@ window.editar = async function editar(id) {
   await abrirFicha(id, "edit");
 };
 
-async function abrirFicha(id, mode) {
+async function abrirFicha(id, mode = "view") {
   const colab = await DBHandler.buscarColaboradorPorId(id);
   currentId = colab.id;
 
@@ -339,6 +339,7 @@ async function abrirFicha(id, mode) {
   showView(false);
   setModoForm(mode);
 }
+
 
 function preencherForm(c) {
   $("colabId").value = c.id ?? "";
@@ -548,5 +549,6 @@ window.buscarCep = async function buscarCep(cep) {
     console.warn("ViaCEP falhou:", e);
   }
 };
+
 
 
