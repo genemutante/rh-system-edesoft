@@ -323,6 +323,7 @@ window.fecharModalTreinamento = function() {
     document.getElementById('btnExcluirTreino').style.display = 'none';
 };
 
+
 window.salvarNovoTreinamento = async function() {
     const idExistente = document.getElementById('inputHiddenId').value;
     const nome = document.getElementById('inputNomeTreino').value.trim();
@@ -340,28 +341,38 @@ window.salvarNovoTreinamento = async function() {
     let acaoLog = idExistente ? 'EDITAR_CURSO' : 'CRIAR_CURSO';
     let detalhesLog = "";
 
-    // LÓGICA DE ANTES E DEPOIS
+    // --- LÓGICA DE ANTES E DEPOIS (AJUSTADA) ---
     if (idExistente && contextoAdmin.treinoOriginal) {
         const orig = contextoAdmin.treinoOriginal;
         const alteracoes = [];
 
         if (orig.nome !== nome) alteracoes.push(`Nome: "${orig.nome}" -> "${nome}"`);
         if (orig.categoria !== categoria) alteracoes.push(`Cat: "${orig.categoria}" -> "${categoria}"`);
-        if (orig.desc !== desc) alteracoes.push(`Desc: Alterada`);
-        if (orig.link !== link) alteracoes.push(`Link: Alterado`);
+        
+        // AJUSTE NA DESCRIÇÃO: Mostra o texto antigo e o novo
+        if ((orig.desc || "") !== desc) {
+            const vAntigo = orig.desc ? `"${orig.desc}"` : "(vazio)";
+            const vNovo = desc ? `"${desc}"` : "(vazio)";
+            alteracoes.push(`Desc: ${vAntigo} -> ${vNovo}`);
+        }
+
+        if ((orig.link || "") !== link) alteracoes.push(`Link: "${orig.link || ''}" -> "${link}"`);
         if (orig.color !== cor) alteracoes.push(`Cor: ${orig.color} -> ${cor}`);
 
-        detalhesLog = alteracoes.length > 0 ? alteracoes.join(" | ") : "Nenhuma alteração detectada nos campos.";
+        detalhesLog = alteracoes.length > 0 ? alteracoes.join(" | ") : "Nenhuma alteração nos campos.";
     } else {
         detalhesLog = `Novo Curso: ${nome} | Categoria: ${categoria}`;
     }
 
     try {
+        // 1. Salva no Banco
         await DBHandler.salvarTreinamento(dadosFormulario);
         
+        // 2. Registra o Log com IP Real
         const ipReal = await obterIPReal();
         await DBHandler.registrarLog(nomeUsuario, acaoLog, detalhesLog, ipReal);
 
+        // 3. Refresh na Interface
         const dadosAtualizados = await DBHandler.carregarDadosIniciais();
         config = dadosAtualizados;
         if (typeof db !== 'undefined') db.dados = config;
@@ -371,11 +382,15 @@ window.salvarNovoTreinamento = async function() {
         window.fecharModalTreinamento();
         
         alert("Salvo com sucesso e registrado no log!");
+
     } catch (e) {
         console.error(e);
         alert("Erro ao salvar.");
     }
 };
+
+
+
 window.editarTreinamento = function(id) {
     if (!window.isAdminMode) return;
 
@@ -804,6 +819,7 @@ window.confirmarAcaoSegura = async function() {
         alert("Erro ao salvar alteração: " + e.message);
     }
 };
+
 
 
 
