@@ -76,19 +76,25 @@ export const DBHandler = {
         return data;
     },
 
-    // --- 3. EXCLUIR TREINAMENTO (COM CASCATA) ---
-    async excluirTreinamento(id) {
-        // 1. Remove regras associadas primeiro
-        await supabase.from('matriz_regras').delete().eq('treinamento_id', id);
 
-        // 2. Remove o treinamento
-        const { error } = await supabase
-            .from('treinamentos')
-            .delete()
-            .eq('id', id);
-            
-        if (error) throw error;
-    },
+// --- 3. EXCLUIR TREINAMENTO (Com Limpeza de Vínculos) ---
+async excluirTreinamento(id) {
+    // 1. Remove primeiro todas as regras associadas na matriz para evitar órfãos
+    const { error: errRegras } = await supabase
+        .from('matriz_regras')
+        .delete()
+        .eq('treinamento_id', id);
+
+    if (errRegras) throw errRegras;
+
+    // 2. Agora remove o treinamento de fato
+    const { error: errTreino } = await supabase
+        .from('treinamentos')
+        .delete()
+        .eq('id', id);
+        
+    if (errTreino) throw errTreino;
+},
 
     // --- 4. ATUALIZAR REGRA ---
     async atualizarRegra(cargoId, treinoId, novoStatus) {
@@ -146,4 +152,5 @@ export const DBHandler = {
         return data;
     }
 };
+
 
