@@ -13,40 +13,46 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export const DBHandler = {
 
-    // --- 1. LEITURA INICIAL ---
+
+// --- 1. LEITURA INICIAL ---
     async carregarDadosIniciais() {
         console.log("🔄 Buscando dados do Supabase...");
         
-        // 1. Busca usando os nomes REAIS das colunas do banco
+        // 1. Busca Treinamentos
         const { data: treinosRaw, error: errT } = await supabase
             .from('treinamentos')
             .select('id, nome, categoria, descricao, cor, link_externo') 
-            .order('nome');
+            .order('categoria', { ascending: true }) 
+            .order('nome', { ascending: true });
             
         if (errT) throw errT;
 
-        // 2. Mapeia para o formato que o script.js espera
-        // O script.js usa: .desc, .color, .link
-        // O banco tem: .descricao, .cor, .link_externo
         const treinos = treinosRaw.map(t => ({
             id: t.id,
             nome: t.nome,
             categoria: t.categoria,
-            desc: t.descricao,      // <--- Mapeamento aqui
-            color: t.cor,           // <--- Mapeamento aqui
-            link: t.link_externo    // <--- Mapeamento aqui
+            desc: t.descricao,
+            color: t.cor,
+            link: t.link_externo
         }));
 
-        const { data: cargos, error: errC } = await supabase
+        // 2. Busca Cargos (ORDENAÇÃO ALTERADA AQUI)
+        const { data: cargosRaw, error: errC } = await supabase
             .from('view_matriz_cargos')
             .select('*')
-            .order('nome');
+            .order('id', { ascending: true }); // <--- MUDANÇA: Ordenar por ID
 
         if (errC) throw errC;
 
+        // Mapeamento de classes de cor
+        const cargos = cargosRaw.map(c => ({
+            ...c,
+            corClass: c.cor_class 
+        }));
+
         return { treinamentos: treinos, cargos: cargos };
     },
-
+    
     // --- 2. GERENCIAR TREINAMENTOS ---
     async salvarTreinamento(treino) {
         // Prepara o payload usando os nomes REAIS das colunas do banco
@@ -121,3 +127,4 @@ export const DBHandler = {
         return data;
     }
 };
+
