@@ -102,7 +102,7 @@
 </head>
 <body>
 
-    <header class="page-header">
+<header class="page-header">
         <div style="display: flex; align-items: center;">
             <h1>Matriz de Capacitação</h1>
             
@@ -124,10 +124,17 @@
                 </div>
             </div>
 
-            <button class="btn-new-course admin-only" onclick="abrirModalTreinamento()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>Novo Curso</span>
-            </button>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="btn-new-course admin-only" onclick="abrirModalCargo()" style="background-color: #334155; border-color: #334155;" title="Adicionar novo cargo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span>Novo Cargo</span>
+                </button>
+
+                <button class="btn-new-course admin-only" onclick="abrirModalTreinamento()" title="Adicionar novo treinamento">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Novo Curso</span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -351,3 +358,4 @@
 
 </body>
 </html>
+
