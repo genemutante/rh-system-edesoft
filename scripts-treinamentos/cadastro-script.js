@@ -278,6 +278,9 @@ if (!["view", "edit", "new"].includes(mode)) {
   mode = "view";
 }
 
+console.log("🔎 isAdmin:", isAdmin);
+console.log("🔎 currentId:", currentId);
+console.log("🔎 Deve mostrar botão editar?", isAdmin && mode === "view" && currentId);
 
   console.log("⚙️ Modo atual:", mode);
 
@@ -553,6 +556,7 @@ window.buscarCep = async function buscarCep(cep) {
     console.warn("ViaCEP falhou:", e);
   }
 };
+
 
 
 
