@@ -911,32 +911,58 @@ window.salvarNovoCargo = async function() {
 
 let tempCargoIndexParaMenu = null;
 
-// --- script.js (Linha ~607) ---
 window.abrirMenuCargo = function(e, index) {
     if (!window.isAdminMode) return;
+    
+    // Impede o menu padrão do sistema
     e.preventDefault();
     e.stopPropagation();
 
-    // FECHA QUALQUER MENU ABERTO ANTES DE ABRIR O NOVO
-    // Isso evita que o menu fique "preso" no cargo anterior
+    // 1. FECHA QUALQUER MENU ANTERIOR IMEDIATAMENTE
     window.fecharMenus();
 
+    // 2. ATUALIZA O ÍNDICE DO CARGO SELECIONADO
     tempCargoIndexParaMenu = index;
+
     const menu = document.getElementById('contextMenuHeader');
     const overlay = document.getElementById('contextMenuOverlay');
 
     if (menu && overlay) {
+        // 3. POSICIONA O MENU NA COORDENADA DO CLIQUE
         menu.style.left = `${e.pageX}px`;
         menu.style.top = `${e.pageY}px`;
-        menu.style.display = 'block'; 
-        menu.classList.remove('hidden');
-        overlay.classList.remove('hidden');
         
-        // Garante que o overlay tenha o evento de fechar
+        // 4. TORNA VISÍVEL
+        menu.classList.remove('hidden');
+        menu.style.display = 'block';
+        overlay.classList.remove('hidden');
+
+        // 5. GARANTE QUE O OVERLAY FECHE O MENU NO CLIQUE ESQUERDO
         overlay.onclick = window.fecharMenus;
     }
 };
 
+// Certifique-se de que a função fecharMenus limpe o display block também
+window.fecharMenus = function() {
+    const menuHeader = document.getElementById('contextMenuHeader');
+    const menuCell = document.getElementById('contextMenuCell');
+    const overlay = document.getElementById('contextMenuOverlay');
+
+    if (menuHeader) {
+        menuHeader.classList.add('hidden');
+        menuHeader.style.display = 'none';
+    }
+    if (menuCell) {
+        menuCell.classList.add('hidden');
+        menuCell.style.display = 'none';
+    }
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+    
+    tempCargoIndexParaMenu = null;
+    tempCellData = null;
+};
 window.editarCargoContexto = function() {
     if (tempCargoIndexParaMenu === null) return;
     const cargo = config.cargos[tempCargoIndexParaMenu];
@@ -998,6 +1024,7 @@ window.fecharMenus = function() {
 
     tempCargoIndexParaMenu = null;
 };
+
 
 
 
