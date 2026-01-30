@@ -118,7 +118,7 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
     colCache = {}; 
     lastHighlightedCol = null;
 
-    // --- A. Cabeçalho (Suporte a Hexadecimal na Borda e Botão Direito) ---
+    // --- A. Cabeçalho (Ajustado para Borda Hexagonal encostar no topo) ---
     let headerHTML = '<tr><th class="top-left-corner"><div class="hud-card">' +
     '<div class="hud-top-label">' + icons.lupa + ' INSPEÇÃO</div>' +
     '<div id="hudScan" class="hud-scan"><div class="scan-icon-large">' + icons.lupa + '</div><div class="scan-msg">Explore a matriz<br>para ver detalhes</div></div>' +
@@ -130,16 +130,17 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
         if (filtroCargo !== 'all' && cargo.id.toString() !== filtroCargo) return;
         const activeClass = (filtroCargo === cargo.id.toString()) ? 'selected-col-header' : '';
         
-        // IDENTIFICAÇÃO DE ESTILO: Diferencia Hexadecimal de Classe CSS antiga
+        // Identifica se é Hexadecimal ou classe legada
         const isHex = cargo.corClass && cargo.corClass.startsWith('#');
         
-        // APLICAÇÃO: Se for Hex, aplica border-top. Se for classe, mantém a classe (ex: b-red)
-        const borderStyle = isHex ? `style="border-top: 4px solid ${cargo.corClass} !important;"` : '';
+        // Aplicação de Estilo: Padding zero na TH e Height 100% no wrapper garantem a borda no topo
+        const borderStyle = isHex ? `style="border-top: 4px solid ${cargo.corClass} !important; height: 100%; box-sizing: border-box;"` : '';
         const extraClass = isHex ? '' : cargo.corClass;
 
         headerHTML += `
             <th class="${activeClass}" 
                 data-col="${index}" 
+                style="padding: 0 !important; vertical-align: top !important;"
                 onclick="document.getElementById('roleFilter').value='${cargo.nome}'; atualizarFiltros();"
                 oncontextmenu="window.abrirMenuCargo(event, ${index})">
                 <div class="role-wrapper ${extraClass}" ${borderStyle}>
@@ -219,8 +220,6 @@ function renderizarMatriz(filtroCargo, filtroCategoria, filtroTexto, filtroObrig
     vincularEventosLupa();
     vincularEventosDestaque();
 }
-
-
 
 // =============================================================================
 // 4. LÓGICA DE FILTROS & HUD
@@ -1050,6 +1049,7 @@ window.fecharMenus = function() {
 
     tempCargoIndexParaMenu = null;
 };
+
 
 
 
