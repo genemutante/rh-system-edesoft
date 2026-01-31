@@ -282,7 +282,10 @@
             </form>
 
             <div class="form-actions">
-                <button type="button" class="btn-danger-text admin-only" id="btnExcluir" style="display:none;" onclick="abrirModalDesligamento(currentId)">Desligar</button>
+                <button id="btnExcluir" class="btn-danger-text admin-only"
+                     onclick="abrirModalConfirmacao('EXCLUIR_COLABORADOR', confirmarDesligamento)">
+                      Excluir
+                </button>
 
                 <div style="flex:1"></div>
                 <button type="button" class="btn-secondary" id="btnCancelarVoltar" onclick="acaoVoltar()">Voltar</button>
@@ -421,6 +424,7 @@
 </body>
 
 </html>
+
 
 
 
