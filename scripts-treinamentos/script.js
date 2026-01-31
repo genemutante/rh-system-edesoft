@@ -239,6 +239,10 @@ function getCargoIdByName(nome) {
 }
 
 window.atualizarFiltros = function(valorCargoClick) {
+
+    const filtroStatusEl = document.getElementById("filtroStatus");
+    const status = filtroStatusEl ? filtroStatusEl.value : "todos";
+
     if (valorCargoClick !== undefined) {
         const cargoObj = config.cargos.find(c => c.id.toString() === valorCargoClick);
         const inputRole = document.getElementById('roleFilter');
@@ -1082,6 +1086,7 @@ window.fecharMenus = function() {
 
     tempCargoIndexParaMenu = null;
 };
+
 
 
 
