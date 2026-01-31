@@ -306,6 +306,53 @@
         </div>
     </div>  
 
+<div id="modalConfirmacao" class="modal-overlay hidden">
+  <div class="modal-card" style="width: 400px; border-top: 4px solid #f59e0b;">
+    <div class="modal-body" style="padding: 24px;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <div style="width: 48px; height: 48px; background: #fffbeb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #d97706;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <h3 style="margin: 0; font-size: 16px; color: #1e293b; text-align: center;">Confirmação de Ação</h3>
+        <p style="margin: 0; font-size: 13px; color: #64748b; text-align: center; line-height: 1.4;">
+          <span id="lblChangeDetail">Você confirma esta operação?</span>
+        </p>
+      </div>
+
+      <div class="audit-box">
+        <div class="audit-row">
+          <span class="audit-label">USER ID:</span>
+          <span class="audit-val">ADMIN_ROOT</span>
+        </div>
+        <div class="audit-row">
+          <span class="audit-label">IP ADDR:</span>
+          <span class="audit-val" id="auditIP">Detectando...</span>
+        </div>
+        <div class="audit-row">
+          <span class="audit-label">TIMESTAMP:</span>
+          <span class="audit-val" id="auditTime">--/--/---- --:--:--</span>
+        </div>
+        <div class="audit-row">
+          <span class="audit-label">ACTION:</span>
+          <span class="audit-val" id="auditAction" style="color: #ef4444;">EXCLUIR_COLABORADOR</span>
+        </div>
+      </div>
+
+      <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 16px;">
+        Esta operação será registrada nos logs do sistema.
+      </p>
+    </div>
+
+    <div class="modal-footer" style="justify-content: space-between; background: #f8fafc;">
+      <button class="btn-ghost" onclick="fecharModalConfirmacao()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarAcaoSegura()" style="background-color: #d97706; border-color: #d97706;">Confirmar</button>
+    </div>
+  </div>
+</div>
 
 	
 	
@@ -385,3 +432,4 @@
 </body>
 
 </html>
+
