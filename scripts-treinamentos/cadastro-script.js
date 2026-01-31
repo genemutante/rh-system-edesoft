@@ -608,11 +608,3 @@ window.buscarCep = async function buscarCep(cep) {
     console.warn("ViaCEP falhou:", e);
   }
 };
-
-
-
-
-
-
-
-
