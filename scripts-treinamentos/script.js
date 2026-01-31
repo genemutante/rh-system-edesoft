@@ -100,9 +100,10 @@ function init() {
     const btnClear = document.getElementById('btnClearFilters');
     if (btnClear) btnClear.innerHTML = icons.filterClear || "Limpar";
     
-    if (document.getElementById("filtroStatus")) {
-         atualizarFiltros();
-       }
+    if (document.getElementById("filtroStatus") && typeof atualizarFiltros === "function") {
+          atualizarFiltros();
+         }
+
 
 }
 
@@ -1089,6 +1090,7 @@ window.fecharMenus = function() {
 
     tempCargoIndexParaMenu = null;
 };
+
 
 
 
