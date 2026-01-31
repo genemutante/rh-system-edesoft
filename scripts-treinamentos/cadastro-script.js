@@ -556,6 +556,25 @@ window.abrirModalDesligamento = function abrirModalDesligamento(id) {
   $("modalDesligamento").style.display = "flex";
 };
 
+async function confirmarDesligamentoComLog(id) {
+  try {
+    const data = new Date().toISOString().slice(0, 10);
+    const motivo = prompt("Motivo do desligamento:", "");
+
+    await DBHandler.desativarColaborador(id, {
+      dataDemissao: data,
+      motivoDemissao: motivo || null,
+    });
+
+    await carregarLista();
+    renderizarTabela();
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao desligar:\n" + (e.message || e));
+  }
+}
+
+
 window.fecharModalDesligamento = function fecharModalDesligamento() {
   $("modalDesligamento").style.display = "none";
   modalTargetId = null;
@@ -608,3 +627,4 @@ window.buscarCep = async function buscarCep(cep) {
     console.warn("ViaCEP falhou:", e);
   }
 };
+
