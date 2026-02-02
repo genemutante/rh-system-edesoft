@@ -103,17 +103,16 @@
             }
         };
 
-        function salvarSessao(nome, role) {
-            const sessao = {
-                user: nome,
-                role: role, // Vindo direto do banco ('ADMIN' ou 'VIEWER')
-                token: 'session-' + Date.now()
-            };
-            localStorage.setItem('rh_session', JSON.stringify(sessao));
-            
-            // REDIRECIONA
-            window.location.href = 'rh-system-edesoft.html'; // Verifique se o nome do arquivo principal é este mesmo
-        }
+function salvarSessao(usuario) {
+    const sessao = {
+        user: usuario.nome,      // Para exibir na tela (Manoel Edesio)
+        login: usuario.username,  // O identificador real (manoel.edesio) <-- ADICIONE ISSO
+        role: usuario.role,
+        token: 'session-' + Date.now()
+    };
+    localStorage.setItem('rh_session', JSON.stringify(sessao));
+    window.location.href = 'rh-system-edesoft.html';
+}
 
         // Verifica se já está logado ao abrir
         const sessaoAtual = localStorage.getItem('rh_session');
@@ -125,6 +124,7 @@
 
 </body>
 </html>
+
 
 
 
