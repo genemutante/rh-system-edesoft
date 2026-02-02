@@ -88,7 +88,7 @@
 
                 if (usuario) {
                     // SUCESSO: Salva sessão e redireciona
-                    salvarSessao(usuario.nome, usuario.role);
+                    salvarSessao(usuario.nome, usuario.username, usuario.role);
                 } else {
                     // FALHA: Usuário ou senha incorretos
                     throw new Error("Usuário ou senha incorretos.");
@@ -138,6 +138,7 @@ function salvarSessao(nome, login, role) {
 
 </body>
 </html>
+
 
 
 
