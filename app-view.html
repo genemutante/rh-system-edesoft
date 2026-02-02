@@ -18,6 +18,7 @@
             
             --bg-app: #f1f5f9;
             --primary: #4f46e5; 
+            --danger: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -32,234 +33,219 @@
         }
 
         /* --- HEADER --- */
-        .app-bar {
+        .app-header {
             height: var(--header-height);
             background: var(--header-bg);
             border-bottom: 1px solid var(--header-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 16px;
+            color: var(--header-text);
             flex-shrink: 0;
             z-index: 100;
-            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3);
         }
 
-        .app-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .header-left { display: flex; align-items: center; gap: 20px; }
 
-        /* BOTÃO INÍCIO */
-        .btn-home {
+        .brand-minimal {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255, 255, 255, 0.1); 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #e2e8f0; 
-            padding: 6px 14px;
-            border-radius: 6px;
             text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .btn-home:hover {
-            background: rgba(255, 255, 255, 0.2);
             color: white;
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
-        }
-
-        .btn-home svg { width: 16px; height: 16px; stroke-width: 2.5; }
-        .btn-home span {
-            font-size: 11px;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-size: 14px;
+            padding-right: 16px;
+            border-right: 1px solid var(--header-border);
         }
 
-        /* DIVISOR */
-        .divider {
-            height: 24px;
-            width: 1px;
-            background: rgba(255, 255, 255, 0.15);
-            margin: 0 4px;
-        }
-
-        /* SELECTOR DE MÓDULO */
-        .module-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .module-selector label {
-            font-size: 11px;
-            color: #94a3b8; 
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-        }
-
-        .module-selector select {
-            height: 32px;
-            padding: 0 32px 0 12px;
-            border-radius: 6px;
-            border: 1px solid transparent;
-            font-size: 13px;
-            font-weight: 600;
-            color: #0f172a; 
-            background-color: white;
-            cursor: pointer;
-            outline: none;
-            min-width: 260px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            background-size: 14px;
-        }
-        
-        .module-selector select:hover { background-color: #f8fafc; }
-        .module-selector select:focus { 
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4); 
-        }
-
-        /* --- DIREITA (USER) --- */
-        .app-bar-right {
-            display: flex;
-            align-items: center;
-            gap: 12px; /* Espaço entre Pill e Logout */
-        }
-
-        .user-pill {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 4px;
-            padding-right: 12px;
-            border-radius: 30px;
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: background 0.2s;
-            cursor: default;
-        }
-        
-        .user-pill:hover { background: rgba(255,255,255,0.1); }
-
-        .avatar-circle {
+        .brand-logo {
+            background: var(--primary);
             width: 28px;
             height: 28px;
-            background: white;
-            color: var(--primary); 
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Seletor de Módulo */
+        .module-switcher {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #1e293b;
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+
+        .module-switcher label { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+
+        .module-switcher select {
+            background: transparent;
+            border: none;
+            color: #f1f5f9;
+            font-size: 13px;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Perfil e Ações */
+        .header-right { display: flex; align-items: center; gap: 16px; }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .user-profile:hover { background: rgba(255,255,255,0.05); }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            background: #334155;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 11px;
-            font-weight: 800;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-weight: 700;
+            color: #cbd5e1;
+            border: 1px solid #475569;
         }
 
-        .user-name {
+        .user-name { font-size: 13px; font-weight: 500; color: #e2e8f0; }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
-            color: #f1f5f9;
-            letter-spacing: 0.02em;
-        }
-
-        /* NOVO: BOTÃO SAIR */
-        .btn-header-logout {
-            background: transparent;
-            border: none;
-            color: #94a3b8;
             cursor: pointer;
-            padding: 6px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
-        .btn-header-logout:hover {
-            color: #ef4444; /* Vermelho ao passar o mouse */
-            background: rgba(239, 68, 68, 0.1);
+            transition: all 0.2s;
         }
 
-        /* --- IFRAME --- */
-        .iframe-container {
-            flex: 1;
-            width: 100%;
-            position: relative;
-            background: var(--bg-app);
-        }
+        .btn-logout:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
+        /* --- CONTEÚDO (IFRAME) --- */
+        .app-viewport { flex: 1; position: relative; width: 100%; height: 100%; }
+
+        iframe { width: 100%; height: 100%; border: none; display: block; }
+
+        /* ==========================================================================
+           MODAL ALTERAR SENHA
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: flex; align-items: center; 
+            justify-content: center; z-index: 9999;
         }
+        .modal-content {
+            background: white; padding: 28px; border-radius: 12px; width: 100%;
+            max-width: 340px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        .modal-content h3 { margin-bottom: 8px; color: #0f172a; font-size: 18px; }
+        .modal-content p { font-size: 14px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
+        
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #475569; }
+        .input-group input { 
+            width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; 
+            font-size: 14px; transition: border-color 0.2s;
+        }
+        .input-group input:focus { border-color: var(--primary); outline: none; }
+
+        .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-save-pw { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: 600; }
+        .btn-cancel-pw { background: #f1f5f9; color: #475569; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        
+        #msgSenha { font-size: 13px; margin-bottom: 12px; padding: 8px; border-radius: 6px; display: none; }
+        .msg-error { background: #fee2e2; color: #b91c1c; }
     </style>
 </head>
 <body>
 
-    <header class="app-bar">
-        <div class="app-bar-left">
-            <a href="rh-system-edesoft.html" class="btn-home" title="Voltar para a Tela Inicial">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                <span>Início</span>
+    <header class="app-header">
+        <div class="header-left">
+            <a href="rh-system-edesoft.html" class="brand-minimal">
+                <div class="brand-logo">EA</div>
+                <span>Academy</span>
             </a>
-            
-            <div class="divider"></div>
-            
-            <div class="module-selector">
-                <label>Módulo Ativo:</label>
+
+            <div class="module-switcher">
+                <label>Módulo:</label>
                 <select id="moduleSelect" onchange="trocarModulo(this.value)">
                     <option value="modulos-treinamentos/001-admin-base-de-dados.html">Admin / Base de Dados</option>
-                    <option value="modulos-treinamentos/002-cadastro-de-colaborador.html">Gestão de Colaboradores</option>
+                    <option value="modulos-treinamentos/002-cadastro-de-colaborador.html">Cadastro Colaboradores</option>
                     <option value="modulos-treinamentos/003-matriz-de-capacitacao.html">Matriz de Capacitação</option>
                     <option value="modulos-treinamentos/004-declaracao-de-experiencia.html">Declaração de Experiência</option>
-                    <option value="modulos-treinamentos/005-controle-capacitacao-colaborador.html">Controle de Capacitação</option>
+                    <option value="modulos-treinamentos/005-controle-capacitacao-colaborador.html">Controle Capacitação</option>
                     <option value="modulos-treinamentos/006-manutencao-cursos.html">Catálogo de Cursos</option>
                     <option value="modulos-treinamentos/007-agendamento-treinamentos.html">Agendamento de Turmas</option>
                 </select>
             </div>
         </div>
 
-        <div class="app-bar-right">
-            <div class="user-pill">
-                <div class="avatar-circle" id="userAvatar">--</div>
-                <span class="user-name" id="userName">Carregando...</span>
+        <div class="header-right">
+            <div class="user-profile" id="btnPerfil" title="Clique para alterar sua senha">
+                <div class="user-avatar" id="userAvatar">--</div>
+                <span class="user-name" id="userName">Usuário</span>
             </div>
-
-            <button onclick="logout()" class="btn-header-logout" title="Sair do Sistema">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </button>
+            <button class="btn-logout" onclick="logout()">Sair</button>
         </div>
     </header>
 
-    <main class="iframe-container">
-        <iframe id="contentFrame" src="" frameborder="0"></iframe>
+    <main class="app-viewport">
+        <iframe id="contentFrame" src="about:blank"></iframe>
     </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. VERIFICAÇÃO DE SESSÃO
-            const sessionRaw = localStorage.getItem('rh_session');
+    <div id="modalSenha" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Segurança</h3>
+            <p>Deseja alterar sua senha de acesso? Digite as informações abaixo.</p>
             
+            <div id="msgSenha"></div>
+
+            <div class="input-group">
+                <label>Senha Atual</label>
+                <input type="password" id="txtSenhaAtual" placeholder="••••••••">
+            </div>
+            
+            <div class="input-group">
+                <label>Nova Senha</label>
+                <input type="password" id="txtNovaSenha" placeholder="Mínimo 6 caracteres">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel-pw" id="btnFecharModal">Cancelar</button>
+                <button class="btn-save-pw" id="btnSalvarSenha">Atualizar Senha</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DBHandler } from './db-handler.js';
+
+        // 1. CARREGAMENTO INICIAL E SESSÃO
+        document.addEventListener('DOMContentLoaded', () => {
+            const sessionRaw = localStorage.getItem('rh_session');
             if (!sessionRaw) {
-                // Sem login, volta pra tela de login
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
                 return;
             }
 
-            // 2. PREENCHIMENTO DE DADOS
             const session = JSON.parse(sessionRaw);
             const elName = document.getElementById('userName');
             const elAvatar = document.getElementById('userAvatar');
@@ -267,7 +253,7 @@
             if (elName) elName.textContent = session.user;
             if (elAvatar) elAvatar.textContent = session.user.substring(0, 2).toUpperCase();
 
-            // 3. CARREGAMENTO DO IFRAME (Código original)
+            // Configuração do Iframe
             const params = new URLSearchParams(window.location.search);
             const src = params.get('src');
             const iframe = document.getElementById('contentFrame');
@@ -281,19 +267,75 @@
             }
         });
 
-        // TROCA DE MÓDULO
-        function trocarModulo(url) {
+        // 2. LOGICA DO MODAL DE SENHA
+        const modal = document.getElementById('modalSenha');
+        const btnPerfil = document.getElementById('btnPerfil');
+        const btnFechar = document.getElementById('btnFecharModal');
+        const btnSalvar = document.getElementById('btnSalvarSenha');
+        const msgDiv = document.getElementById('msgSenha');
+
+        btnPerfil.onclick = () => {
+            modal.style.display = 'flex';
+        };
+
+        btnFechar.onclick = () => {
+            modal.style.display = 'none';
+            msgDiv.style.display = 'none';
+            document.getElementById('txtSenhaAtual').value = '';
+            document.getElementById('txtNovaSenha').value = '';
+        };
+
+        btnSalvar.onclick = async () => {
+            const atual = document.getElementById('txtSenhaAtual').value;
+            const nova = document.getElementById('txtNovaSenha').value;
+            const session = JSON.parse(localStorage.getItem('rh_session'));
+
+            if (!atual || !nova) {
+                exibirErro("Preencha todos os campos.");
+                return;
+            }
+
+            if (nova.length < 4) {
+                exibirErro("A nova senha deve ter ao menos 4 caracteres.");
+                return;
+            }
+
+            try {
+                btnSalvar.disabled = true;
+                btnSalvar.textContent = "Processando...";
+
+                // Note: Usamos session.user que contém o 'nome' ou 'username' salvo no login
+                await DBHandler.alterarSenha(session.user, atual, nova);
+
+                alert("Senha atualizada com sucesso!");
+                btnFechar.onclick(); // Fecha e limpa
+            } catch (err) {
+                exibirErro(err.message);
+            } finally {
+                btnSalvar.disabled = false;
+                btnSalvar.textContent = "Atualizar Senha";
+            }
+        };
+
+        function exibirErro(texto) {
+            msgDiv.textContent = texto;
+            msgDiv.className = 'msg-error';
+            msgDiv.style.display = 'block';
+        }
+
+        // 3. TROCA DE MÓDULO (Lógica global exposta)
+        window.trocarModulo = function(url) {
             const iframe = document.getElementById('contentFrame');
             iframe.src = url;
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?src=' + url;
             window.history.pushState({path:newUrl},'',newUrl);
         }
 
-        // FUNÇÃO DE LOGOUT
-        function logout() {
+        // 4. LOGOUT
+        window.logout = function() {
             if(confirm("Deseja encerrar a sessão?")) {
                 localStorage.removeItem('rh_session');
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             }
         }
     </script>
