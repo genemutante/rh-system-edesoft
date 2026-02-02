@@ -202,19 +202,19 @@
 
             const session = JSON.parse(sessionRaw);
 
-            // Preenche o campo oculto do formulário de senha para o browser/acessibilidade
+            // LOG: Verificar o que está na sessão ao carregar
+            console.log("Sessão carregada no app-view:", session);
+
             const elHiddenUser = document.getElementById('hiddenUsername');
             if (elHiddenUser) {
                 elHiddenUser.value = session.login || session.user;
             }
 
-            // Atualiza Interface (Nome e Avatar)
             const elName = document.getElementById('userName');
             const elAvatar = document.getElementById('userAvatar');
             if (elName) elName.textContent = session.user;
             if (elAvatar) elAvatar.textContent = session.user.substring(0, 2).toUpperCase();
 
-            // Aplica Restrição MATRIZ_ONLY
             if (session.role === 'MATRIZ_ONLY') {
                 const select = document.getElementById('moduleSelect');
                 if (select) {
@@ -224,7 +224,6 @@
                 }
             }
 
-            // Gerenciamento do Iframe
             const params = new URLSearchParams(window.location.search);
             const src = params.get('src');
             const iframe = document.getElementById('contentFrame');
@@ -236,7 +235,7 @@
             }
         });
 
-        // 2. LÓGICA DO MODAL DE SENHA
+        // 2. LÓGICA DO MODAL DE SENHA COM LOGS
         function aplicarErro(inputEl, mensagem) {
             document.querySelectorAll('.input-group').forEach(g => g.classList.remove('has-error'));
             inputEl.closest('.input-group').classList.add('has-error');
@@ -265,42 +264,38 @@
         formSenha.onsubmit = async (e) => {
             e.preventDefault();
             
-            const atual = inputAtual.value.trim();
-            const nova = inputNova.value.trim();
             const session = JSON.parse(localStorage.getItem('rh_session'));
             const loginReal = session.login || session.user;
+            const atual = inputAtual.value.trim();
+            const nova = inputNova.value.trim();
 
-            console.log("Tentando alterar senha para o login:", loginReal);
+            // --- LOGS NO CONSOLE (F12) ---
+            console.log("--- INÍCIO DA TROCA DE SENHA ---");
+            console.log("Login identificado na sessão:", loginReal);
+            console.log("Objeto sessão completo:", session);
+            console.log("Senha atual digitada:", atual);
+            console.log("Nova senha desejada:", nova);
 
-            // Validação: Apenas se os campos estão preenchidos
             if (!atual) return aplicarErro(inputAtual, "Digite a senha atual.");
+            if (nova.length < 6) return aplicarErro(inputNova, "A nova senha deve ter no mínimo 6 dígitos.");
             
-            // Validação: Regra de 6 dígitos apenas para a nova senha
-            if (nova.length < 6) {
-                return aplicarErro(inputNova, "A nova senha deve ter no mínimo 6 dígitos.");
-            }
-            
-            if (atual === nova) {
-                return aplicarErro(inputNova, "A nova senha não pode ser igual à atual.");
-            }
-
             try {
                 const btn = document.getElementById('btnSalvarSenha');
                 btn.disabled = true;
                 btn.textContent = "Validando...";
 
-                // Chamada ao Banco
+                console.log("A enviar pedido para o DBHandler...");
                 await DBHandler.alterarSenha(loginReal, atual, nova);
 
+                console.log("DBHandler retornou SUCESSO.");
                 alert("Senha alterada com sucesso!");
                 document.getElementById('btnFecharModal').click();
             } catch (err) {
-                // Se o erro for do banco (senha atual errada), focamos no campo atual
-                if (err.message.toLowerCase().includes("atual") || err.message.includes("406")) {
+                console.error("ERRO capturado no formulário:", err.message);
+                if (err.message.includes("406") || err.message.toLowerCase().includes("atual")) {
                     aplicarErro(inputAtual, "A senha atual está incorreta.");
                 } else {
                     msgDiv.textContent = "Erro: " + err.message;
-                    msgDiv.className = 'msg-error';
                     msgDiv.style.display = 'block';
                 }
             } finally {
