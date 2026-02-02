@@ -314,23 +314,85 @@ document.getElementById('btnSalvarPermissoes').onclick = async () => {
     }
 };
         // 4. GESTÃO DE USUÁRIOS
-        async function carregarUsuarios() {
-            try {
-                const { data } = await supabaseClient.from('usuarios_sistema').select('*').order('nome');
-                const body = document.getElementById('listaUsuariosBody');
-                body.innerHTML = '';
-                data.forEach(u => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td style="text-align:left; padding-left: 15px;">${u.nome}</td>
-                        <td><code>${u.username}</code></td>
-                        <td><span class="role-badge">${u.role}</span></td>
-                        <td><button class="btn-danger" onclick="window.removerUser('${u.id}', '${u.nome}')">Excluir</button></td>
-                    `;
-                    body.appendChild(tr);
-                });
-            } catch (e) { console.error(e); }
+// --- GESTÃO DE USUÁRIOS: CARREGAMENTO COM EDIÇÃO ---
+async function carregarUsuarios() {
+    const tbody = document.getElementById('listaUsuariosBody');
+    tbody.innerHTML = '<tr><td colspan="4" align="center">Buscando usuários...</td></tr>';
+
+    try {
+        const { data: usuarios, error } = await supabaseClient
+            .from('usuarios_sistema')
+            .select('*')
+            .order('nome');
+
+        if (error) throw error;
+
+        tbody.innerHTML = '';
+        usuarios.forEach(u => {
+            const tr = document.createElement('tr');
+            
+            // Geramos as opções do Select dinamicamente para destacar a Role atual
+            const optionsHtml = ROLES.map(role => 
+                `<option value="${role}" ${u.role === role ? 'selected' : ''}>${role}</option>`
+            ).join('');
+
+            tr.innerHTML = `
+                <td style="text-align:left; padding-left: 15px;"><strong>${u.nome}</strong></td>
+                <td><code>${u.username}</code></td>
+                <td>
+                    <select onchange="window.atualizarRoleUsuario('${u.id}', this.value)" 
+                            style="font-size: 11px; padding: 4px; border-radius: 4px; border: 1px solid #cbd5e1; background: #fff;">
+                        ${optionsHtml}
+                    </select>
+                </td>
+                <td>
+                    <button class="btn-danger" onclick="window.removerUser('${u.id}', '${u.nome}')">Excluir</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        console.error("Erro ao listar usuários:", err);
+    }
+}
+
+// Função para gravar a alteração de cargo no banco
+window.atualizarRoleUsuario = async (userId, novaRole) => {
+    const session = JSON.parse(localStorage.getItem('rh_session'));
+
+    // Segurança: Aviso caso o admin esteja alterando a própria role
+    if (userId === session.userId && novaRole !== 'ADMIN') {
+        if (!confirm("Atenção: Você está alterando seu próprio cargo. Se confirmar, poderá perder acesso a esta tela. Deseja continuar?")) {
+            carregarUsuarios(); // Recarrega para voltar o valor original
+            return;
         }
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('usuarios_sistema')
+            .update({ role: novaRole })
+            .eq('id', userId);
+
+        if (error) throw error;
+
+        // Feedback visual rápido
+        console.log(`Cargo de ${userId} atualizado para ${novaRole}`);
+        alert("Cargo atualizado com sucesso!");
+        
+        // Se o usuário alterou a própria role, precisamos atualizar a sessão
+        if (userId === session.userId) {
+            session.role = novaRole;
+            localStorage.setItem('rh_session', JSON.stringify(session));
+            alert("Suas permissões mudaram. A página será recarregada.");
+            window.parent.location.reload(); // Recarrega o app-view completo
+        }
+
+    } catch (err) {
+        alert("Erro ao atualizar cargo: " + err.message);
+        carregarUsuarios(); // Reverte a alteração visual em caso de erro
+    }
+};
 
         document.getElementById('formNovoUsuario').onsubmit = async (e) => {
             e.preventDefault();
@@ -363,8 +425,11 @@ document.getElementById('btnSalvarPermissoes').onclick = async () => {
                 else alert("Erro ao excluir: " + error.message);
             }
         };
+
+        
     </script>
 </body>
 </html>
+
 
 
