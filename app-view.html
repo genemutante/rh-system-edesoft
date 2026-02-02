@@ -241,38 +241,55 @@
             document.querySelectorAll('.input-group').forEach(g => g.classList.remove('has-error'));
         };
 
-        formSenha.onsubmit = async (e) => {
-            e.preventDefault();
-            const atual = inputAtual.value.trim();
-            const nova = inputNova.value.trim();
-            const session = JSON.parse(localStorage.getItem('rh_session'));
+formSenha.onsubmit = async (e) => {
+    e.preventDefault();
+    
+    const atual = inputAtual.value.trim();
+    const nova = inputNova.value.trim();
+    const session = JSON.parse(localStorage.getItem('rh_session'));
 
-            if (!atual) return aplicarErro(inputAtual, "Informe a senha atual.");
-            if (nova.length < 6) return aplicarErro(inputNova, "A nova senha deve ter no mínimo 6 dígitos.");
-            if (atual === nova) return aplicarErro(inputNova, "A nova senha não pode ser igual à atual.");
+    // 1. Validação de Campo Vazio (Apenas se está preenchido)
+    if (!atual) {
+        return aplicarErro(inputAtual, "Por favor, digite sua senha atual.");
+    }
 
-            try {
-                const btn = document.getElementById('btnSalvarSenha');
-                btn.disabled = true;
-                btn.textContent = "Salvando...";
+    // 2. Validação da NOVA SENHA (Aqui sim checamos os 6 dígitos)
+    if (nova.length < 6) {
+        return aplicarErro(inputNova, "A nova senha deve ter no mínimo 6 dígitos.");
+    }
 
-                await DBHandler.alterarSenha(session.user, atual, nova);
+    if (atual === nova) {
+        return aplicarErro(inputNova, "A nova senha não pode ser igual à atual.");
+    }
 
-                alert("Senha alterada com sucesso!");
-                document.getElementById('btnFecharModal').click();
-            } catch (err) {
-                if (err.message.toLowerCase().includes("atual")) {
-                    aplicarErro(inputAtual, "Senha atual incorreta.");
-                } else {
-                    msgDiv.textContent = err.message;
-                    msgDiv.style.display = 'block';
-                }
-            } finally {
-                const btn = document.getElementById('btnSalvarSenha');
-                btn.disabled = false;
-                btn.textContent = "Atualizar Senha";
-            }
-        };
+    try {
+        const btn = document.getElementById('btnSalvarSenha');
+        btn.disabled = true;
+        btn.textContent = "Verificando...";
+
+        // IMPORTANTE: Usamos 'session.login' que é o username (ex: manoel.edesio)
+        // Se ainda não atualizou o index.html, use session.user temporariamente
+        const identificador = session.login || session.user;
+        
+        await DBHandler.alterarSenha(identificador, atual, nova);
+
+        alert("Senha atualizada com sucesso!");
+        document.getElementById('btnFecharModal').click();
+    } catch (err) {
+        // Se o erro vier do banco de dados sobre a senha atual
+        if (err.message.includes("atual") || err.message.includes("incorreta")) {
+            aplicarErro(inputAtual, "A senha atual digitada não confere com o banco.");
+        } else {
+            msgDiv.textContent = err.message;
+            msgDiv.className = 'msg-error';
+            msgDiv.style.display = 'block';
+        }
+    } finally {
+        const btn = document.getElementById('btnSalvarSenha');
+        btn.disabled = false;
+        btn.textContent = "Atualizar Senha";
+    }
+};;
 
         // 3. FUNÇÕES GLOBAIS
         window.trocarModulo = (url) => {
@@ -290,4 +307,5 @@
     </script>
 </body>
 </html>
+
 
