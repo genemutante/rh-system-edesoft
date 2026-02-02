@@ -26,7 +26,7 @@
 
         /* --- LAYOUT --- */
         .main-workspace { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 30px 20px; overflow-y: auto; }
-        .admin-card { background: #ffffff; width: 100%; max-width: 1200px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); overflow: hidden; }
+        .admin-card { background: #ffffff; width: 100%; max-width: 1250px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); overflow: hidden; }
         
         /* --- ABAS --- */
         .tabs-header { display: flex; background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0 12px; }
@@ -46,21 +46,23 @@
         .perm-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; text-align: center; vertical-align: middle; }
         .perm-table td:first-child { text-align: left; font-weight: 600; color: #1e293b; font-size: 12px; padding-left: 15px; }
 
-        /* --- FORMULÁRIOS --- */
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 5px; text-transform: uppercase; }
-        .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; transition: border 0.2s; }
-        .input-group input:focus { border-color: var(--primary); }
-
         /* --- BOTÕES --- */
         .btn-action { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; }
         .btn-action:hover:not(:disabled) { background: var(--primary-hover); }
         .btn-action:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
 
         .btn-cancel { background: #fff; color: #64748b; border: 1px solid #cbd5e1; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; display: none; }
+        .btn-cancel:hover { background: #f8fafc; }
+        
         .btn-danger { background: none; border: none; color: var(--danger); font-size: 11px; font-weight: 700; cursor: pointer; }
 
-        .info-box { background: #fff7ed; border: 1px solid #ffedd5; color: #9a3412; padding: 12px; border-radius: 8px; font-size: 12px; margin-bottom: 20px; line-height: 1.5; }
+        /* --- FORMULÁRIOS --- */
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 5px; text-transform: uppercase; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; transition: border 0.2s; }
+        .input-group input:focus { border-color: var(--primary); }
+
+        .highlight-change { background-color: #eef2ff !important; border-color: var(--primary) !important; }
     </style>
 </head>
 <body>
@@ -83,14 +85,18 @@
             </div>
 
             <div id="tab-permissoes" class="card-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #64748b;">Configure os níveis de acesso (Ver | Editar | Detalhes) por cargo.</div>
+                    <div id="areaAcoesMatriz" style="display: flex; gap: 10px;">
+                        <button id="btnCancelarMatriz" class="btn-cancel" onclick="window.cancelarAlteracoesMatriz()">Cancelar</button>
+                        <button id="btnSalvarPermissoes" class="btn-action" disabled>Gravar Matriz de Acesso</button>
+                    </div>
+                </div>
                 <div class="matrix-container">
                     <table class="perm-table">
                         <thead><tr id="headerRoles"><th>Módulo</th></tr></thead>
                         <tbody id="permTableBody"></tbody>
                     </table>
-                </div>
-                <div style="margin-top: 20px; text-align: right;">
-                    <button class="btn-action" id="btnSalvarPermissoes">Gravar Matriz de Acesso</button>
                 </div>
             </div>
 
@@ -99,20 +105,11 @@
                     <div id="containerFormNovo" style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
                         <h3 style="font-size: 14px; margin-bottom: 15px;">Novo Acesso</h3>
                         <form id="formNovoUsuario">
+                            <div class="input-group"><label>Nome</label><input type="text" id="addNome" required></div>
+                            <div class="input-group"><label>Login</label><input type="text" id="addLogin" required></div>
+                            <div class="input-group"><label>Senha</label><input type="password" id="addSenha" required></div>
                             <div class="input-group">
-                                <label>Nome Completo</label>
-                                <input type="text" id="addNome" placeholder="Ex: José Silva" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Login (Username)</label>
-                                <input type="text" id="addLogin" placeholder="jose.silva" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Senha Inicial</label>
-                                <input type="password" id="addSenha" placeholder="Min. 6 dígitos" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Cargo (Role)</label>
+                                <label>Cargo</label>
                                 <select id="addRole">
                                     <option value="COLABORADOR">COLABORADOR</option>
                                     <option value="GESTOR">GESTOR</option>
@@ -131,7 +128,7 @@
                             <h3 style="font-size: 14px;">Usuários Registrados</h3>
                             <div id="areaAcoesUsuarios" style="display: flex; gap: 10px;">
                                 <button id="btnCancelarUsuarios" class="btn-cancel" onclick="window.cancelarAlteracoesUsuarios()">Cancelar</button>
-                                <button id="btnSalvarUsuarios" class="btn-action" disabled onclick="window.salvarAlteracoesUsuarios()">Gravar Alterações</button>
+                                <button id="btnSalvarUsuarios" class="btn-action" disabled onclick="window.salvarAlteracoesUsuarios()">Gravar Alterações de Cargos</button>
                             </div>
                         </div>
                         <div class="matrix-container">
@@ -157,6 +154,7 @@
         import { DBHandler, supabaseClient } from '../bd-treinamentos/db-handler.js';
 
         const ROLES = ['ADMIN', 'TD_COORD', 'RH_OPERACIONAL', 'GESTOR', 'AUDITOR', 'COLABORADOR'];
+        let originalMatrixState = []; // Cache para detectar mudanças na matriz
 
         document.addEventListener('DOMContentLoaded', () => {
             configurarAbas();
@@ -172,39 +170,83 @@
                     btn.classList.add('active');
                     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
                     if (btn.dataset.tab === 'usuarios') carregarUsuarios();
+                    if (btn.dataset.tab === 'permissoes') initMatrix();
                 };
             });
         }
 
         async function carregarStatus() {
-            try {
-                const { count: users } = await supabaseClient.from('usuarios_sistema').select('*', { count: 'exact', head: true });
-                const { count: mods } = await supabaseClient.from('modulos_sistema').select('*', { count: 'exact', head: true });
-                document.getElementById('metaInfo').innerHTML = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div style="padding: 15px; background: #eff6ff; border-radius: 8px; border: 1px solid #dbeafe;"><span style="display:block; font-size:11px; color:#1d4ed8; font-weight:700;">USUÁRIOS ATIVOS</span><strong style="font-size:24px;">${users || 0}</strong></div><div style="padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #dcfce7;"><span style="display:block; font-size:11px; color:#15803d; font-weight:700;">MÓDULOS NO SISTEMA</span><strong style="font-size:24px;">${mods || 0}</strong></div></div>`;
-            } catch(e) {}
+            const { count: users } = await supabaseClient.from('usuarios_sistema').select('*', { count: 'exact', head: true });
+            const { count: mods } = await supabaseClient.from('modulos_sistema').select('*', { count: 'exact', head: true });
+            document.getElementById('metaInfo').innerHTML = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div style="padding: 15px; background: #eff6ff; border-radius: 8px; border: 1px solid #dbeafe;"><span style="display:block; font-size:11px; color:#1d4ed8; font-weight:700;">USUÁRIOS ATIVOS</span><strong style="font-size:24px;">${users || 0}</strong></div><div style="padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #dcfce7;"><span style="display:block; font-size:11px; color:#15803d; font-weight:700;">MÓDULOS NO SISTEMA</span><strong style="font-size:24px;">${mods || 0}</strong></div></div>`;
         }
 
+        // --- LÓGICA DA MATRIZ (DIRTY CHECK) ---
         async function initMatrix() {
             const header = document.getElementById('headerRoles');
             const body = document.getElementById('permTableBody');
             header.innerHTML = '<th>Módulo</th>';
-            ROLES.forEach(r => { header.innerHTML += `<th colspan="3" style="border-left: 1px solid #e2e8f0; width: 180px;">${r}<br><span style="font-size:8px; color:#94a3b8">VER | EDITAR | DETALHES</span></th>`; });
+            ROLES.forEach(r => { header.innerHTML += `<th colspan="3" style="border-left: 1px solid #e2e8f0; width: 180px;">${r}<br><span style="font-size:8px; color:#94a3b8">V | E | D</span></th>`; });
+
             const { data: modulos } = await supabaseClient.from('modulos_sistema').select('*').order('ordem');
             const { data: acessos } = await supabaseClient.from('acesso_modulos').select('*');
+            
+            originalMatrixState = acessos; // Salva estado inicial
             body.innerHTML = '';
+
             modulos.forEach(mod => {
                 const tr = document.createElement('tr');
                 let html = `<td><strong>${mod.label}</strong></td>`;
                 ROLES.forEach(role => {
                     const ac = acessos.find(a => a.modulo_id === mod.id && a.role === role);
-                    html += `<td style="border-left: 1px solid #f1f5f9;"><input type="checkbox" class="check-ver" data-modulo="${mod.id}" data-role="${role}" ${ac ? 'checked' : ''}></td><td><input type="checkbox" class="check-editar" data-modulo="${mod.id}" data-role="${role}" ${ac?.pode_editar ? 'checked' : ''}></td><td><input type="checkbox" class="check-detalhes" data-modulo="${mod.id}" data-role="${role}" ${ac?.ver_detalhes ? 'checked' : ''}></td>`;
+                    html += `
+                        <td style="border-left: 1px solid #f1f5f9;">
+                            <input type="checkbox" class="check-ver matrix-cb" data-modulo="${mod.id}" data-role="${role}" data-type="ver" ${ac ? 'checked' : ''} onchange="window.verificarAlteracoesMatriz()">
+                        </td>
+                        <td>
+                            <input type="checkbox" class="check-editar matrix-cb" data-modulo="${mod.id}" data-role="${role}" data-type="editar" ${ac?.pode_editar ? 'checked' : ''} onchange="window.verificarAlteracoesMatriz()">
+                        </td>
+                        <td>
+                            <input type="checkbox" class="check-detalhes matrix-cb" data-modulo="${mod.id}" data-role="${role}" data-type="detalhes" ${ac?.ver_detalhes ? 'checked' : ''} onchange="window.verificarAlteracoesMatriz()">
+                        </td>`;
                 });
-                tr.innerHTML = html; body.appendChild(tr);
+                tr.innerHTML = html;
+                body.appendChild(tr);
             });
+            window.verificarAlteracoesMatriz();
         }
 
+        window.verificarAlteracoesMatriz = () => {
+            const cbs = document.querySelectorAll('.matrix-cb');
+            let mudou = false;
+
+            cbs.forEach(cb => {
+                const role = cb.dataset.role;
+                const modId = parseInt(cb.dataset.modulo);
+                const type = cb.dataset.type;
+                const acOriginal = originalMatrixState.find(a => a.modulo_id === modId && a.role === role);
+
+                let valorOriginal = false;
+                if (type === 'ver') valorOriginal = !!acOriginal;
+                if (type === 'editar') valorOriginal = acOriginal?.pode_editar || false;
+                if (type === 'detalhes') valorOriginal = acOriginal?.ver_detalhes || false;
+
+                if (cb.checked !== valorOriginal) {
+                    mudou = true;
+                    cb.parentElement.style.backgroundColor = '#eef2ff';
+                } else {
+                    cb.parentElement.style.backgroundColor = 'transparent';
+                }
+            });
+
+            document.getElementById('btnSalvarPermissoes').disabled = !mudou;
+            document.getElementById('btnCancelarMatriz').style.display = mudou ? 'block' : 'none';
+        };
+
+        window.cancelarAlteracoesMatriz = () => { initMatrix(); };
+
         document.getElementById('btnSalvarPermissoes').onclick = async () => {
-            if (!confirm("Salvar matriz?")) return;
+            if (!confirm("Confirmar gravação da nova matriz?")) return;
             const payload = [];
             ROLES.forEach(role => {
                 document.querySelectorAll(`.check-ver[data-role="${role}"]:checked`).forEach(cb => {
@@ -216,11 +258,16 @@
                     });
                 });
             });
-            await supabaseClient.from('acesso_modulos').delete().neq('id', 0);
-            if (payload.length > 0) await supabaseClient.from('acesso_modulos').insert(payload);
-            alert("Matriz salva!");
+
+            try {
+                await supabaseClient.from('acesso_modulos').delete().neq('id', 0);
+                if (payload.length > 0) await supabaseClient.from('acesso_modulos').insert(payload);
+                alert("Matriz atualizada!");
+                initMatrix();
+            } catch (e) { alert("Erro ao salvar."); }
         };
 
+        // --- GESTÃO DE USUÁRIOS (DIRTY CHECK) ---
         async function carregarUsuarios() {
             const body = document.getElementById('listaUsuariosBody');
             body.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
@@ -240,17 +287,14 @@
             let mudou = false;
             selects.forEach(sel => {
                 const isDirty = sel.value !== sel.dataset.original;
-                sel.style.borderColor = isDirty ? 'var(--primary)' : '#cbd5e1';
+                sel.classList.toggle('highlight-change', isDirty);
                 if (isDirty) mudou = true;
             });
             document.getElementById('btnSalvarUsuarios').disabled = !mudou;
             document.getElementById('btnCancelarUsuarios').style.display = mudou ? 'block' : 'none';
         };
 
-        window.cancelarAlteracoesUsuarios = () => {
-            document.querySelectorAll('.user-role-select').forEach(sel => sel.value = sel.dataset.original);
-            window.verificarAlteracoesUsuarios();
-        };
+        window.cancelarAlteracoesUsuarios = () => { carregarUsuarios(); };
 
         window.salvarAlteracoesUsuarios = async () => {
             const dirty = Array.from(document.querySelectorAll('.user-role-select')).filter(s => s.value !== s.dataset.original);
@@ -259,14 +303,12 @@
             for (const sel of dirty) {
                 await supabaseClient.from('usuarios_sistema').update({ role: sel.value }).eq('id', sel.dataset.id);
                 await DBHandler.registrarLog(session.user, "ALTERAR_CARGO", `${sel.dataset.nome}: ${sel.dataset.original} -> ${sel.value}`);
-                if (sel.dataset.id === session.userId) session.role = sel.value;
             }
-            localStorage.setItem('rh_session', JSON.stringify(session));
-            alert("Sucesso!");
+            alert("Cargos atualizados!");
             carregarUsuarios();
         };
 
-        // LÓGICA DE CRIAÇÃO RESTAURADA
+        // CRIAÇÃO E MODO LEITURA
         document.getElementById('formNovoUsuario').onsubmit = async (e) => {
             e.preventDefault();
             const payload = {
@@ -276,11 +318,7 @@
                 role: document.getElementById('addRole').value
             };
             const { error } = await supabaseClient.from('usuarios_sistema').insert([payload]);
-            if (!error) { 
-                alert("Usuário criado!"); 
-                e.target.reset(); 
-                carregarUsuarios(); 
-            } else alert(error.message);
+            if (!error) { alert("Usuário criado!"); e.target.reset(); carregarUsuarios(); } else alert(error.message);
         };
 
         window.removerUser = async (id, nome) => {
@@ -292,7 +330,7 @@
 
         function verificarModoLeitura() {
             if (new URLSearchParams(window.location.search).get('readonly') === 'true') {
-                document.getElementById('btnSalvarPermissoes')?.remove();
+                document.getElementById('areaAcoesMatriz')?.remove();
                 document.getElementById('containerFormNovo')?.remove();
                 document.getElementById('areaAcoesUsuarios')?.remove();
                 const grid = document.getElementById('gridUsuarios');
