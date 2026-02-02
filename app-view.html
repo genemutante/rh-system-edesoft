@@ -158,64 +158,84 @@
         const select = document.getElementById('moduleSelect');
         const iframe = document.getElementById('contentFrame');
 
-        // 1. INICIALIZAÇÃO DINÂMICA (CARREGAMENTO DO BANCO)
-        document.addEventListener('DOMContentLoaded', async () => {
-            const sessionRaw = localStorage.getItem('rh_session');
-            if (!sessionRaw) { window.location.href = 'index.html'; return; }
+       // 1. INICIALIZAÇÃO DINÂMICA (CARREGAMENTO DO BANCO)
+document.addEventListener('DOMContentLoaded', async () => {
+    // Captura os elementos necessários da DOM
+    const elSelect = document.getElementById('moduleSelect');
+    const elIframe = document.getElementById('contentFrame');
+    const elName = document.getElementById('userName');
+    const elAvatar = document.getElementById('userAvatar');
+    const elHiddenUser = document.getElementById('hiddenUsername');
 
-            const session = JSON.parse(sessionRaw);
-            const loginReal = session.login || session.user;
+    // Validação de Sessão
+    const sessionRaw = localStorage.getItem('rh_session');
+    if (!sessionRaw) { 
+        window.location.href = 'index.html'; 
+        return; 
+    }
 
-            // Preenche dados básicos do usuário
-            document.getElementById('userName').textContent = session.user;
-            document.getElementById('userAvatar').textContent = session.user.substring(0, 2).toUpperCase();
-            document.getElementById('hiddenUsername').value = loginReal;
+    const session = JSON.parse(sessionRaw);
+    const loginReal = session.login || session.user;
 
-            try {
-                // BUSCA MÓDULOS PERMITIDOS NO BANCO
-                const modulos = await DBHandler.buscarModulosPermitidos(session.role);
-                
-                if (!modulos || modulos.length === 0) {
-                    alert("Seu perfil não possui nenhum módulo de acesso vinculado.");
-                    return;
-                }
+    // Preenche dados básicos da interface
+    if (elName) elName.textContent = session.user;
+    if (elAvatar) elAvatar.textContent = session.user.substring(0, 2).toUpperCase();
+    if (elHiddenUser) elHiddenUser.value = loginReal;
 
-                // Preenche o Select dinamicamente
-                select.innerHTML = '';
-                modulos.forEach(mod => {
-                    const opt = document.createElement('option');
-                    opt.value = mod.path;
-                    opt.textContent = mod.label;
-                    select.appendChild(opt);
-                });
+    try {
+        // BUSCA MÓDULOS PERMITIDOS NO BANCO (Baseado na Role da Sessão)
+        const modulos = await DBHandler.buscarModulosPermitidos(session.role);
+        
+        if (!modulos || modulos.length === 0) {
+            alert("Atenção: Seu perfil não possui permissões de acesso configuradas no sistema.");
+            return;
+        }
 
-                // Lógica de Direcionamento (Guarda de Segurança)
-                const params = new URLSearchParams(window.location.search);
-                const requestedSrc = params.get('src');
-                
-                // Se tentou acessar um SRC, verifica se está na lista permitida
-                if (requestedSrc) {
-                    const temPermissao = modulos.some(m => m.path === requestedSrc);
-                    if (temPermissao) {
-                        iframe.src = requestedSrc;
-                        select.value = requestedSrc;
-                    } else {
-                        console.warn("Tentativa de acesso não autorizado ao módulo:", requestedSrc);
-                        alert("Acesso Negado: Você não tem permissão para este módulo.");
-                        iframe.src = modulos[0].path;
-                        select.value = modulos[0].path;
-                    }
-                } else {
-                    // Se não tem parâmetro, carrega o primeiro módulo da lista
-                    iframe.src = modulos[0].path;
-                }
-
-            } catch (err) {
-                console.error("Erro ao carregar menu dinâmico:", err);
-                alert("Erro ao carregar permissões do sistema.");
-            }
+        // Limpa e Preenche o Seletor de Módulos dinamicamente
+        elSelect.innerHTML = '';
+        modulos.forEach(mod => {
+            const opt = document.createElement('option');
+            opt.value = mod.path;
+            opt.textContent = mod.label;
+            elSelect.appendChild(opt);
         });
 
+        // Lógica de Direcionamento e Guarda de Segurança
+        const params = new URLSearchParams(window.location.search);
+        const requestedSrc = params.get('src');
+        
+        // Verifica se o SRC solicitado na URL está na lista de permitidos do usuário
+        const temPermissao = modulos.some(m => m.path === requestedSrc);
+        
+        if (requestedSrc) {
+            if (temPermissao) {
+                // Acesso Autorizado
+                elIframe.src = requestedSrc;
+                elSelect.value = requestedSrc;
+            } else {
+                // Tentativa de Acesso Indevido
+                console.warn("Bloqueio de Segurança: Tentativa de acesso não autorizado ao módulo:", requestedSrc);
+                alert("Acesso Negado: Você não tem permissão para visualizar este módulo.");
+                
+                // Redireciona para o primeiro módulo da lista permitida
+                elIframe.src = modulos[0].path;
+                elSelect.value = modulos[0].path;
+                
+                // Limpa o parâmetro inválido da URL sem recarregar a página
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, '', newUrl);
+            }
+        } else {
+            // Comportamento padrão: Carrega o primeiro módulo disponível para aquele perfil
+            elIframe.src = modulos[0].path;
+            elSelect.value = modulos[0].path;
+        }
+
+    } catch (err) {
+        console.error("Erro crítico na inicialização do sistema:", err);
+        alert("Ocorreu um erro ao carregar suas permissões. Por favor, tente fazer login novamente.");
+    }
+});
         // 2. LÓGICA DO MODAL DE SENHA
         function aplicarErro(inputEl, mensagem) {
             document.querySelectorAll('.input-group').forEach(g => g.classList.remove('has-error'));
@@ -285,3 +305,4 @@
     </script>
 </body>
 </html>
+
