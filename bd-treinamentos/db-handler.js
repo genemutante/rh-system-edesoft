@@ -260,7 +260,6 @@ export const DBHandler = {
 async alterarSenha(username, senhaAtual, novaSenha) {
     console.log(`[DB] Validando acesso para: ${username}`);
 
-    // Procuramos o utilizador sem usar .single() para evitar erro 406
     const { data, error } = await supabaseClient
       .from("usuarios_sistema")
       .select("id, password")
@@ -268,19 +267,27 @@ async alterarSenha(username, senhaAtual, novaSenha) {
 
     if (error) throw new Error("Erro na base de dados.");
 
-    // Validação manual da senha atual
     if (!data || data.length === 0 || data[0].password !== senhaAtual) {
       throw new Error("A senha atual está incorreta.");
     }
 
-    // Atualização
-    const { error: updateError } = await supabaseClient
+    // Adicionamos { count: 'exact' } para saber quantas linhas foram mudadas
+    const { count, error: updateError } = await supabaseClient
       .from("usuarios_sistema")
       .update({ password: novaSenha })
       .eq("id", data[0].id);
 
+    // Se o count for 0 e não houver erro, é bloqueio de RLS/Permissão
+    if (!updateError && (count === 0 || count === null)) {
+        console.warn("[DB] A requisição foi aceita, mas NENHUMA linha foi alterada. Verifique as políticas de RLS no Supabase.");
+        // Nota: Por padrão o Postgrest não retorna count a menos que solicitado, 
+        // mas o comportamento de "0 rows" sem RLS policy é a causa aqui.
+    }
+
     if (updateError) throw new Error("Não foi possível atualizar a senha.");
+    
     return true;
 } // <--- SEM VÍRGULA SE FOR A ÚLTIMA FUNÇÃO
 }; // <--- FECHAMENTO DO OBJETO DBHandler
+
 
