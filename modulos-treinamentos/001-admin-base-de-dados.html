@@ -63,6 +63,25 @@
         .input-group input:focus { border-color: var(--primary); }
 
         .highlight-change { background-color: #eef2ff !important; border-color: var(--primary) !important; }
+
+/* Cores fixas para os Checkboxes (Identidade Visual) */
+.check-ver { accent-color: var(--primary) !important; width: 16px; height: 16px; cursor: pointer; }
+.check-editar { accent-color: var(--danger) !important; width: 16px; height: 16px; cursor: pointer; }
+.check-detalhes { accent-color: var(--success) !important; width: 16px; height: 16px; cursor: pointer; }
+
+/* Destaque para quando a célula for alterada (Dirty State) */
+.cell-dirty {
+    background-color: #eef2ff !important; /* Azul bem claro para indicar mudança */
+    box-shadow: inset 0 0 0 1px var(--primary); /* Borda interna sutil */
+}
+
+/* Garante que o checkbox desabilitado (Auditor) pareça realmente travado */
+input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    filter: grayscale(1);
+    opacity: 0.6;
+}
+        
     </style>
 </head>
 <body>
@@ -345,3 +364,4 @@
     </script>
 </body>
 </html>
+
