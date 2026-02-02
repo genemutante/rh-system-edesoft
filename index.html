@@ -104,19 +104,21 @@
         };
 
 // 1. Função que prepara e salva os dados do usuário no navegador
-        function salvarSessao(nome, login, role) {
-            const sessao = {
-                user: nome,        // Nome para exibição (ex: Manoel Edesio)
-                login: login,      // Login para o banco (ex: manoel.edesio)
-                role: role,        // Nível de acesso (ADMIN, MATRIZ_ONLY, etc)
-                token: 'session-' + Date.now()
-            };
-            
-            localStorage.setItem('rh_session', JSON.stringify(sessao));
-            
-            // Redireciona para o Dashboard principal
-            window.location.href = 'rh-system-edesoft.html';
-        }
+// No index.html, a função deve guardar o login técnico
+function salvarSessao(nome, login, role) {
+    const sessao = {
+        user: nome,        
+        login: login,   
+        role: role,
+        token: 'session-' + Date.now()
+    };
+    localStorage.setItem('rh_session', JSON.stringify(sessao));
+    window.location.href = 'rh-system-edesoft.html';
+}
+
+// Chame-a assim após validar o login:
+// const usuario = await DBHandler.validarLogin(u, p);
+// if (usuario) salvarSessao(usuario.nome, usuario.username, usuario.role);
 
         // 2. Lógica dentro da função de Login (Exemplo de aplicação)
         // Quando o DBHandler retornar o usuário com sucesso:
@@ -136,6 +138,7 @@
 
 </body>
 </html>
+
 
 
 
