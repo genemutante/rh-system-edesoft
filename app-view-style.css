@@ -156,3 +156,39 @@ body {
 .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
 .btn-confirmar { background: #4f46e5; color: white; border: none; padding: 10px; border-radius: 6px; flex: 1; cursor: pointer; }
 .btn-cancelar { background: #f1f5f9; color: #475569; border: none; padding: 10px; border-radius: 6px; cursor: pointer; }
+
+/* Estado de Erro no Input */
+.input-group.has-error input {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    animation: shake 0.4s ease-in-out;
+}
+
+.input-group.has-error label {
+    color: #ef4444;
+}
+
+/* Animação para chamar atenção no erro */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Melhoria no Feedback de Erro */
+#msgSenha {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    padding: 10px;
+    border-radius: 8px;
+    display: none;
+    border: 1px solid transparent;
+}
+
+.msg-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fee2e2 !important;
+}
