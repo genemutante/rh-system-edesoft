@@ -214,92 +214,105 @@
             } catch (e) { console.error(e); }
         }
 
-        // 3. MATRIZ DE PERMISSÕES (VER | EDITAR)
-        async function initMatrix() {
-            const header = document.getElementById('headerRoles');
-            const body = document.getElementById('permTableBody');
+   // 3. MATRIZ DE PERMISSÕES DINÂMICA (VER | EDITAR | DETALHES)
+async function initMatrix() {
+    const header = document.getElementById('headerRoles');
+    const body = document.getElementById('permTableBody');
+    
+    // Cabeçalho com Três Colunas por Role (V | E | D)
+    header.innerHTML = '<th>Módulo do Sistema</th>';
+    ROLES.forEach(r => {
+        header.innerHTML += `
+            <th colspan="3" style="border-left: 1px solid #e2e8f0; width: 180px;">
+                ${r}<br>
+                <span style="font-size:8px; color:#94a3b8">VER | EDITAR | DETALHES</span>
+            </th>`;
+    });
+
+    try {
+        const { data: modulos } = await supabaseClient.from('modulos_sistema').select('*').order('ordem');
+        const { data: acessos } = await supabaseClient.from('acesso_modulos').select('*');
+
+        body.innerHTML = '';
+        modulos.forEach(mod => {
+            const tr = document.createElement('tr');
+            let html = `<td style="text-align:left"><strong>${mod.label}</strong></td>`;
             
-            header.innerHTML = '<th>Módulo do Sistema</th>';
-            ROLES.forEach(r => {
-                header.innerHTML += `
-                    <th colspan="2" style="border-left: 1px solid #e2e8f0; width: 120px;">
-                        ${r}<br>
-                        <span style="font-size:8px; color:#94a3b8">VER | EDITAR</span>
-                    </th>`;
-            });
-
-            try {
-                const { data: modulos } = await supabaseClient.from('modulos_sistema').select('*').order('ordem');
-                const { data: acessos } = await supabaseClient.from('acesso_modulos').select('*');
-
-                body.innerHTML = '';
-                modulos.forEach(mod => {
-                    const tr = document.createElement('tr');
-                    let html = `<td style="text-align:left"><strong>${mod.label}</strong></td>`;
-                    
-                    ROLES.forEach(role => {
-                        const acesso = acessos.find(a => a.modulo_id === mod.id && a.role === role);
-                        const podeVer = !!acesso;
-                        const podeEditar = acesso ? acesso.pode_editar : false;
-
-                        html += `
-                            <td style="border-left: 1px solid #f1f5f9; width: 60px;">
-                                <input type="checkbox" class="check-ver" data-modulo="${mod.id}" data-role="${role}" ${podeVer ? 'checked' : ''}>
-                            </td>
-                            <td style="width: 60px;">
-                                <input type="checkbox" class="check-editar" data-modulo="${mod.id}" data-role="${role}" ${podeEditar ? 'checked' : ''}>
-                            </td>`;
-                    });
-                    tr.innerHTML = html;
-                    body.appendChild(tr);
-                });
-            } catch (err) {
-                body.innerHTML = `<tr><td colspan="13">Erro ao carregar matriz: ${err.message}</td></tr>`;
-            }
-        }
-
-        document.getElementById('btnSalvarPermissoes').onclick = async () => {
-            if (!confirm("Confirmar a atualização da matriz de acesso?")) return;
-            
-            const btn = document.getElementById('btnSalvarPermissoes');
-            const payload = [];
-
-            // Captura lógica: Para cada role, verifica quais módulos têm "VER" marcado
             ROLES.forEach(role => {
-                const checksVer = document.querySelectorAll(`.check-ver[data-role="${role}"]:checked`);
-                checksVer.forEach(cbVer => {
-                    const moduloId = cbVer.dataset.modulo;
-                    const cbEditar = document.querySelector(`.check-editar[data-modulo="${moduloId}"][data-role="${role}"]`);
-                    
-                    payload.push({
-                        role: role,
-                        modulo_id: parseInt(moduloId),
-                        pode_editar: cbEditar ? cbEditar.checked : false
-                    });
-                });
+                const acesso = acessos.find(a => a.modulo_id === mod.id && a.role === role);
+                const podeVer = !!acesso;
+                const podeEditar = acesso ? acesso.pode_editar : false;
+                const podeDetalhar = acesso ? acesso.ver_detalhes : false;
+
+                html += `
+                    <td style="border-left: 1px solid #f1f5f9; width: 60px;">
+                        <input type="checkbox" class="check-ver" data-modulo="${mod.id}" data-role="${role}" ${podeVer ? 'checked' : ''}>
+                    </td>
+                    <td style="width: 60px;">
+                        <input type="checkbox" class="check-editar" data-modulo="${mod.id}" data-role="${role}" ${podeEditar ? 'checked' : ''}>
+                    </td>
+                    <td style="width: 60px;">
+                        <input type="checkbox" class="check-detalhes" data-modulo="${mod.id}" data-role="${role}" ${podeDetalhar ? 'checked' : ''}>
+                    </td>`;
             });
+            tr.innerHTML = html;
+            body.appendChild(tr);
+        });
+    } catch (err) {
+        body.innerHTML = `<tr><td colspan="${(ROLES.length * 3) + 1}">Erro ao carregar matriz: ${err.message}</td></tr>`;
+    }
+}
 
-            try {
-                btn.disabled = true;
-                btn.textContent = "Gravando...";
+document.getElementById('btnSalvarPermissoes').onclick = async () => {
+    if (!confirm("Confirmar a atualização das permissões granulares?")) return;
+    
+    const btn = document.getElementById('btnSalvarPermissoes');
+    const payload = [];
 
-                // Limpa e reinsere
-                await supabaseClient.from('acesso_modulos').delete().neq('id', 0);
-                if (payload.length > 0) {
-                    const { error } = await supabaseClient.from('acesso_modulos').insert(payload);
-                    if (error) throw error;
-                }
-                
-                alert("Matriz de permissões salva com sucesso!");
-            } catch (e) {
-                alert("Erro ao salvar: " + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "Gravar Matriz de Acesso";
-                initMatrix();
-            }
-        };
+    // Captura lógica para os três estados
+    ROLES.forEach(role => {
+        // Apenas processamos módulos onde o "VER" está marcado
+        const checksVer = document.querySelectorAll(`.check-ver[data-role="${role}"]:checked`);
+        
+        checksVer.forEach(cbVer => {
+            const moduloId = cbVer.dataset.modulo;
+            
+            // Localiza os checkboxes irmãos (Editar e Detalhes) para este módulo/role
+            const cbEditar = document.querySelector(`.check-editar[data-modulo="${moduloId}"][data-role="${role}"]`);
+            const cbDetalhes = document.querySelector(`.check-detalhes[data-modulo="${moduloId}"][data-role="${role}"]`);
+            
+            payload.push({
+                role: role,
+                modulo_id: parseInt(moduloId),
+                pode_editar: cbEditar ? cbEditar.checked : false,
+                ver_detalhes: cbDetalhes ? cbDetalhes.checked : false
+            });
+        });
+    });
 
+    try {
+        btn.disabled = true;
+        btn.textContent = "Gravando Alterações...";
+
+        // 1. Limpa as permissões atuais
+        const { error: delError } = await supabaseClient.from('acesso_modulos').delete().neq('id', 0);
+        if (delError) throw delError;
+
+        // 2. Insere a nova matriz configurada
+        if (payload.length > 0) {
+            const { error: insError } = await supabaseClient.from('acesso_modulos').insert(payload);
+            if (insError) throw insError;
+        }
+        
+        alert("Matriz de permissões salva com sucesso! O sistema aplicará as regras no próximo acesso de cada usuário.");
+    } catch (e) {
+        alert("Erro ao salvar matriz no banco: " + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Gravar Matriz de Acesso";
+        initMatrix(); // Recarrega para garantir sincronia visual
+    }
+};
         // 4. GESTÃO DE USUÁRIOS
         async function carregarUsuarios() {
             try {
@@ -353,4 +366,5 @@
     </script>
 </body>
 </html>
+
 
