@@ -109,15 +109,7 @@
                 <span>Academy</span>
             </a>
             <div class="module-switcher">
-                <select id="moduleSelect" onchange="trocarModulo(this.value)">
-                    <option value="modulos-treinamentos/001-admin-base-de-dados.html" id="optAdmin">Admin / Base de Dados</option>
-                    <option value="modulos-treinamentos/002-cadastro-de-colaborador.html" id="optColab">Cadastro Colaboradores</option>
-                    <option value="modulos-treinamentos/003-matriz-de-capacitacao.html" id="optMatriz">Matriz de Capacitação</option>
-                    <option value="modulos-treinamentos/004-declaracao-de-experiencia.html" id="optDecla">Declaração de Experiência</option>
-                    <option value="modulos-treinamentos/005-controle-capacitacao-colaborador.html" id="optControle">Controle Capacitação</option>
-                    <option value="modulos-treinamentos/006-manutencao-cursos.html" id="optCursos">Catálogo de Cursos</option>
-                    <option value="modulos-treinamentos/007-agendamento-treinamentos.html" id="optAgend">Agendamento de Turmas</option>
-                </select>
+                <select id="moduleSelect" onchange="trocarModulo(this.value)"></select>
             </div>
         </div>
 
@@ -163,35 +155,68 @@
         const inputAtual = document.getElementById('txtSenhaAtual');
         const inputNova = document.getElementById('txtNovaSenha');
         const msgDiv = document.getElementById('msgSenha');
+        const select = document.getElementById('moduleSelect');
+        const iframe = document.getElementById('contentFrame');
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // 1. INICIALIZAÇÃO DINÂMICA (CARREGAMENTO DO BANCO)
+        document.addEventListener('DOMContentLoaded', async () => {
             const sessionRaw = localStorage.getItem('rh_session');
             if (!sessionRaw) { window.location.href = 'index.html'; return; }
 
             const session = JSON.parse(sessionRaw);
-            console.log("Sessão detetada:", session);
+            const loginReal = session.login || session.user;
 
-            const elHiddenUser = document.getElementById('hiddenUsername');
-            if (elHiddenUser) elHiddenUser.value = session.login || session.user;
-
+            // Preenche dados básicos do usuário
             document.getElementById('userName').textContent = session.user;
             document.getElementById('userAvatar').textContent = session.user.substring(0, 2).toUpperCase();
+            document.getElementById('hiddenUsername').value = loginReal;
 
-            if (session.role === 'MATRIZ_ONLY') {
-                const select = document.getElementById('moduleSelect');
-                Array.from(select.options).forEach(opt => {
-                    if (opt.id !== 'optMatriz') opt.remove();
+            try {
+                // BUSCA MÓDULOS PERMITIDOS NO BANCO
+                const modulos = await DBHandler.buscarModulosPermitidos(session.role);
+                
+                if (!modulos || modulos.length === 0) {
+                    alert("Seu perfil não possui nenhum módulo de acesso vinculado.");
+                    return;
+                }
+
+                // Preenche o Select dinamicamente
+                select.innerHTML = '';
+                modulos.forEach(mod => {
+                    const opt = document.createElement('option');
+                    opt.value = mod.path;
+                    opt.textContent = mod.label;
+                    select.appendChild(opt);
                 });
-            }
 
-            const params = new URLSearchParams(window.location.search);
-            const iframe = document.getElementById('contentFrame');
-            const select = document.getElementById('moduleSelect');
-            const src = params.get('src');
-            iframe.src = src || select.options[0].value;
-            if (src) select.value = src;
+                // Lógica de Direcionamento (Guarda de Segurança)
+                const params = new URLSearchParams(window.location.search);
+                const requestedSrc = params.get('src');
+                
+                // Se tentou acessar um SRC, verifica se está na lista permitida
+                if (requestedSrc) {
+                    const temPermissao = modulos.some(m => m.path === requestedSrc);
+                    if (temPermissao) {
+                        iframe.src = requestedSrc;
+                        select.value = requestedSrc;
+                    } else {
+                        console.warn("Tentativa de acesso não autorizado ao módulo:", requestedSrc);
+                        alert("Acesso Negado: Você não tem permissão para este módulo.");
+                        iframe.src = modulos[0].path;
+                        select.value = modulos[0].path;
+                    }
+                } else {
+                    // Se não tem parâmetro, carrega o primeiro módulo da lista
+                    iframe.src = modulos[0].path;
+                }
+
+            } catch (err) {
+                console.error("Erro ao carregar menu dinâmico:", err);
+                alert("Erro ao carregar permissões do sistema.");
+            }
         });
 
+        // 2. LÓGICA DO MODAL DE SENHA
         function aplicarErro(inputEl, mensagem) {
             document.querySelectorAll('.input-group').forEach(g => g.classList.remove('has-error'));
             inputEl.closest('.input-group').classList.add('has-error');
@@ -209,6 +234,7 @@
         });
 
         document.getElementById('btnPerfil').onclick = () => modal.style.display = 'flex';
+        
         document.getElementById('btnFecharModal').onclick = () => {
             modal.style.display = 'none';
             formSenha.reset();
@@ -222,27 +248,19 @@
             const atual = inputAtual.value.trim();
             const nova = inputNova.value.trim();
 
-            console.log("--- DEBUG TROCA DE SENHA ---");
-            console.log("Login a usar:", loginReal);
-            console.log("Senha atual:", atual);
-
             if (!atual) return aplicarErro(inputAtual, "Digite a senha atual.");
-            if (nova.length < 6) return aplicarErro(inputNova, "Mínimo de 6 dígitos.");
+            if (nova.length < 6) return aplicarErro(inputNova, "A nova senha deve ter no mínimo 6 dígitos.");
 
             try {
                 const btn = document.getElementById('btnSalvarSenha');
                 btn.disabled = true;
-                btn.textContent = "Processando...";
-
-             
-                console.log("Enviando para o banco -> Login:", loginReal, "Nova Senha:", nova);
+                btn.textContent = "Validando...";
 
                 await DBHandler.alterarSenha(loginReal, atual, nova);
 
-                alert("Sucesso!");
+                alert("Senha alterada com sucesso!");
                 document.getElementById('btnFecharModal').click();
             } catch (err) {
-                console.error("Erro na troca:", err.message);
                 aplicarErro(inputAtual, err.message);
             } finally {
                 const btn = document.getElementById('btnSalvarSenha');
@@ -251,14 +269,15 @@
             }
         };
 
+        // 3. NAVEGAÇÃO
         window.trocarModulo = (url) => {
-            document.getElementById('contentFrame').src = url;
+            iframe.src = url;
             const newUrl = `${window.location.pathname}?src=${url}`;
             window.history.pushState({}, '', newUrl);
         };
 
         window.logout = () => {
-            if (confirm("Sair?")) {
+            if (confirm("Encerrar sessão?")) {
                 localStorage.removeItem('rh_session');
                 window.location.href = 'index.html';
             }
@@ -266,4 +285,3 @@
     </script>
 </body>
 </html>
-
