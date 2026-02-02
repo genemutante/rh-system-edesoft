@@ -11,6 +11,7 @@
             --primary: #4f46e5;
             --primary-hover: #4338ca;
             --danger: #ef4444;
+            --success: #10b981;
             --bg-gray: #f1f5f9;
             --text-main: #0f172a;
             --border-color: #cbd5e1;
@@ -25,7 +26,7 @@
 
         /* --- LAYOUT --- */
         .main-workspace { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 30px 20px; overflow-y: auto; }
-        .admin-card { background: #ffffff; width: 100%; max-width: 1100px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); overflow: hidden; }
+        .admin-card { background: #ffffff; width: 100%; max-width: 1200px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); overflow: hidden; }
         
         /* --- ABAS --- */
         .tabs-header { display: flex; background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0 12px; }
@@ -42,11 +43,8 @@
         .perm-table { width: 100%; border-collapse: collapse; font-size: 11px; }
         .perm-table th { background: #f8fafc; padding: 10px; text-align: center; color: #475569; border-bottom: 2px solid #e2e8f0; }
         .perm-table th:first-child { text-align: left; font-size: 12px; }
-        .perm-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; text-align: center; }
-        .perm-table td:first-child { text-align: left; font-weight: 600; color: #1e293b; font-size: 12px; }
-        
-        .check-ver { accent-color: var(--primary); cursor: pointer; }
-        .check-editar { accent-color: var(--danger); cursor: pointer; }
+        .perm-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; text-align: center; vertical-align: middle; }
+        .perm-table td:first-child { text-align: left; font-weight: 600; color: #1e293b; font-size: 12px; padding-left: 15px; }
         
         .role-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; background: #e0e7ff; color: #4338ca; text-transform: uppercase; }
 
@@ -54,16 +52,12 @@
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 5px; text-transform: uppercase; }
         .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
-        .input-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
 
         /* --- BOTÕES --- */
-        .btn-action { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; transition: background 0.2s; }
-        .btn-action:hover { background: var(--primary-hover); }
-        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
-        
+        .btn-action { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
+        .btn-save-row { background: var(--success); color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; }
         .btn-danger { background: none; border: none; color: var(--danger); font-size: 11px; font-weight: 700; cursor: pointer; }
-        .btn-danger:hover { text-decoration: underline; }
-
+        
         .info-box { background: #fff7ed; border: 1px solid #ffedd5; color: #9a3412; padding: 12px; border-radius: 8px; font-size: 12px; margin-bottom: 20px; line-height: 1.5; }
     </style>
 </head>
@@ -84,53 +78,34 @@
 
             <div id="tab-status" class="card-body active">
                 <div class="info-box">Monitoramento em tempo real da base de dados Academy integrada ao Supabase Cloud.</div>
-                <div id="metaInfo">
-                    </div>
+                <div id="metaInfo"></div>
             </div>
 
             <div id="tab-permissoes" class="card-body">
                 <div class="info-box">
-                    <strong>Configuração de Acesso:</strong> Marque <b>VER</b> para permitir acesso ao módulo e <b>EDITAR</b> para liberar funções de gravação/exclusão. Usuários sem a marcação "Editar" abrirão os módulos em modo de leitura automática.
+                    <strong>Matriz V|E|D:</strong> Configure se o cargo pode <b>Ver</b> o módulo, <b>Editar</b> dados ou visualizar <b>Detalhes</b> sensíveis (LGPD).
                 </div>
-                
                 <div class="matrix-container">
                     <table class="perm-table">
-                        <thead>
-                            <tr id="headerRoles">
-                                <th>Módulo</th>
-                                </tr>
-                        </thead>
-                        <tbody id="permTableBody">
-                            <tr><td colspan="13" align="center">Carregando matriz de permissões...</td></tr>
-                        </tbody>
+                        <thead><tr id="headerRoles"><th>Módulo</th></tr></thead>
+                        <tbody id="permTableBody"></tbody>
                     </table>
                 </div>
-
                 <div style="margin-top: 20px; text-align: right;">
                     <button class="btn-action" id="btnSalvarPermissoes">Gravar Matriz de Acesso</button>
                 </div>
             </div>
 
             <div id="tab-usuarios" class="card-body">
-                <div style="display: grid; grid-template-columns: 320px 1fr; gap: 30px;">
-                    
-                    <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <div id="gridUsuarios" style="display: grid; grid-template-columns: 320px 1fr; gap: 30px;">
+                    <div id="containerFormNovo" style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
                         <h3 style="font-size: 14px; margin-bottom: 15px;">Novo Acesso</h3>
                         <form id="formNovoUsuario">
+                            <div class="input-group"><label>Nome</label><input type="text" id="addNome" required></div>
+                            <div class="input-group"><label>Login</label><input type="text" id="addLogin" required></div>
+                            <div class="input-group"><label>Senha</label><input type="password" id="addSenha" required></div>
                             <div class="input-group">
-                                <label>Nome Completo</label>
-                                <input type="text" id="addNome" placeholder="Ex: José Silva" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Login (Username)</label>
-                                <input type="text" id="addLogin" placeholder="Ex: jose.silva" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Senha Inicial</label>
-                                <input type="password" id="addSenha" placeholder="Mínimo 6 dígitos" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Cargo (Role)</label>
+                                <label>Cargo</label>
                                 <select id="addRole">
                                     <option value="COLABORADOR">COLABORADOR</option>
                                     <option value="GESTOR">GESTOR</option>
@@ -144,7 +119,7 @@
                         </form>
                     </div>
 
-                    <div>
+                    <div id="containerTabelaUsuarios">
                         <h3 style="font-size: 14px; margin-bottom: 15px;">Usuários Registrados</h3>
                         <div class="matrix-container">
                             <table class="perm-table">
@@ -156,14 +131,12 @@
                                         <th>Ação</th>
                                     </tr>
                                 </thead>
-                                <tbody id="listaUsuariosBody">
-                                    </tbody>
+                                <tbody id="listaUsuariosBody"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -176,9 +149,9 @@
             configurarAbas();
             carregarStatus();
             initMatrix();
+            verificarModoLeitura();
         });
 
-        // 1. GESTÃO DE ABAS
         function configurarAbas() {
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.onclick = () => {
@@ -186,302 +159,116 @@
                     btn.classList.add('active');
                     const tabId = 'tab-' + btn.dataset.tab;
                     document.getElementById(tabId).classList.add('active');
-
                     if (btn.dataset.tab === 'usuarios') carregarUsuarios();
                     if (btn.dataset.tab === 'permissoes') initMatrix();
                 };
             });
         }
 
-        // 2. STATUS DO SISTEMA
         async function carregarStatus() {
             try {
                 const { count: users } = await supabaseClient.from('usuarios_sistema').select('*', { count: 'exact', head: true });
                 const { count: mods } = await supabaseClient.from('modulos_sistema').select('*', { count: 'exact', head: true });
-                
-                document.getElementById('metaInfo').innerHTML = `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div style="padding: 15px; background: #eff6ff; border-radius: 8px; border: 1px solid #dbeafe;">
-                            <span style="display:block; font-size:11px; color:#1d4ed8; font-weight:700;">USUÁRIOS ATIVOS</span>
-                            <strong style="font-size:24px;">${users || 0}</strong>
-                        </div>
-                        <div style="padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #dcfce7;">
-                            <span style="display:block; font-size:11px; color:#15803d; font-weight:700;">MÓDULOS NO SISTEMA</span>
-                            <strong style="font-size:24px;">${mods || 0}</strong>
-                        </div>
-                    </div>
-                `;
+                document.getElementById('metaInfo').innerHTML = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div style="padding: 15px; background: #eff6ff; border-radius: 8px; border: 1px solid #dbeafe;"><span style="display:block; font-size:11px; color:#1d4ed8; font-weight:700;">USUÁRIOS ATIVOS</span><strong style="font-size:24px;">${users || 0}</strong></div><div style="padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #dcfce7;"><span style="display:block; font-size:11px; color:#15803d; font-weight:700;">MÓDULOS NO SISTEMA</span><strong style="font-size:24px;">${mods || 0}</strong></div></div>`;
             } catch (e) { console.error(e); }
         }
 
-   // 3. MATRIZ DE PERMISSÕES DINÂMICA (VER | EDITAR | DETALHES)
-async function initMatrix() {
-    const header = document.getElementById('headerRoles');
-    const body = document.getElementById('permTableBody');
-    
-    // Cabeçalho com Três Colunas por Role (V | E | D)
-    header.innerHTML = '<th>Módulo do Sistema</th>';
-    ROLES.forEach(r => {
-        header.innerHTML += `
-            <th colspan="3" style="border-left: 1px solid #e2e8f0; width: 180px;">
-                ${r}<br>
-                <span style="font-size:8px; color:#94a3b8">VER | EDITAR | DETALHES</span>
-            </th>`;
-    });
+        async function initMatrix() {
+            const header = document.getElementById('headerRoles');
+            const body = document.getElementById('permTableBody');
+            header.innerHTML = '<th>Módulo</th>';
+            ROLES.forEach(r => { header.innerHTML += `<th colspan="3" style="border-left: 1px solid #e2e8f0; width: 180px;">${r}<br><span style="font-size:8px; color:#94a3b8">VER | EDITAR | DETALHES</span></th>`; });
 
-    try {
-        const { data: modulos } = await supabaseClient.from('modulos_sistema').select('*').order('ordem');
-        const { data: acessos } = await supabaseClient.from('acesso_modulos').select('*');
+            try {
+                const { data: modulos } = await supabaseClient.from('modulos_sistema').select('*').order('ordem');
+                const { data: acessos } = await supabaseClient.from('acesso_modulos').select('*');
+                body.innerHTML = '';
+                modulos.forEach(mod => {
+                    const tr = document.createElement('tr');
+                    let html = `<td><strong>${mod.label}</strong></td>`;
+                    ROLES.forEach(role => {
+                        const ac = acessos.find(a => a.modulo_id === mod.id && a.role === role);
+                        html += `<td style="border-left: 1px solid #f1f5f9; width: 60px;"><input type="checkbox" class="check-ver" data-modulo="${mod.id}" data-role="${role}" ${ac ? 'checked' : ''}></td><td style="width: 60px;"><input type="checkbox" class="check-editar" data-modulo="${mod.id}" data-role="${role}" ${ac?.pode_editar ? 'checked' : ''}></td><td style="width: 60px;"><input type="checkbox" class="check-detalhes" data-modulo="${mod.id}" data-role="${role}" ${ac?.ver_detalhes ? 'checked' : ''}></td>`;
+                    });
+                    tr.innerHTML = html; body.appendChild(tr);
+                });
+            } catch (err) { body.innerHTML = `<tr><td colspan="20">Erro ao carregar matriz.</td></tr>`; }
+        }
 
-        body.innerHTML = '';
-        modulos.forEach(mod => {
-            const tr = document.createElement('tr');
-            let html = `<td style="text-align:left"><strong>${mod.label}</strong></td>`;
-            
+        document.getElementById('btnSalvarPermissoes').onclick = async () => {
+            if (!confirm("Salvar matriz de acesso?")) return;
+            const payload = [];
             ROLES.forEach(role => {
-                const acesso = acessos.find(a => a.modulo_id === mod.id && a.role === role);
-                const podeVer = !!acesso;
-                const podeEditar = acesso ? acesso.pode_editar : false;
-                const podeDetalhar = acesso ? acesso.ver_detalhes : false;
-
-                html += `
-                    <td style="border-left: 1px solid #f1f5f9; width: 60px;">
-                        <input type="checkbox" class="check-ver" data-modulo="${mod.id}" data-role="${role}" ${podeVer ? 'checked' : ''}>
-                    </td>
-                    <td style="width: 60px;">
-                        <input type="checkbox" class="check-editar" data-modulo="${mod.id}" data-role="${role}" ${podeEditar ? 'checked' : ''}>
-                    </td>
-                    <td style="width: 60px;">
-                        <input type="checkbox" class="check-detalhes" data-modulo="${mod.id}" data-role="${role}" ${podeDetalhar ? 'checked' : ''}>
-                    </td>`;
+                document.querySelectorAll(`.check-ver[data-role="${role}"]:checked`).forEach(cb => {
+                    const modId = cb.dataset.modulo;
+                    payload.push({
+                        role, modulo_id: parseInt(modId),
+                        pode_editar: document.querySelector(`.check-editar[data-modulo="${modId}"][data-role="${role}"]`).checked,
+                        ver_detalhes: document.querySelector(`.check-detalhes[data-modulo="${modId}"][data-role="${role}"]`).checked
+                    });
+                });
             });
-            tr.innerHTML = html;
-            body.appendChild(tr);
-        });
-    } catch (err) {
-        body.innerHTML = `<tr><td colspan="${(ROLES.length * 3) + 1}">Erro ao carregar matriz: ${err.message}</td></tr>`;
-    }
-}
+            try {
+                await supabaseClient.from('acesso_modulos').delete().neq('id', 0);
+                if (payload.length > 0) await supabaseClient.from('acesso_modulos').insert(payload);
+                alert("Permissões salvas!");
+            } catch (e) { alert("Erro ao salvar."); }
+        };
 
-document.getElementById('btnSalvarPermissoes').onclick = async () => {
-    if (!confirm("Confirmar a atualização das permissões granulares?")) return;
-    
-    const btn = document.getElementById('btnSalvarPermissoes');
-    const payload = [];
-
-    // Captura lógica para os três estados
-    ROLES.forEach(role => {
-        // Apenas processamos módulos onde o "VER" está marcado
-        const checksVer = document.querySelectorAll(`.check-ver[data-role="${role}"]:checked`);
-        
-        checksVer.forEach(cbVer => {
-            const moduloId = cbVer.dataset.modulo;
-            
-            // Localiza os checkboxes irmãos (Editar e Detalhes) para este módulo/role
-            const cbEditar = document.querySelector(`.check-editar[data-modulo="${moduloId}"][data-role="${role}"]`);
-            const cbDetalhes = document.querySelector(`.check-detalhes[data-modulo="${moduloId}"][data-role="${role}"]`);
-            
-            payload.push({
-                role: role,
-                modulo_id: parseInt(moduloId),
-                pode_editar: cbEditar ? cbEditar.checked : false,
-                ver_detalhes: cbDetalhes ? cbDetalhes.checked : false
-            });
-        });
-    });
-
-    try {
-        btn.disabled = true;
-        btn.textContent = "Gravando Alterações...";
-
-        // 1. Limpa as permissões atuais
-        const { error: delError } = await supabaseClient.from('acesso_modulos').delete().neq('id', 0);
-        if (delError) throw delError;
-
-        // 2. Insere a nova matriz configurada
-        if (payload.length > 0) {
-            const { error: insError } = await supabaseClient.from('acesso_modulos').insert(payload);
-            if (insError) throw insError;
-        }
-        
-        alert("Matriz de permissões salva com sucesso! O sistema aplicará as regras no próximo acesso de cada usuário.");
-    } catch (e) {
-        alert("Erro ao salvar matriz no banco: " + e.message);
-    } finally {
-        btn.disabled = false;
-        btn.textContent = "Gravar Matriz de Acesso";
-        initMatrix(); // Recarrega para garantir sincronia visual
-    }
-};
-        // 4. GESTÃO DE USUÁRIOS
-// --- GESTÃO DE USUÁRIOS: CARREGAMENTO COM EDIÇÃO ---
-async function carregarUsuarios() {
-    const tbody = document.getElementById('listaUsuariosBody');
-    tbody.innerHTML = '<tr><td colspan="4" align="center">Buscando usuários...</td></tr>';
-
-    try {
-        const { data: usuarios, error } = await supabaseClient
-            .from('usuarios_sistema')
-            .select('*')
-            .order('nome');
-
-        if (error) throw error;
-
-        tbody.innerHTML = '';
-        usuarios.forEach(u => {
-            const tr = document.createElement('tr');
-            
-            const optionsHtml = ROLES.map(role => 
-                `<option value="${role}" ${u.role === role ? 'selected' : ''}>${role}</option>`
-            ).join('');
-
-            tr.innerHTML = `
-                <td style="text-align:left; padding-left: 15px;"><strong>${u.nome}</strong></td>
-                <td><code>${u.username}</code></td>
-                <td>
-                    <select id="select-role-${u.id}" 
-                            style="font-size: 11px; padding: 4px; border-radius: 4px; border: 1px solid #cbd5e1; background: #fff;">
-                        ${optionsHtml}
-                    </select>
-                </td>
-                <td style="display: flex; gap: 10px; justify-content: center;">
-                    <button class="btn-save-row" onclick="window.salvarAlteracaoCargo('${u.id}', '${u.nome}')" 
-                            style="background: #10b981; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer;">
-                        Salvar
-                    </button>
-                    <button class="btn-danger" onclick="window.removerUser('${u.id}', '${u.nome}')">Excluir</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } catch (err) {
-        console.error("Erro ao listar usuários:", err);
-    }
-}
-
-// Função para gravar a alteração de cargo no banco
-window.atualizarRoleUsuario = async (userId, novaRole) => {
-    const session = JSON.parse(localStorage.getItem('rh_session'));
-
-    // Segurança: Aviso caso o admin esteja alterando a própria role
-    if (userId === session.userId && novaRole !== 'ADMIN') {
-        if (!confirm("Atenção: Você está alterando seu próprio cargo. Se confirmar, poderá perder acesso a esta tela. Deseja continuar?")) {
-            carregarUsuarios(); // Recarrega para voltar o valor original
-            return;
-        }
-    }
-
-    try {
-        const { error } = await supabaseClient
-            .from('usuarios_sistema')
-            .update({ role: novaRole })
-            .eq('id', userId);
-
-        if (error) throw error;
-
-        // Feedback visual rápido
-        console.log(`Cargo de ${userId} atualizado para ${novaRole}`);
-        alert("Cargo atualizado com sucesso!");
-        
-        // Se o usuário alterou a própria role, precisamos atualizar a sessão
-        if (userId === session.userId) {
-            session.role = novaRole;
-            localStorage.setItem('rh_session', JSON.stringify(session));
-            alert("Suas permissões mudaram. A página será recarregada.");
-            window.parent.location.reload(); // Recarrega o app-view completo
+        async function carregarUsuarios() {
+            const body = document.getElementById('listaUsuariosBody');
+            body.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
+            try {
+                const { data } = await supabaseClient.from('usuarios_sistema').select('*').order('nome');
+                body.innerHTML = '';
+                data.forEach(u => {
+                    const options = ROLES.map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r}</option>`).join('');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td><strong>${u.nome}</strong></td><td><code>${u.username}</code></td><td><select id="sel-role-${u.id}" style="font-size:11px;">${options}</select></td><td style="display:flex; gap:8px; justify-content:center;"><button class="btn-save-row" onclick="window.salvarAlteracaoCargo('${u.id}', '${u.nome}')">Salvar</button><button class="btn-danger" onclick="window.removerUser('${u.id}', '${u.nome}')">Excluir</button></td>`;
+                    body.appendChild(tr);
+                });
+            } catch (e) { console.error(e); }
         }
 
-    } catch (err) {
-        alert("Erro ao atualizar cargo: " + err.message);
-        carregarUsuarios(); // Reverte a alteração visual em caso de erro
-    }
-};
-
-        document.getElementById('formNovoUsuario').onsubmit = async (e) => {
-            e.preventDefault();
-            const user = {
-                nome: document.getElementById('addNome').value.trim(),
-                username: document.getElementById('addLogin').value.trim(),
-                password: document.getElementById('addSenha').value.trim(),
-                role: document.getElementById('addRole').value
-            };
-
-            if (user.password.length < 6) {
-                alert("A senha deve ter no mínimo 6 dígitos.");
-                return;
-            }
-
-            const { error } = await supabaseClient.from('usuarios_sistema').insert([user]);
-            if (!error) { 
-                alert("Usuário criado com sucesso!"); 
-                e.target.reset(); 
-                carregarUsuarios(); 
-            } else { 
-                alert("Erro: " + error.message); 
-            }
+        window.salvarAlteracaoCargo = async (userId, nome) => {
+            const novaRole = document.getElementById(`sel-role-${userId}`).value;
+            const session = JSON.parse(localStorage.getItem('rh_session'));
+            if (!confirm(`Alterar cargo de ${nome} para ${novaRole}?`)) return;
+            try {
+                await supabaseClient.from('usuarios_sistema').update({ role: novaRole }).eq('id', userId);
+                await DBHandler.registrarLog(session.user, "ALTERAR_CARGO", `Alterou cargo de ${nome} para ${novaRole}`);
+                alert("Atualizado!");
+                if (userId === session.userId) { session.role = novaRole; localStorage.setItem('rh_session', JSON.stringify(session)); window.parent.location.reload(); }
+            } catch (e) { alert("Erro ao atualizar."); }
         };
 
         window.removerUser = async (id, nome) => {
-            if (confirm(`Remover permanentemente o acesso de ${nome}?`)) {
-                const { error } = await supabaseClient.from('usuarios_sistema').delete().eq('id', id);
-                if (!error) carregarUsuarios();
-                else alert("Erro ao excluir: " + error.message);
+            if (confirm(`Excluir ${nome}?`)) {
+                await supabaseClient.from('usuarios_sistema').delete().eq('id', id);
+                carregarUsuarios();
             }
         };
 
+        document.getElementById('formNovoUsuario').onsubmit = async (e) => {
+            e.preventDefault();
+            const user = { nome: document.getElementById('addNome').value, username: document.getElementById('addLogin').value, password: document.getElementById('addSenha').value, role: document.getElementById('addRole').value };
+            const { error } = await supabaseClient.from('usuarios_sistema').insert([user]);
+            if (!error) { alert("Usuário criado!"); e.target.reset(); carregarUsuarios(); } else alert(error.message);
+        };
 
-
-        // Função para bloquear a tela caso o usuário seja apenas leitor
-function verificarModoLeitura() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('readonly') === 'true') {
-        console.log("🛡️ Ajustando layout para modo leitura.");
-        
-        // 1. Esconde o botão de salvar matriz
-        const btnSalvar = document.getElementById('btnSalvarPermissoes');
-        if (btnSalvar) btnSalvar.remove();
-
-        // 2. Ajusta a aba de Gestão de Usuários
-        const formNovo = document.getElementById('formNovoUsuario');
-        if (formNovo) {
-            const formContainer = formNovo.closest('div');
-            const gridContainer = formContainer.parentElement; // O container que tem o display: grid
-
-            // Esconde o container do formulário
-            formContainer.style.display = 'none'; 
-
-            // ESSA É A CHAVE: Muda o grid de "320px 1fr" para "1fr" (largura total)
-            gridContainer.style.gridTemplateColumns = '1fr';
-            gridContainer.style.gap = '0'; 
+        function verificarModoLeitura() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('readonly') === 'true') {
+                const btnM = document.getElementById('btnSalvarPermissoes'); if (btnM) btnM.remove();
+                const form = document.getElementById('containerFormNovo'); if (form) form.style.display = 'none';
+                const grid = document.getElementById('gridUsuarios'); if (grid) { grid.style.gridTemplateColumns = '1fr'; grid.style.gap = '0'; }
+                const obs = new MutationObserver(() => {
+                    document.querySelectorAll('input[type="checkbox"], select').forEach(el => { el.disabled = true; el.style.cursor = 'not-allowed'; });
+                    document.querySelectorAll('.btn-save-row, .btn-danger').forEach(el => el.remove());
+                });
+                obs.observe(document.body, { childList: true, subtree: true });
+            }
         }
-
-        // 3. Bloqueio de interação (MutationObserver)
-        const observer = new MutationObserver(() => {
-            document.querySelectorAll('input[type="checkbox"], select').forEach(el => {
-                // No caso do Auditor, deixamos o select de cargo visível mas desativado
-                el.disabled = true;
-                el.style.cursor = 'not-allowed';
-            });
-            document.querySelectorAll('.btn-danger').forEach(el => el.remove());
-        });
-
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
-}
-
-// Chame esta função no final do seu DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    configurarAbas();
-    carregarStatus();
-    initMatrix();
-    verificarModoLeitura(); // <-- Nova trava aqui
-});
     </script>
 </body>
 </html>
-
-
-
-
-
-
