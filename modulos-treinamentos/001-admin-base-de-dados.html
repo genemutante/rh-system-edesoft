@@ -426,10 +426,47 @@ window.atualizarRoleUsuario = async (userId, novaRole) => {
             }
         };
 
+
+
+        // Função para bloquear a tela caso o usuário seja apenas leitor
+function verificarModoLeitura() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('readonly') === 'true') {
+        console.log("🛡️ Bloqueio de Segurança: Usuário em modo leitura.");
         
+        // 1. Esconde o botão de salvar matriz
+        const btnSalvar = document.getElementById('btnSalvarPermissoes');
+        if (btnSalvar) btnSalvar.remove();
+
+        // 2. Esconde o formulário de novo usuário
+        const formNovo = document.getElementById('formNovoUsuario');
+        if (formNovo) formNovo.closest('div').style.display = 'none';
+
+        // 3. Desabilita todos os checkboxes da matriz (após carregarem)
+        const observer = new MutationObserver(() => {
+            document.querySelectorAll('input[type="checkbox"], select').forEach(el => {
+                el.disabled = true;
+                el.style.cursor = 'not-allowed';
+            });
+            // Remove botões de excluir da lista de usuários
+            document.querySelectorAll('.btn-danger').forEach(el => el.remove());
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+}
+
+// Chame esta função no final do seu DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    configurarAbas();
+    carregarStatus();
+    initMatrix();
+    verificarModoLeitura(); // <-- Nova trava aqui
+});
     </script>
 </body>
 </html>
+
 
 
 
