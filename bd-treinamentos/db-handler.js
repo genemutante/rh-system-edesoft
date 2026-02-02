@@ -246,27 +246,17 @@ export const DBHandler = {
     return this.atualizarColaborador(id, { data_demissao: null, motivo_demissao: null });
   },
 
+// ... outras funções acima (reativarColaborador, listarCargos, etc)
+
   async listarCargos() {
     const { data, error } = await supabaseClient
       .from("cargos")
-      .select("id, nome")
-      .order("nome", { ascending: true });
-
+      .select("*");
     if (error) throw new Error(normalizeError(error));
-    return data || [];
-  },
-};
+    return data;
+  }, // <--- CERTIFIQUE-SE DE QUE EXISTE ESTA VÍRGULA AQUI
 
-// ✅ Compat: expõe no global (para scripts antigos que usam DBHandler sem import)
-globalThis.supabaseClient = supabaseClient;
-globalThis.DBHandler = DBHandler;
-
-console.log("✅ DBHandler (ESM) carregado e Supabase conectado.");
-
-// Dentro de export const DBHandler = { ... }
-
-async alterarSenha(username, senhaAtual, novaSenha) {
-    // 1. Primeiro verificamos se a senha atual está correta
+  async alterarSenha(username, senhaAtual, novaSenha) {
     const { data: usuario, error: errorBusca } = await supabaseClient
         .from("usuarios_sistema")
         .select("*")
@@ -278,13 +268,12 @@ async alterarSenha(username, senhaAtual, novaSenha) {
         throw new Error("A senha atual está incorreta.");
     }
 
-    // 2. Se estiver correta, atualizamos para a nova
     const { error: errorUpdate } = await supabaseClient
         .from("usuarios_sistema")
         .update({ password: novaSenha })
         .eq("username", username);
 
     if (errorUpdate) throw new Error("Erro ao atualizar a senha.");
-    
     return true;
-},
+  } // <--- SEM VÍRGULA SE FOR A ÚLTIMA FUNÇÃO
+}; // <--- FECHAMENTO DO OBJETO DBHandler
