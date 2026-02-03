@@ -39,12 +39,17 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- TABELAS --- */
-        .matrix-container { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px; }
+        .matrix-container { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; }
         .perm-table { width: 100%; border-collapse: collapse; font-size: 11px; }
         .perm-table th { background: #f8fafc; padding: 10px; text-align: center; color: #475569; border-bottom: 2px solid #e2e8f0; }
         .perm-table th:first-child { text-align: left; font-size: 12px; padding-left: 15px; }
         .perm-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; text-align: center; vertical-align: middle; }
         .perm-table td:first-child { text-align: left; font-weight: 600; color: #1e293b; font-size: 12px; padding-left: 15px; }
+
+        /* --- CHECKBOXES COLORIDOS --- */
+        .check-ver { accent-color: var(--primary) !important; width: 16px; height: 16px; cursor: pointer; }
+        .check-editar { accent-color: var(--danger) !important; width: 16px; height: 16px; cursor: pointer; }
+        .check-detalhes { accent-color: var(--success) !important; width: 16px; height: 16px; cursor: pointer; }
 
         /* --- BOTÕES --- */
         .btn-action { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; }
@@ -53,7 +58,6 @@
 
         .btn-cancel { background: #fff; color: #64748b; border: 1px solid #cbd5e1; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; display: none; }
         .btn-cancel:hover { background: #f8fafc; }
-        
         .btn-danger { background: none; border: none; color: var(--danger); font-size: 11px; font-weight: 700; cursor: pointer; }
 
         /* --- FORMULÁRIOS --- */
@@ -62,26 +66,8 @@
         .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; transition: border 0.2s; }
         .input-group input:focus { border-color: var(--primary); }
 
-        .highlight-change { background-color: #eef2ff !important; border-color: var(--primary) !important; }
-
-/* Cores fixas para os Checkboxes (Identidade Visual) */
-.check-ver { accent-color: var(--primary) !important; width: 16px; height: 16px; cursor: pointer; }
-.check-editar { accent-color: var(--danger) !important; width: 16px; height: 16px; cursor: pointer; }
-.check-detalhes { accent-color: var(--success) !important; width: 16px; height: 16px; cursor: pointer; }
-
-/* Destaque para quando a célula for alterada (Dirty State) */
-.cell-dirty {
-    background-color: #eef2ff !important; /* Azul bem claro para indicar mudança */
-    box-shadow: inset 0 0 0 1px var(--primary); /* Borda interna sutil */
-}
-
-/* Garante que o checkbox desabilitado (Auditor) pareça realmente travado */
-input[type="checkbox"]:disabled {
-    cursor: not-allowed;
-    filter: grayscale(1);
-    opacity: 0.6;
-}
-        
+        .highlight-change { background-color: #eef2ff !important; }
+        .role-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; background: #e0e7ff; color: #4338ca; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -97,6 +83,7 @@ input[type="checkbox"]:disabled {
                 <button class="tab-btn active" data-tab="status">Status & Backup</button>
                 <button class="tab-btn" data-tab="permissoes">Matriz de Permissões</button>
                 <button class="tab-btn" data-tab="usuarios">Gestão de Usuários</button>
+                <button class="tab-btn" data-tab="logs">Logs de Auditoria</button>
             </nav>
 
             <div id="tab-status" class="card-body active">
@@ -105,7 +92,7 @@ input[type="checkbox"]:disabled {
 
             <div id="tab-permissoes" class="card-body">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div style="font-size: 12px; color: #64748b;">Configure os níveis de acesso (Ver | Editar | Detalhes) por cargo.</div>
+                    <div style="font-size: 12px; color: #64748b;">Configure os níveis de acesso por cargo. Células azuis indicam alterações pendentes.</div>
                     <div id="areaAcoesMatriz" style="display: flex; gap: 10px;">
                         <button id="btnCancelarMatriz" class="btn-cancel" onclick="window.cancelarAlteracoesMatriz()">Cancelar</button>
                         <button id="btnSalvarPermissoes" class="btn-action" disabled>Gravar Matriz de Acesso</button>
@@ -124,9 +111,9 @@ input[type="checkbox"]:disabled {
                     <div id="containerFormNovo" style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
                         <h3 style="font-size: 14px; margin-bottom: 15px;">Novo Acesso</h3>
                         <form id="formNovoUsuario">
-                            <div class="input-group"><label>Nome</label><input type="text" id="addNome" required></div>
+                            <div class="input-group"><label>Nome Completo</label><input type="text" id="addNome" required></div>
                             <div class="input-group"><label>Login</label><input type="text" id="addLogin" required></div>
-                            <div class="input-group"><label>Senha</label><input type="password" id="addSenha" required></div>
+                            <div class="input-group"><label>Senha Inicial</label><input type="password" id="addSenha" required></div>
                             <div class="input-group">
                                 <label>Cargo</label>
                                 <select id="addRole">
@@ -135,7 +122,7 @@ input[type="checkbox"]:disabled {
                                     <option value="RH_OPERACIONAL">RH OPERACIONAL</option>
                                     <option value="TD_COORD">COORDENADOR T&D</option>
                                     <option value="AUDITOR">AUDITOR</option>
-                                    <option value="ADMIN">ADMINISTRADOR</option>
+                                    <option value="ADMIN" selected>ADMINISTRADOR</option>
                                 </select>
                             </div>
                             <button type="submit" class="btn-action" style="width: 100%;">Criar Usuário</button>
@@ -147,7 +134,7 @@ input[type="checkbox"]:disabled {
                             <h3 style="font-size: 14px;">Usuários Registrados</h3>
                             <div id="areaAcoesUsuarios" style="display: flex; gap: 10px;">
                                 <button id="btnCancelarUsuarios" class="btn-cancel" onclick="window.cancelarAlteracoesUsuarios()">Cancelar</button>
-                                <button id="btnSalvarUsuarios" class="btn-action" disabled onclick="window.salvarAlteracoesUsuarios()">Gravar Alterações de Cargos</button>
+                                <button id="btnSalvarUsuarios" class="btn-action" disabled onclick="window.salvarAlteracoesUsuarios()">Gravar Alterações</button>
                             </div>
                         </div>
                         <div class="matrix-container">
@@ -166,6 +153,28 @@ input[type="checkbox"]:disabled {
                     </div>
                 </div>
             </div>
+
+            <div id="tab-logs" class="card-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="font-size: 14px;">Logs de Auditoria</h3>
+                    <button class="btn-action" onclick="window.carregarLogs()" style="padding: 6px 15px;">Atualizar Histórico</button>
+                </div>
+                <div class="matrix-container">
+                    <table class="perm-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding-left: 15px;">Data/Hora</th>
+                                <th>Usuário</th>
+                                <th>Ação</th>
+                                <th style="text-align: left;">Detalhes</th>
+                                <th>Tela</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaLogsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -173,7 +182,7 @@ input[type="checkbox"]:disabled {
         import { DBHandler, supabaseClient } from '../bd-treinamentos/db-handler.js';
 
         const ROLES = ['ADMIN', 'TD_COORD', 'RH_OPERACIONAL', 'GESTOR', 'AUDITOR', 'COLABORADOR'];
-        let originalMatrixState = []; // Cache para detectar mudanças na matriz
+        let originalMatrixState = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             configurarAbas();
@@ -182,6 +191,7 @@ input[type="checkbox"]:disabled {
             verificarModoLeitura();
         });
 
+        // --- NAVEGAÇÃO ---
         function configurarAbas() {
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.onclick = () => {
@@ -190,27 +200,28 @@ input[type="checkbox"]:disabled {
                     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
                     if (btn.dataset.tab === 'usuarios') carregarUsuarios();
                     if (btn.dataset.tab === 'permissoes') initMatrix();
+                    if (btn.dataset.tab === 'logs') window.carregarLogs();
                 };
             });
         }
 
         async function carregarStatus() {
-            const { count: users } = await supabaseClient.from('usuarios_sistema').select('*', { count: 'exact', head: true });
-            const { count: mods } = await supabaseClient.from('modulos_sistema').select('*', { count: 'exact', head: true });
-            document.getElementById('metaInfo').innerHTML = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div style="padding: 15px; background: #eff6ff; border-radius: 8px; border: 1px solid #dbeafe;"><span style="display:block; font-size:11px; color:#1d4ed8; font-weight:700;">USUÁRIOS ATIVOS</span><strong style="font-size:24px;">${users || 0}</strong></div><div style="padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #dcfce7;"><span style="display:block; font-size:11px; color:#15803d; font-weight:700;">MÓDULOS NO SISTEMA</span><strong style="font-size:24px;">${mods || 0}</strong></div></div>`;
+            const { count: u } = await supabaseClient.from('usuarios_sistema').select('*', { count: 'exact', head: true });
+            const { count: m } = await supabaseClient.from('modulos_sistema').select('*', { count: 'exact', head: true });
+            document.getElementById('metaInfo').innerHTML = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div style="padding: 15px; background: #eff6ff; border-radius: 8px; border: 1px solid #dbeafe;"><span style="display:block; font-size:11px; color:#1d4ed8; font-weight:700;">USUÁRIOS ATIVOS</span><strong style="font-size:24px;">${u || 0}</strong></div><div style="padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #dcfce7;"><span style="display:block; font-size:11px; color:#15803d; font-weight:700;">MÓDULOS NO SISTEMA</span><strong style="font-size:24px;">${m || 0}</strong></div></div>`;
         }
 
-        // --- LÓGICA DA MATRIZ (DIRTY CHECK) ---
+        // --- MATRIZ (V|E|D) ---
         async function initMatrix() {
             const header = document.getElementById('headerRoles');
             const body = document.getElementById('permTableBody');
             header.innerHTML = '<th>Módulo</th>';
-            ROLES.forEach(r => { header.innerHTML += `<th colspan="3" style="border-left: 1px solid #e2e8f0; width: 180px;">${r}<br><span style="font-size:8px; color:#94a3b8">V | E | D</span></th>`; });
+            ROLES.forEach(r => { header.innerHTML += `<th colspan="3" style="border-left: 1px solid #e2e8f0; width: 180px;">${r}<br><span style="font-size:8px; color:#94a3b8">VER | EDITAR | DETALHES</span></th>`; });
 
             const { data: modulos } = await supabaseClient.from('modulos_sistema').select('*').order('ordem');
             const { data: acessos } = await supabaseClient.from('acesso_modulos').select('*');
             
-            originalMatrixState = acessos; // Salva estado inicial
+            originalMatrixState = acessos;
             body.innerHTML = '';
 
             modulos.forEach(mod => {
@@ -238,34 +249,26 @@ input[type="checkbox"]:disabled {
         window.verificarAlteracoesMatriz = () => {
             const cbs = document.querySelectorAll('.matrix-cb');
             let mudou = false;
-
             cbs.forEach(cb => {
-                const role = cb.dataset.role;
-                const modId = parseInt(cb.dataset.modulo);
-                const type = cb.dataset.type;
-                const acOriginal = originalMatrixState.find(a => a.modulo_id === modId && a.role === role);
+                const acOrig = originalMatrixState.find(a => a.modulo_id == cb.dataset.modulo && a.role == cb.dataset.role);
+                let origVal = false;
+                if(cb.dataset.type === 'ver') origVal = !!acOrig;
+                if(cb.dataset.type === 'editar') origVal = acOrig?.pode_editar || false;
+                if(cb.dataset.type === 'detalhes') origVal = acOrig?.ver_detalhes || false;
 
-                let valorOriginal = false;
-                if (type === 'ver') valorOriginal = !!acOriginal;
-                if (type === 'editar') valorOriginal = acOriginal?.pode_editar || false;
-                if (type === 'detalhes') valorOriginal = acOriginal?.ver_detalhes || false;
-
-                if (cb.checked !== valorOriginal) {
-                    mudou = true;
-                    cb.parentElement.style.backgroundColor = '#eef2ff';
-                } else {
-                    cb.parentElement.style.backgroundColor = 'transparent';
-                }
+                const dirty = cb.checked !== origVal;
+                cb.parentElement.classList.toggle('highlight-change', dirty);
+                if (dirty) mudou = true;
             });
-
             document.getElementById('btnSalvarPermissoes').disabled = !mudou;
             document.getElementById('btnCancelarMatriz').style.display = mudou ? 'block' : 'none';
         };
 
-        window.cancelarAlteracoesMatriz = () => { initMatrix(); };
+        window.cancelarAlteracoesMatriz = () => initMatrix();
 
         document.getElementById('btnSalvarPermissoes').onclick = async () => {
-            if (!confirm("Confirmar gravação da nova matriz?")) return;
+            if (!confirm("Confirmar atualização da matriz?")) return;
+            const session = JSON.parse(localStorage.getItem('rh_session'));
             const payload = [];
             ROLES.forEach(role => {
                 document.querySelectorAll(`.check-ver[data-role="${role}"]:checked`).forEach(cb => {
@@ -281,72 +284,86 @@ input[type="checkbox"]:disabled {
             try {
                 await supabaseClient.from('acesso_modulos').delete().neq('id', 0);
                 if (payload.length > 0) await supabaseClient.from('acesso_modulos').insert(payload);
-                alert("Matriz atualizada!");
+                await DBHandler.registrarLog(session.user, "ATUALIZAR_MATRIZ", "Atualização global de permissões", "Administração");
+                alert("Matriz Salva!");
                 initMatrix();
             } catch (e) { alert("Erro ao salvar."); }
         };
 
-        // --- GESTÃO DE USUÁRIOS (DIRTY CHECK) ---
+        // --- USUÁRIOS ---
         async function carregarUsuarios() {
             const body = document.getElementById('listaUsuariosBody');
             body.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
-            const { data: usuarios } = await supabaseClient.from('usuarios_sistema').select('*').order('nome');
+            const { data } = await supabaseClient.from('usuarios_sistema').select('*').order('nome');
             body.innerHTML = '';
-            usuarios.forEach(u => {
+            data.forEach(u => {
                 const tr = document.createElement('tr');
-                const options = ROLES.map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r}</option>`).join('');
-                tr.innerHTML = `<td><strong>${u.nome}</strong></td><td><code>${u.username}</code></td><td><select class="user-role-select" data-id="${u.id}" data-original="${u.role}" data-nome="${u.nome}" onchange="window.verificarAlteracoesUsuarios()">${options}</select></td><td><button class="btn-danger" onclick="window.removerUser('${u.id}', '${u.nome}')">Excluir</button></td>`;
+                const opt = ROLES.map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r}</option>`).join('');
+                tr.innerHTML = `<td><strong>${u.nome}</strong></td><td><code>${u.username}</code></td><td><select class="user-role-select" data-id="${u.id}" data-original="${u.role}" data-nome="${u.nome}" onchange="window.verificarAlteracoesUsuarios()">${opt}</select></td><td><button class="btn-danger" onclick="window.removerUser('${u.id}', '${u.nome}')">Excluir</button></td>`;
                 body.appendChild(tr);
             });
             window.verificarAlteracoesUsuarios();
         }
 
         window.verificarAlteracoesUsuarios = () => {
-            const selects = document.querySelectorAll('.user-role-select');
+            const sels = document.querySelectorAll('.user-role-select');
             let mudou = false;
-            selects.forEach(sel => {
-                const isDirty = sel.value !== sel.dataset.original;
-                sel.classList.toggle('highlight-change', isDirty);
-                if (isDirty) mudou = true;
+            sels.forEach(s => {
+                const dirty = s.value !== s.dataset.original;
+                s.classList.toggle('highlight-change', dirty);
+                if (dirty) mudou = true;
             });
             document.getElementById('btnSalvarUsuarios').disabled = !mudou;
             document.getElementById('btnCancelarUsuarios').style.display = mudou ? 'block' : 'none';
         };
 
-        window.cancelarAlteracoesUsuarios = () => { carregarUsuarios(); };
+        window.cancelarAlteracoesUsuarios = () => carregarUsuarios();
 
         window.salvarAlteracoesUsuarios = async () => {
             const dirty = Array.from(document.querySelectorAll('.user-role-select')).filter(s => s.value !== s.dataset.original);
             if (!confirm(`Gravar ${dirty.length} alteração(ões)?`)) return;
             const session = JSON.parse(localStorage.getItem('rh_session'));
-            for (const sel of dirty) {
-                await supabaseClient.from('usuarios_sistema').update({ role: sel.value }).eq('id', sel.dataset.id);
-                await DBHandler.registrarLog(session.user, "ALTERAR_CARGO", `${sel.dataset.nome}: ${sel.dataset.original} -> ${sel.value}`);
+            for (const s of dirty) {
+                await supabaseClient.from('usuarios_sistema').update({ role: s.value }).eq('id', s.dataset.id);
+                await DBHandler.registrarLog(session.user, "ALTERAR_CARGO", `${s.dataset.nome}: ${s.dataset.original} -> ${s.value}`, "Administração");
             }
-            alert("Cargos atualizados!");
-            carregarUsuarios();
+            alert("Sucesso!"); carregarUsuarios();
         };
 
-        // CRIAÇÃO E MODO LEITURA
         document.getElementById('formNovoUsuario').onsubmit = async (e) => {
             e.preventDefault();
-            const payload = {
-                nome: document.getElementById('addNome').value.trim(),
-                username: document.getElementById('addLogin').value.trim(),
-                password: document.getElementById('addSenha').value,
-                role: document.getElementById('addRole').value
-            };
-            const { error } = await supabaseClient.from('usuarios_sistema').insert([payload]);
-            if (!error) { alert("Usuário criado!"); e.target.reset(); carregarUsuarios(); } else alert(error.message);
+            const session = JSON.parse(localStorage.getItem('rh_session'));
+            const u = { nome: document.getElementById('addNome').value, username: document.getElementById('addLogin').value, password: document.getElementById('addSenha').value, role: document.getElementById('addRole').value };
+            const { error } = await supabaseClient.from('usuarios_sistema').insert([u]);
+            if (!error) { 
+                await DBHandler.registrarLog(session.user, "CRIAR_USUARIO", `Criou acesso para ${u.nome}`, "Administração");
+                alert("Criado!"); e.target.reset(); carregarUsuarios(); 
+            } else alert(error.message);
         };
 
         window.removerUser = async (id, nome) => {
             if (confirm(`Excluir ${nome}?`)) {
+                const session = JSON.parse(localStorage.getItem('rh_session'));
                 await supabaseClient.from('usuarios_sistema').delete().eq('id', id);
+                await DBHandler.registrarLog(session.user, "EXCLUIR_USUARIO", `Removeu acesso de ${nome}`, "Administração");
                 carregarUsuarios();
             }
         };
 
+        // --- LOGS ---
+        window.carregarLogs = async () => {
+            const body = document.getElementById('listaLogsBody');
+            body.innerHTML = '<tr><td colspan="5">Buscando...</td></tr>';
+            const { data } = await supabaseClient.from('logs_sistema').select('*').order('created_at', { ascending: false }).limit(50);
+            body.innerHTML = '';
+            data?.forEach(l => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td style="text-align:left; color:#64748b">${new Date(l.created_at).toLocaleString()}</td><td><span class="role-badge" style="background:#f1f5f9; color:#475569">${l.usuario}</span></td><td><strong>${l.acao}</strong></td><td style="text-align:left; font-size:10px;">${l.detalhes}</td><td><small>${l.tela || '-'}</small></td>`;
+                body.appendChild(tr);
+            });
+        };
+
+        // --- MODO LEITURA ---
         function verificarModoLeitura() {
             if (new URLSearchParams(window.location.search).get('readonly') === 'true') {
                 document.getElementById('areaAcoesMatriz')?.remove();
@@ -364,4 +381,3 @@ input[type="checkbox"]:disabled {
     </script>
 </body>
 </html>
-
