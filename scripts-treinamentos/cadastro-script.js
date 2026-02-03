@@ -273,12 +273,14 @@ window.ativarModoEdicao = function ativarModoEdicao() {
 window.visualizar = id => abrirFicha(id, "view");
 window.editar = id => abrirFicha(id, "edit");
 
+// ---------- Carregamento da Ficha (Baseline de Auditoria) ----------
 async function abrirFicha(id, mode = "view") {
   const colab = await DBHandler.buscarColaboradorPorId(id);
   if (!colab) return;
   
   currentId = colab.id;
-  window.originalColabData = JSON.parse(JSON.stringify(colab)); // Deep copy para auditoria
+  // Criamos uma cópia imutável dos dados vindo do SQL para servir de "De" no Log
+  window.originalColabData = Object.freeze({ ...colab });
 
   preencherForm(colab);
   $("formTitle").textContent = mode === "edit" ? "Editar Colaborador" : "Ficha do Colaborador";
@@ -397,64 +399,88 @@ function coletarPayload() {
 }
 
 // ---------- Salvar com Auditoria ----------
+// ---------- Ações de Salvamento ----------
 window.salvarColaborador = async function salvarColaborador() {
-  try {
-    const session = JSON.parse(localStorage.getItem("rh_session"));
-    const payload = coletarPayload();
-    let logDetalhes = "";
-    let acao = currentId ? "EDITAR_COLABORADOR" : "CRIAR_COLABORADOR";
+    try {
+        const session = JSON.parse(localStorage.getItem("rh_session"));
+        const payload = coletarPayload(); 
+        let logDetalhes = "";
+        let acao = currentId ? "EDITAR_COLABORADOR" : "CRIAR_COLABORADOR";
 
-    // Lógica de Diff para Auditoria
-    if (currentId && window.originalColabData) {
-      const camposMonitorados = {
-        'nome': 'Nome',
-        'cpf': 'CPF',
-        'data_admissao': 'Admissão',
-        'cargo_atual_id': { label: 'Cargo', isSelect: true, map: CARGOS_MAP },
-        'salario': 'Salário',
-        'departamento': 'Depto',
-        'gestor_id': { label: 'Gestor', isSelect: true, map: GESTORES_MAP },
-        'unidade': 'Unidade',
-        'tipo_contrato': 'Contrato'
-      };
-
-      let mudancas = [];
-      for (const [key, config] of Object.entries(camposMonitorados)) {
-        const label = typeof config === 'string' ? config : config.label;
-        let valorNovo = payload[key] ?? "—";
-        let valorAntigo = window.originalColabData[key] ?? "—";
-
-        if (config.isSelect) {
-          valorNovo = config.map.get(Number(valorNovo)) || "—";
-          valorAntigo = config.map.get(Number(valorAntigo)) || "—";
+        if (currentId && window.originalColabData) {
+            // Detalhamento de mudanças para Edição
+            logDetalhes = processarDiferencas(window.originalColabData, payload);
+            if (!logDetalhes) logDetalhes = "Salvamento sem alterações de valores.";
+        } else {
+            // Detalhamento para Novo Registro
+            logDetalhes = `• Nova Admissão Efetuada\n• Nome: ${payload.nome}\n• Cargo: ${CARGOS_MAP.get(payload.cargo_atual_id) || '—'}`;
         }
 
-        if (String(valorNovo).trim() !== String(valorAntigo).trim()) {
-          mudancas.push(`• ${label}: ${valorAntigo} ➔ ${valorNovo}`);
-        }
-      }
-      logDetalhes = mudancas.length > 0 ? mudancas.join('\n') : "Nenhuma alteração detectada.";
-    } else {
-      const cargoNome = CARGOS_MAP.get(payload.cargo_atual_id) || "—";
-      logDetalhes = `• Admissão de Novo Colaborador\n• Nome: ${payload.nome}\n• Cargo: ${cargoNome}`;
+        if (!currentId) await DBHandler.inserirColaborador(payload);
+        else await DBHandler.atualizarColaborador(currentId, payload);
+
+        // Registro do Log para a tela de Administração
+        await DBHandler.registrarLog(session.user, acao, logDetalhes, "Gestão de Colaboradores");
+
+        alert("✅ Dados processados e auditoria registrada.");
+        window.acaoVoltar();
+    } catch (e) {
+        alert("Erro ao salvar: " + (e.message || e));
     }
-
-    // Execução
-    if (!currentId) await DBHandler.inserirColaborador(payload);
-    else await DBHandler.atualizarColaborador(currentId, payload);
-
-    // Registro no Log de Auditoria
-    await DBHandler.registrarLog(session.user, acao, logDetalhes, "Gestão de Colaboradores");
-
-    await carregarLista();
-    showView(true);
-    renderizarTabela();
-    alert("✅ Registro salvo com sucesso.");
-  } catch (e) {
-    console.error(e);
-    alert("Erro ao salvar:\n" + (e.message || e));
-  }
 };
+
+
+// ---------- Motor de Auditoria (De ➔ Para) ----------
+function processarDiferencas(original, novo) {
+    // Mapeamento baseado exatamente no esquema da tabela public.colaboradores
+    const esquema = {
+        nome: "Nome", cpf: "CPF", data_nascimento: "Nascimento", genero: "Gênero",
+        estado_civil: "Estado Civil", nacionalidade: "Nacionalidade", naturalidade: "Naturalidade",
+        raca_etnia: "Raça/Etnia", escolaridade: "Escolaridade", nome_pai: "Nome do Pai",
+        nome_mae: "Nome da Mãe", pcd: "PCD", candidato: "Candidato",
+        data_admissao: "Data Admissão", cargo_atual_id: { label: "Cargo", map: CARGOS_MAP },
+        departamento: "Departamento", unidade: "Unidade", matricula: "Matrícula",
+        tipo_contrato: "Contrato", salario: "Salário Base", moeda: "Moeda",
+        turno: "Turno", gestor_id: { label: "Gestor Direto", map: GESTORES_MAP },
+        email_empresarial: "Email Corp.", rg: "RG", orgao_expedidor: "Órgão Exp.",
+        data_expedicao: "Expedição RG", pis: "PIS/PASEP", ctps_num: "CTPS Nº",
+        ctps_serie: "Série CTPS", titulo_eleitor: "Tít. Eleitor", zona_eleitoral: "Zona/Seção",
+        reservista: "Reservista", cnh: "CNH", cep: "CEP", logradouro: "Endereço",
+        numero: "Nº", complemento: "Compl.", bairro: "Bairro", cidade: "Cidade",
+        estado: "UF", email_pessoal: "Email Pessoal", celular: "Celular",
+        telefone_emergencia: "Tel. Emergência", banco: "Banco", agencia: "Agência",
+        conta_corrente: "Conta Corrente"
+    };
+
+    let mudancas = [];
+    const norm = (v) => (v === null || v === undefined || String(v).trim() === "") ? "—" : String(v).trim();
+
+    for (const [coluna, config] of Object.entries(esquema)) {
+        let label = typeof config === 'string' ? config : config.label;
+        let vAntigo = original[coluna];
+        let vNovo = novo[coluna];
+
+        // Tratamento para Checkboxes/Booleanos
+        if (typeof vNovo === 'boolean') {
+            vAntigo = !!vAntigo ? "Sim" : "Não";
+            vNovo = vNovo ? "Sim" : "Não";
+        } else {
+            vAntigo = norm(vAntigo);
+            vNovo = norm(vNovo);
+        }
+
+        // Tradução de IDs para Nomes amigáveis (Cargo e Gestor)
+        if (config.map && vAntigo !== vNovo) {
+            vAntigo = config.map.get(Number(vAntigo)) || vAntigo;
+            vNovo = config.map.get(Number(vNovo)) || vNovo;
+        }
+
+        if (vAntigo !== vNovo) {
+            mudancas.push(`• ${label}: ${vAntigo} ➔ ${vNovo}`);
+        }
+    }
+    return mudancas.join('\n');
+}
 
 // ---------- Desligamento / Reativação ----------
 let modalTargetId = null;
@@ -471,41 +497,47 @@ window.fecharModalDesligamento = () => {
   modalTargetId = null;
 };
 
-window.confirmarDesligamento = async () => {
-  try {
-    if (!modalTargetId) return;
-    const session = JSON.parse(localStorage.getItem("rh_session"));
-    const colab = COLABS.find(c => c.id === modalTargetId);
-    const dataD = $("modalDataDemissao").value;
-    const motivo = $("modalMotivo").value || "Não informado";
+// ---------- Desligamento com Log Detalhado ----------
+window.confirmarDesligamento = async function confirmarDesligamento() {
+    try {
+        if (!modalTargetId) return;
+        const session = JSON.parse(localStorage.getItem("rh_session"));
+        const colab = COLABS.find(c => c.id === modalTargetId);
+        
+        const dataD = $("modalDataDemissao").value;
+        const motivo = $("modalMotivo").value || "Não informado";
 
-    await DBHandler.desativarColaborador(modalTargetId, {
-      dataDemissao: dataD,
-      motivoDemissao: motivo,
-    });
+        await DBHandler.desativarColaborador(modalTargetId, {
+            dataDemissao: dataD,
+            motivoDemissao: motivo,
+        });
 
-    await DBHandler.registrarLog(session.user, "DESLIGAR_COLABORADOR", `• Colaborador: ${colab.nome}\n• Data: ${fmtDateBR(dataD)}\n• Motivo: ${motivo}`, "Gestão de Colaboradores");
+        const logMsg = `• Colaborador: ${colab.nome}\n• Status: ATIVO ➔ DESLIGADO\n• Data: ${fmtDateBR(dataD)}\n• Motivo: ${motivo}`;
+        await DBHandler.registrarLog(session.user, "DESLIGAR_COLABORADOR", logMsg, "Gestão de Colaboradores");
 
-    fecharModalDesligamento();
-    await carregarLista();
-    renderizarTabela();
-  } catch (e) {
-    alert("Erro ao desligar: " + (e.message || e));
-  }
+        window.fecharModalDesligamento();
+        await carregarLista();
+        window.renderizarTabela();
+    } catch (e) {
+        alert("Erro no desligamento: " + (e.message || e));
+    }
 };
 
-window.reativar = async id => {
+// ---------- Reativação com Log Detalhado ----------
+window.reativar = async function reativar(id) {
   try {
     const session = JSON.parse(localStorage.getItem("rh_session"));
     const colab = COLABS.find(c => c.id === id);
     
     await DBHandler.reativarColaborador(id);
-    await DBHandler.registrarLog(session.user, "REATIVAR_COLABORADOR", `• Colaborador: ${colab.nome} foi reativado no sistema.`, "Gestão de Colaboradores");
+    
+    const logMsg = `• Colaborador: ${colab.nome}\n• Status: DESLIGADO ➔ ATIVO\n• Detalhes: Registro reativado pelo administrador.`;
+    await DBHandler.registrarLog(session.user, "REATIVAR_COLABORADOR", logMsg, "Gestão de Colaboradores");
 
     await carregarLista();
-    renderizarTabela();
+    window.renderizarTabela();
   } catch (e) {
-    alert("Erro ao reativar: " + (e.message || e));
+    alert("Erro na reativação: " + (e.message || e));
   }
 };
 
