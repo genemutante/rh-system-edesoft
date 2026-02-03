@@ -124,16 +124,21 @@ export const DBHandler = {
     // =========================
     // 4) LOGS
     // =========================
-    async registrarLog(usuario, acao, detalhes, ip) {
+async registrarLog(usuario, acao, detalhes, tela) {
+    try {
         const { error } = await supabaseClient.from("logs_sistema").insert({
-            usuario,
-            acao,
-            detalhes,
-            ip: ip || "IP não detectado",
+            usuario: usuario,
+            acao: acao,
+            detalhes: detalhes,
+            tela: tela || "Sistema",
+            ip: "Automático (Cloud)" // O Supabase registra o IP na camada de auth, mas podemos marcar como automático
         });
 
-        if (error) console.error("Erro silencioso ao gravar log:", error);
-    },
+        if (error) throw error;
+    } catch (err) {
+        console.error("Erro ao gravar log de auditoria:", err);
+    }
+}
 
     // =========================
     // 5) CARGOS
@@ -293,3 +298,4 @@ export const DBHandler = {
         return this.atualizarColaborador(id, { data_demissao: null, motivo_demissao: null });
     }
 };
+
