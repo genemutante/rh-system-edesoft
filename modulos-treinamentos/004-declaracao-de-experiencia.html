@@ -390,7 +390,11 @@ tr:hover td { background: #fcfdfe; }
 }
 
 .type-cert { background: #e0e7ff; color: #4338ca; }
-.type-notorio { background: #fef3c7; color: #92400e; }
+.type-atestado {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 
 .readonly-mode .input-full {
     background: #f1f5f9;
@@ -425,7 +429,8 @@ tr:hover td { background: #fcfdfe; }
       <select id="filterTipo" class="control-slim" onchange="window.filtrar()">
         <option value="TODOS">Todos</option>
         <option value="CERTIFICADO">Certificado</option>
-        <option value="NOTORIO">Notório</option>
+        <option value="ATESTADO">Atestado</option>
+
       </select>
     </div>
 
@@ -483,7 +488,8 @@ tr:hover td { background: #fcfdfe; }
     </div>
   </button>
 
-  <button class="evidence-card" type="button" data-mode="notorio" onclick="window.selectMode('notorio')">
+  <button class="evidence-card" type="button" data-mode="atestado" onclick="window.selectMode('atestado')">
+
     <div class="icon-box" style="background: #fef3c7; color: #92400e;">
       ✔️
     </div>
@@ -531,7 +537,7 @@ tr:hover td { background: #fcfdfe; }
                         </div>
                     </div>
 
-                    <div id="form-notorio" style="display: none;">
+                    <div id="form-atestado" style="display: none;">
                         <span class="field-label">Justificativa do RH</span>
                         <textarea id="notorioJustificativa" class="input-full" style="height: 120px;" placeholder="Detalhes da validação..."></textarea>
                         <span class="field-label">Aprovador Técnico</span>
@@ -626,9 +632,10 @@ function renderizarTabela(lista) {
             <td><strong>${item.colaboradores?.nome || '—'}</strong></td>
             <td>${item.treinamentos?.nome || '—'}</td>
             <td>
-                <span class="badge ${item.atividade_externa === 'NOTORIO' ? 'type-notorio' : 'type-cert'}">
-                    ${item.atividade_externa}
-                </span>
+<span class="badge ${item.atividade_externa === 'ATESTADO' ? 'type-atestado' : 'type-cert'}">
+  ${item.atividade_externa}
+</span>
+
             </td>
             <td>${item.data_homologacao ? new Date(item.data_homologacao).toLocaleDateString('pt-BR') : '—'}</td>
             <td>${item.nota || '—'}</td>
@@ -637,7 +644,7 @@ function renderizarTabela(lista) {
                 
 <button class="btn-action" 
         style="background: #f8fafc; color: #1e293b; border: 1px solid #cbd5e1;" 
-        onclick="${item.atividade_externa === 'NOTORIO' ? `window.gerarAtestado(${item.id})` : `window.gerarCertificado(${item.id})`}">
+        onclick="${item.atividade_externa === 'ATESTADO' ? `window.gerarAtestado(${item.id})` : `window.gerarCertificado(${item.id})`}">
     ${item.atividade_externa === 'NOTORIO' ? '⚖️' : '📜'}
 </button>
 
@@ -682,7 +689,8 @@ function renderizarTabela(lista) {
 
   // Alterna o formulário
   document.getElementById('form-certificado').style.display = mode === 'certificado' ? 'block' : 'none';
-  document.getElementById('form-notorio').style.display = mode === 'notorio' ? 'block' : 'none';
+  document.getElementById('form-atestado').style.display = mode === 'atestado' ? 'block' : 'none';
+
 };
 
 
@@ -792,8 +800,8 @@ window.salvarHomologacao = async () => {
         function preencherCampos(d) {
             document.getElementById('selectColaborador').value = d.colaborador_id;
             document.getElementById('selectTreinamento').value = d.treinamento_id;
-            if (d.atividade_externa === 'NOTORIO') {
-                window.selectMode('notorio', document.getElementById('btn-notorio'));
+if (d.atividade_externa === 'ATESTADO') {
+    window.selectMode('atestado');
                 document.getElementById('notorioJustificativa').value = d.observacoes || "";
                 document.getElementById('notorioAprovador').value = d.instrutor || "";
             } else {
@@ -1120,6 +1128,7 @@ window.gerarAtestado = (id) => {
     </script>
 </body>
 </html>
+
 
 
 
