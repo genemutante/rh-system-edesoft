@@ -336,9 +336,19 @@ async registrarLog(usuario, acao, detalhes, tela) {
         if (error) throw error;
     }
 
+async buscarHomologacaoPorId(id) {
+    const { data, error } = await supabaseClient
+        .from("homologacoes_treinamentos")
+        .select("*")
+        .eq("id", id)
+        .single();
 
+    if (error) throw error;
+    return data;
+}
     
 };
+
 
 
 
