@@ -52,12 +52,62 @@
       letter-spacing: -0.02em;
     }
 
-    #view-lista {
+    .btn {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+    }
+
+    .btn-outline {
+      background: white;
+      color: var(--text-muted);
+    }
+
+    .admin-only {
+      display: none;
+    }
+
+    .badge {
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .type-cert {
+      background: #e0e7ff;
+      color: #4338ca;
+    }
+
+    .type-notorio {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    #view-lista, #view-formulario {
       flex: 1;
-      display: flex;
+      display: none;
       flex-direction: column;
       overflow: hidden;
       animation: fadeIn 0.2s ease;
+    }
+
+    #view-lista.active,
+    #view-formulario.active {
+      display: flex;
     }
 
     .filter-bar {
@@ -83,7 +133,6 @@
       gap: 4px;
       flex: 1 1 220px;
       min-width: 200px;
-      max-width: 100%;
     }
 
     .filter-group label {
@@ -94,37 +143,14 @@
     }
 
     .search-input,
-    .filter-select {
+    .filter-select,
+    .form-control {
       height: 36px;
       padding: 0 10px;
       border: 1px solid var(--border);
       border-radius: 6px;
       font-size: 14px;
       background: #f1f5f9;
-    }
-
-    .btn {
-      height: 36px;
-      padding: 0 16px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      font-size: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      border: none;
-    }
-
-    .btn-outline {
-      background: white;
-      color: var(--text-muted);
     }
 
     .table-container {
@@ -142,11 +168,13 @@
       border: 1px solid var(--border);
     }
 
+    th, td {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
     th {
       background: #f8fafc;
-      text-align: left;
-      padding: 10px 12px;
-      font-size: 10px;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -154,10 +182,7 @@
     }
 
     td {
-      padding: 6px 12px;
       border-bottom: 1px solid #f1f5f9;
-      font-size: 13px;
-      line-height: 1.2;
     }
 
     tr:hover td {
@@ -168,61 +193,23 @@
       display: flex;
       justify-content: flex-end;
       gap: 4px;
-      white-space: nowrap;
-      min-width: 110px;
     }
 
     .btn-action {
       width: 30px;
       height: 30px;
       border-radius: 6px;
-      border: 1px solid transparent;
       cursor: pointer;
+      font-size: 15px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
       transition: 0.2s;
     }
 
-    .btn-view {
-      background: #eff6ff;
-      color: var(--view-blue);
-      border-color: #dbeafe;
-    }
-
-    .btn-edit {
-      background: #f5f3ff;
-      color: var(--edit-purple);
-      border-color: #ede9fe;
-    }
-
-    .btn-delete {
-      background: #fef2f2;
-      color: var(--delete-red);
-      border-color: #fee2e2;
-    }
-
-    .badge {
-      padding: 3px 6px;
-      border-radius: 4px;
-      font-size: 9px;
-      font-weight: 800;
-    }
-
-    .type-cert {
-      background: #e0e7ff;
-      color: #4338ca;
-    }
-
-    .type-notorio {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .admin-only {
-      display: none;
-    }
+    .btn-view { background: #eff6ff; color: var(--view-blue); border: 1px solid #dbeafe; }
+    .btn-edit { background: #f5f3ff; color: var(--edit-purple); border: 1px solid #ede9fe; }
+    .btn-delete { background: #fef2f2; color: var(--delete-red); border: 1px solid #fee2e2; }
 
     @keyframes fadeIn {
       from { opacity: 0; }
@@ -234,16 +221,16 @@
   <header class="app-header">
     <div class="header-title">ACADEMY // GESTÃO DE CERTIFICAÇÕES</div>
     <button class="btn btn-primary admin-only" id="btnTopNovo" onclick="window.abrirFormulario()">
-      <span>+ </span> NOVO REGISTRO
+      ➕ NOVO REGISTRO
     </button>
   </header>
 
-  <div id="view-lista">
+  <div id="view-lista" class="active">
     <div class="filter-bar">
       <div class="filter-inner">
         <div class="filter-group">
-          <label>Pesquisar colaborador ou curso</label>
-          <input id="searchBox" class="search-input" placeholder="Buscar..." onkeyup="window.filtrar()">
+          <label>Pesquisar</label>
+          <input type="text" id="searchBox" class="search-input" onkeyup="window.filtrar()" placeholder="Buscar colaborador ou curso...">
         </div>
         <div class="filter-group" style="flex: 0 0 160px">
           <label>Tipo</label>
@@ -277,6 +264,90 @@
     </div>
   </div>
 
-  <!-- O restante do view-formulario e scripts permanecem como no modelo completo anterior -->
+  <div id="view-formulario">
+    <div style="padding: 24px;">
+      <h2 id="form-title">Detalhes do Registro</h2>
+      <p style="margin: 8px 0 16px 0; color: var(--text-muted); font-size: 13px;">Formulário em construção.</p>
+      <button class="btn btn-outline" onclick="window.voltarParaLista()">⬅ Voltar</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { DBHandler } from '../bd-treinamentos/db-handler.js';
+    let DADOS_LISTA = [];
+
+    window.carregarLista = async () => {
+      DADOS_LISTA = await DBHandler.listarHomologacoes();
+      renderizarTabela(DADOS_LISTA);
+    };
+
+    function renderizarTabela(lista) {
+      const tbody = document.querySelector("#homologTable tbody");
+      const session = JSON.parse(localStorage.getItem('rh_session')) || { role: 'VIEWER' };
+
+      tbody.innerHTML = lista.map(item => `
+        <tr>
+          <td><strong>${item.colaboradores?.nome || '—'}</strong></td>
+          <td>${item.treinamentos?.nome || '—'}</td>
+          <td><span class="badge ${item.atividade_externa === 'NOTORIO' ? 'type-notorio' : 'type-cert'}">${item.atividade_externa || 'CERTIFICADO'}</span></td>
+          <td>${item.data_homologacao ? new Date(item.data_homologacao).toLocaleDateString('pt-BR') : '—'}</td>
+          <td>${item.nota || 'N/A'}</td>
+          <td class="actions-cell">
+            <button class="btn-action btn-view" onclick="window.abrirFormulario(${item.id}, true)">👁️</button>
+            ${session.role === 'ADMIN' ? `
+              <button class="btn-action btn-edit" onclick="window.abrirFormulario(${item.id}, false)">✏️</button>
+              <button class="btn-action btn-delete" onclick="window.deletarRegistro(${item.id})">🗑️</button>
+            ` : ''}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.filtrar = () => {
+      const busca = document.getElementById('searchBox').value.toLowerCase();
+      const tipo = document.getElementById('filterTipo').value;
+
+      renderizarTabela(DADOS_LISTA.filter(i =>
+        ((i.colaboradores?.nome || "").toLowerCase().includes(busca) ||
+         (i.treinamentos?.nome || "").toLowerCase().includes(busca)) &&
+        (tipo === 'TODOS' || i.atividade_externa === tipo)
+      ));
+    };
+
+    window.limparFiltros = () => {
+      document.getElementById('searchBox').value = "";
+      document.getElementById('filterTipo').value = "TODOS";
+      renderizarTabela(DADOS_LISTA);
+    };
+
+    window.abrirFormulario = (id = null, visualizar = false) => {
+      document.getElementById('view-lista').classList.remove('active');
+      document.getElementById('view-formulario').classList.add('active');
+      document.getElementById('form-title').textContent = id ? (visualizar ? 'Visualização de Registro' : 'Editar Registro') : 'Novo Registro';
+    };
+
+    window.voltarParaLista = () => {
+      document.getElementById('view-formulario').classList.remove('active');
+      document.getElementById('view-lista').classList.add('active');
+    };
+
+    window.deletarRegistro = async (id) => {
+      if (!confirm('Deseja realmente excluir o registro?')) return;
+      try {
+        await DBHandler.excluirHomologacao(id);
+        await window.carregarLista();
+      } catch (e) {
+        alert('Erro ao excluir: ' + e.message);
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const session = JSON.parse(localStorage.getItem('rh_session')) || { role: 'VIEWER' };
+      if (session.role === 'ADMIN') {
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-flex');
+      }
+      await window.carregarLista();
+    });
+  </script>
 </body>
 </html>
