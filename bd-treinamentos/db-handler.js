@@ -303,19 +303,20 @@ async registrarLog(usuario, acao, detalhes, tela) {
     // =========================
     // 8) HOMOLOGAÇÕES (MÓDULO 4)
     // =========================
-    async listarHomologacoes() {
-        const { data, error } = await supabaseClient
-            .from("homologacoes_treinamentos")
-            .select(`
-                *,
-                colaboradores (nome, departamento),
-                treinamentos (nome, categoria)
-            `)
-            .order("data_homologacao", { ascending: false });
+async listarHomologacoes() {
+    const { data, error } = await supabaseClient
+        .from("homologacoes_treinamentos")
+        .select(`
+            *,
+            colaboradores (nome, departamento, genero),
+            treinamentos (nome, categoria)
+        `)
+        .order("data_homologacao", { ascending: false });
 
-        if (error) throw error;
-        return data;
-    },
+    if (error) throw error;
+    return data;
+},
+
 
     async salvarHomologacao(payload) {
         const { data, error } = await supabaseClient
@@ -348,6 +349,7 @@ async buscarHomologacaoPorId(id) {
 }
     
 };
+
 
 
 
