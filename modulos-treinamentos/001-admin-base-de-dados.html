@@ -83,13 +83,13 @@
 
             <div id="tab-permissoes" class="card-body">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div style="font-size: 12px; color: #64748b;">Ajustes na matriz exigem gravação global.</div>
-                    <div style="display: flex; gap: 10px;">
+                    <div style="font-size: 12px; color: #64748b;">Configure os níveis de acesso por cargo.</div>
+                    <div id="areaAcoesMatriz" style="display: flex; gap: 10px;">
                         <button id="btnCancelarMatriz" class="btn-cancel" onclick="window.cancelarAlteracoesMatriz()">Cancelar</button>
                         <button id="btnSalvarPermissoes" class="btn-action" disabled>Gravar Matriz de Acesso</button>
                     </div>
                 </div>
-                <div class="matrix-container"><table class="perm-table"><thead id="headerRoles"></thead><tbody id="permTableBody"></tbody></table></div>
+                <div class="matrix-container"><table class="perm-table"><thead><tr id="headerRoles"><th>Módulo</th></tr></thead><tbody id="permTableBody"></tbody></table></div>
             </div>
 
             <div id="tab-usuarios" class="card-body">
@@ -97,17 +97,20 @@
                     <div id="containerFormNovo" style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
                         <h3 style="font-size: 14px; margin-bottom: 15px;">Novo Acesso</h3>
                         <form id="formNovoUsuario">
-                            <div style="margin-bottom: 10px;"><label style="font-size:11px; font-weight:700;">NOME</label><input type="text" id="addNome" style="width:100%; padding:8px;" required></div>
-                            <div style="margin-bottom: 10px;"><label style="font-size:11px; font-weight:700;">LOGIN</label><input type="text" id="addLogin" style="width:100%; padding:8px;" required></div>
-                            <div style="margin-bottom: 10px;"><label style="font-size:11px; font-weight:700;">SENHA</label><input type="password" id="addSenha" style="width:100%; padding:8px;" required></div>
-                            <div style="margin-bottom: 20px;"><label style="font-size:11px; font-weight:700;">CARGO</label><select id="addRole" style="width:100%; padding:8px;"></select></div>
+                            <div class="input-group"><label>Nome</label><input type="text" id="addNome" required></div>
+                            <div class="input-group"><label>Login</label><input type="text" id="addLogin" required></div>
+                            <div class="input-group"><label>Senha</label><input type="password" id="addSenha" required></div>
+                            <div class="input-group">
+                                <label>Cargo</label>
+                                <select id="addRole"></select>
+                            </div>
                             <button type="submit" class="btn-action" style="width: 100%;">Criar Usuário</button>
                         </form>
                     </div>
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                             <h3 style="font-size: 14px;">Usuários Registrados</h3>
-                            <div style="display: flex; gap: 10px;">
+                            <div id="areaAcoesUsuarios" style="display: flex; gap: 10px;">
                                 <button id="btnCancelarUsuarios" class="btn-cancel" onclick="window.cancelarAlteracoesUsuarios()">Cancelar</button>
                                 <button id="btnSalvarUsuarios" class="btn-action" disabled onclick="window.salvarAlteracoesUsuarios()">Gravar Alterações</button>
                             </div>
@@ -119,18 +122,9 @@
 
             <div id="tab-logs" class="card-body">
                 <div class="filter-bar">
-                    <div class="filter-group">
-                        <label>Início</label>
-                        <input type="date" id="logDateInicio" class="filter-input">
-                    </div>
-                    <div class="filter-group">
-                        <label>Fim</label>
-                        <input type="date" id="logDateFim" class="filter-input">
-                    </div>
-                    <div class="filter-group">
-                        <label>Filtrar por Tela</label>
-                        <select id="logFilterTela" class="filter-input" style="width: 200px;"></select>
-                    </div>
+                    <div class="filter-group"><label>Início</label><input type="date" id="logDateInicio" class="filter-input"></div>
+                    <div class="filter-group"><label>Fim</label><input type="date" id="logDateFim" class="filter-input"></div>
+                    <div class="filter-group"><label>Tela</label><select id="logFilterTela" class="filter-input" style="width: 200px;"></select></div>
                     <button class="btn-action" onclick="window.carregarLogs()" style="height: 35px;">Filtrar Histórico</button>
                 </div>
                 <div class="matrix-container">
@@ -151,33 +145,40 @@
         let originalMatrixState = [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            // A ordem aqui importa: primeiro verificamos o modo leitura para ajustar a UI
+            verificarModoLeitura();
+            
+            // Depois inicializamos os componentes que restaram
             configurarAbas();
             carregarStatus();
             initMatrix();
-            verificarModoLeitura();
             popularSelectRoles();
             popularFiltroTelas();
             setarDatasIniciais();
         });
 
+        // CORREÇÃO: Verifica se o elemento existe antes de tentar preencher
         function popularSelectRoles() {
             const select = document.getElementById('addRole');
-            select.innerHTML = ROLES.map(r => `<option value="${r}">${r}</option>`).join('');
+            if (select) {
+                select.innerHTML = ROLES.map(r => `<option value="${r}">${r}</option>`).join('');
+            }
         }
 
         function setarDatasIniciais() {
             const hoje = new Date();
             const trintaDiasAtras = new Date();
             trintaDiasAtras.setDate(hoje.getDate() - 30);
-            
-            document.getElementById('logDateFim').value = hoje.toISOString().split('T')[0];
-            document.getElementById('logDateInicio').value = trintaDiasAtras.toISOString().split('T')[0];
+            const elFim = document.getElementById('logDateFim');
+            const elIni = document.getElementById('logDateInicio');
+            if(elFim) elFim.value = hoje.toISOString().split('T')[0];
+            if(elIni) elIni.value = trintaDiasAtras.toISOString().split('T')[0];
         }
 
         async function popularFiltroTelas() {
-            const { data } = await supabaseClient.from('modulos_sistema').select('label').order('label');
             const select = document.getElementById('logFilterTela');
-            // Adicionamos as telas fixas e as do banco
+            if (!select) return;
+            const { data } = await supabaseClient.from('modulos_sistema').select('label').order('label');
             const telas = ['Administração', 'Login', ...data.map(m => m.label)];
             select.innerHTML = telas.map(t => `<option value="${t}">${t}</option>`).join('');
         }
@@ -190,6 +191,7 @@
                     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
                     if (btn.dataset.tab === 'usuarios') carregarUsuarios();
                     if (btn.dataset.tab === 'logs') window.carregarLogs();
+                    if (btn.dataset.tab === 'permissoes') initMatrix();
                 };
             });
         }
@@ -197,15 +199,17 @@
         async function carregarStatus() {
             const { count: u } = await supabaseClient.from('usuarios_sistema').select('*', { count: 'exact', head: true });
             const { count: m } = await supabaseClient.from('modulos_sistema').select('*', { count: 'exact', head: true });
-            document.getElementById('metaInfo').innerHTML = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div style="padding: 15px; background: #eff6ff; border-radius: 8px; border: 1px solid #dbeafe;"><span style="display:block; font-size:11px; color:#1d4ed8; font-weight:700;">USUÁRIOS ATIVOS</span><strong style="font-size:24px;">${u || 0}</strong></div><div style="padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #dcfce7;"><span style="display:block; font-size:11px; color:#15803d; font-weight:700;">MÓDULOS NO SISTEMA</span><strong style="font-size:24px;">${m || 0}</strong></div></div>`;
+            const elMeta = document.getElementById('metaInfo');
+            if(elMeta) elMeta.innerHTML = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div style="padding: 15px; background: #eff6ff; border-radius: 8px; border: 1px solid #dbeafe;"><span style="display:block; font-size:11px; color:#1d4ed8; font-weight:700;">USUÁRIOS ATIVOS</span><strong style="font-size:24px;">${u || 0}</strong></div><div style="padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #dcfce7;"><span style="display:block; font-size:11px; color:#15803d; font-weight:700;">MÓDULOS NO SISTEMA</span><strong style="font-size:24px;">${m || 0}</strong></div></div>`;
         }
 
         // --- MATRIZ ---
         async function initMatrix() {
             const header = document.getElementById('headerRoles');
             const body = document.getElementById('permTableBody');
+            if(!header || !body) return;
             header.innerHTML = '<th>Módulo</th>';
-            ROLES.forEach(r => { header.innerHTML += `<th colspan="3" style="border-left: 1px solid #e2e8f0; width: 180px;">${r}<br><span style="font-size:8px; color:#94a3b8">VER | EDITAR | DETALHES</span></th>`; });
+            ROLES.forEach(r => { header.innerHTML += `<th colspan="3" style="border-left: 1px solid #e2e8f0; width: 180px;">${r}<br><span style="font-size:8px; color:#94a3b8">V | E | D</span></th>`; });
 
             const { data: mods } = await supabaseClient.from('modulos_sistema').select('*').order('ordem');
             const { data: acc } = await supabaseClient.from('acesso_modulos').select('*');
@@ -237,34 +241,37 @@
                 cb.parentElement.classList.toggle('highlight-change', isDirty);
                 if (isDirty) dirty = true;
             });
-            document.getElementById('btnSalvarPermissoes').disabled = !dirty;
-            document.getElementById('btnCancelarMatriz').style.display = dirty ? 'block' : 'none';
+            const btnS = document.getElementById('btnSalvarPermissoes');
+            const btnC = document.getElementById('btnCancelarMatriz');
+            if(btnS) btnS.disabled = !dirty;
+            if(btnC) btnC.style.display = dirty ? 'block' : 'none';
         };
 
         window.cancelarAlteracoesMatriz = () => initMatrix();
 
         document.getElementById('btnSalvarPermissoes').onclick = async () => {
-            const sess = JSON.parse(localStorage.getItem('rh_session'));
             const payload = [];
+            const sess = JSON.parse(localStorage.getItem('rh_session'));
             ROLES.forEach(role => {
                 document.querySelectorAll(`.matrix-cb[data-role="${role}"][data-type="ver"]:checked`).forEach(cb => {
-                    const modId = cb.dataset.modulo;
+                    const mid = cb.dataset.modulo;
                     payload.push({
-                        role, modulo_id: parseInt(modId),
-                        pode_editar: document.querySelector(`.matrix-cb[data-modulo="${modId}"][data-role="${role}"][data-type="editar"]`).checked,
-                        ver_detalhes: document.querySelector(`.matrix-cb[data-modulo="${modId}"][data-role="${role}"][data-type="detalhes"]`).checked
+                        role, modulo_id: parseInt(mid),
+                        pode_editar: document.querySelector(`.matrix-cb[data-modulo="${mid}"][data-role="${role}"][data-type="editar"]`).checked,
+                        ver_detalhes: document.querySelector(`.matrix-cb[data-modulo="${mid}"][data-role="${role}"][data-type="detalhes"]`).checked
                     });
                 });
             });
             await supabaseClient.from('acesso_modulos').delete().neq('id', 0);
             if (payload.length > 0) await supabaseClient.from('acesso_modulos').insert(payload);
-            await DBHandler.registrarLog(sess.user, "ATUALIZAR_MATRIZ", "Alterou permissões do sistema", "Administração");
+            await DBHandler.registrarLog(sess.user, "ATUALIZAR_MATRIZ", "Atualizou matriz de acesso", "Administração");
             alert("Matriz Salva!"); initMatrix();
         };
 
         // --- USUÁRIOS ---
         async function carregarUsuarios() {
             const body = document.getElementById('listaUsuariosBody');
+            if(!body) return;
             body.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
             const { data } = await supabaseClient.from('usuarios_sistema').select('*').order('nome');
             body.innerHTML = '';
@@ -285,8 +292,10 @@
                 s.classList.toggle('highlight-change', isDirty);
                 if (isDirty) dirty = true;
             });
-            document.getElementById('btnSalvarUsuarios').disabled = !dirty;
-            document.getElementById('btnCancelarUsuarios').style.display = dirty ? 'block' : 'none';
+            const btnS = document.getElementById('btnSalvarUsuarios');
+            const btnC = document.getElementById('btnCancelarUsuarios');
+            if(btnS) btnS.disabled = !dirty;
+            if(btnC) btnC.style.display = dirty ? 'block' : 'none';
         };
 
         window.cancelarAlteracoesUsuarios = () => carregarUsuarios();
@@ -321,31 +330,22 @@
             }
         };
 
-        // --- LOGS COM FILTRO DE PERÍODO E TELA ---
         window.carregarLogs = async () => {
             const body = document.getElementById('listaLogsBody');
+            if(!body) return;
             const dataInicio = document.getElementById('logDateInicio').value;
             const dataFim = document.getElementById('logDateFim').value;
             const telaFiltro = document.getElementById('logFilterTela').value;
 
-            body.innerHTML = '<tr><td colspan="5">Buscando histórico filtrado...</td></tr>';
-
-            // Criamos a query base
+            body.innerHTML = '<tr><td colspan="5">Buscando histórico...</td></tr>';
             let query = supabaseClient.from('logs_sistema').select('*');
-
-            // Aplicamos os filtros de período (considerando início e fim do dia)
             if (dataInicio) query = query.gte('created_at', `${dataInicio}T00:00:00`);
             if (dataFim) query = query.lte('created_at', `${dataFim}T23:59:59`);
-            
-            // Aplicamos o filtro obrigatório de tela
             query = query.eq('tela', telaFiltro);
 
             const { data, error } = await query.order('created_at', { ascending: false }).limit(200);
-
             if (error) { body.innerHTML = `<tr><td colspan="5">Erro: ${error.message}</td></tr>`; return; }
-            
-            body.innerHTML = data.length ? '' : '<tr><td colspan="5">Nenhum registro encontrado para este período nesta tela.</td></tr>';
-            
+            body.innerHTML = data.length ? '' : '<tr><td colspan="5">Nenhum registro para este período.</td></tr>';
             data?.forEach(l => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td style="text-align:left; color:#64748b">${new Date(l.created_at).toLocaleString()}</td><td><span class="role-badge" style="background:#f1f5f9; color:#475569">${l.usuario}</span></td><td><strong>${l.acao}</strong></td><td style="text-align:left; font-size:10px;">${l.detalhes}</td><td><small>${l.tela || '-'}</small></td>`;
