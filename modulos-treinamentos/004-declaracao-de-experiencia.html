@@ -997,8 +997,8 @@ window.gerarAtestado = (id) => {
         <html lang="pt-BR">
         <head>
             <meta charset="UTF-8">
-            <title>Atestado de Equivalência - ${nomeColaborador}</title>
-            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&display=swap" rel="stylesheet">
+            <title>Atestado - ${nomeColaborador}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=Pinyon+Script&display=swap" rel="stylesheet">
             <style>
                 :root { 
                     --slate-900: #0f172a; 
@@ -1008,55 +1008,54 @@ window.gerarAtestado = (id) => {
 
                 body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: flex-start; background: #f1f5f9; font-family: 'Montserrat', sans-serif; }
                 
-                /* CANVAS - AJUSTE DE ALTURA PARA PÁGINA ÚNICA */
+                /* CANVAS - ALTURA RECALCULADA PARA PÁGINA ÚNICA */
                 .canvas { 
-                    width: 297mm; height: 205mm; /* Altura reduzida para segurança na impressão */
+                    width: 297mm; height: 200mm; /* Reduzido para garantir margem de segurança */
                     background: #fff; position: relative; 
-                    display: flex; flex-direction: column; padding: 35px 70px; box-sizing: border-box; 
+                    display: flex; flex-direction: column; padding: 30px 70px; box-sizing: border-box; 
                     border: 1px solid #e2e8f0;
                 }
 
-                /* Barra lateral sóbria do atestado */
                 .canvas::before {
                     content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 10px;
                     background: var(--slate-900);
                 }
 
-                .header { border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 30px; }
+                .header { border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 20px; }
                 .header p { font-size: 10px; font-weight: 800; color: var(--gray-muted); text-transform: uppercase; margin: 0; letter-spacing: 2px; }
-                .header h1 { font-size: 30px; font-weight: 900; color: var(--slate-900); margin: 2px 0 0 0; text-transform: uppercase; }
+                .header h1 { font-size: 28px; font-weight: 900; color: var(--slate-900); margin: 2px 0 0 0; text-transform: uppercase; }
 
-                /* Texto principal sem o "flex:1" que causava o buraco */
-                .text-body { font-size: 19px; color: #334155; line-height: 1.6; text-align: justify; margin-bottom: 20px; }
+                .text-body { font-size: 18px; color: #334155; line-height: 1.5; text-align: justify; margin-bottom: 10px; }
                 .text-body b { color: var(--slate-900); }
 
-                /* Caixa de Parecer Técnico compacta */
+                .student-name { font-family: 'Pinyon Script', cursive; font-size: 62px; color: var(--slate-900); margin: 0; text-align: center; }
+
                 .parecer-box { 
                     background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0; 
-                    padding: 20px; margin: 20px 0; font-size: 15px; color: #475569;
+                    padding: 15px; margin: 15px 0; font-size: 14px; color: #475569;
                 }
-                .parecer-box b { font-size: 11px; text-transform: uppercase; color: var(--gray-muted); display: block; margin-bottom: 5px; }
+                .parecer-box b { font-size: 10px; text-transform: uppercase; color: var(--gray-muted); display: block; margin-bottom: 3px; }
 
-                /* Rodapé colado ao conteúdo para evitar 2ª página */
+                /* RODAPÉ COMPACTO */
                 .footer { 
                     margin-top: auto; display: flex; justify-content: space-between; 
-                    align-items: flex-end; padding-top: 20px; border-top: 1px solid #f1f5f9;
+                    align-items: flex-end; padding-top: 15px; border-top: 1px solid #f1f5f9;
                 }
 
                 .footer-col { width: 250px; }
-                .f-label { font-size: 10px; font-weight: 700; color: var(--gray-muted); text-transform: uppercase; margin-bottom: 5px; }
-                .f-value { font-size: 15px; font-weight: 700; color: var(--slate-900); border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+                .f-label { font-size: 9px; font-weight: 700; color: var(--gray-muted); text-transform: uppercase; margin-bottom: 4px; }
+                .f-value { font-size: 14px; font-weight: 700; color: var(--slate-900); border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
 
-                .seal-svg { width: 95px; height: 95px; }
+                .seal-svg { width: 85px; height: 85px; }
 
                 .signature-box { text-align: right; width: 300px; }
-                .platform-name { font-weight: 900; font-size: 20px; color: var(--slate-900); letter-spacing: 1px; margin-bottom: 5px; }
-                .platform-badge { font-size: 10px; color: var(--gray-muted); line-height: 1.4; border-right: 4px solid var(--gold); padding-right: 12px; }
+                .platform-name { font-weight: 900; font-size: 18px; color: var(--slate-900); margin-bottom: 3px; }
+                .platform-badge { font-size: 9px; color: var(--gray-muted); line-height: 1.3; border-right: 4px solid var(--gold); padding-right: 12px; }
 
                 @media print { 
                     body { background: white; } 
                     @page { size: A4 landscape; margin: 0; } 
-                    .canvas { border: none; height: 210mm; padding: 30px 60px; } 
+                    .canvas { border: none; height: 210mm; padding: 25px 60px; } 
                 }
             </style>
         </head>
@@ -1068,13 +1067,14 @@ window.gerarAtestado = (id) => {
                 </div>
 
                 <div class="text-body">
-                    Declaramos para os devidos fins que o colaborador <b>${nomeColaborador}</b> teve sua experiência profissional 
-                    validada pela plataforma <b>Academy</b>, demonstrando proficiência prática integral nos temas abordados pelo treinamento:
+                    Declaramos para os devidos fins que o colaborador:
+                    <div class="student-name">${nomeColaborador}</div>
+                    teve sua experiência profissional validada pela plataforma <b>Academy</b>, demonstrando proficiência prática integral nos temas abordados pelo treinamento:
                     <br><br>
-                    <span style="font-size: 24px; font-weight: 900; color: var(--slate-900); letter-spacing: 1px;">${nomeCurso.toUpperCase()}</span>
+                    <span style="font-size: 22px; font-weight: 900; color: var(--slate-900);">${nomeCurso.toUpperCase()}</span>
                     <br><br>
-                    Esta validação reconhece que o histórico profissional do colaborador supre a necessidade de realização do curso supracitado, 
-                    conferindo-lhe o status de <b>Habilitado</b> por equivalência de funções e liberando-o das obrigatoriedades acadêmicas sobre o tema.
+                    Esta validação reconhece que o histórico do colaborador supre a necessidade de treinamento formal, 
+                    conferindo-lhe o status de <b>Habilitado</b> por equivalência de funções.
                 </div>
 
                 <div class="parecer-box">
@@ -1091,9 +1091,9 @@ window.gerarAtestado = (id) => {
                     <div class="seal-svg">
                         <svg viewBox="0 0 100 100">
                             <circle cx="50" cy="50" r="45" fill="none" stroke="#c5a059" stroke-width="2"/>
-                            <path id="pathT" fill="none" d="M 50,50 m -33,0 a 33,33 0 1,1 66,0 a 33,33 0 1,1 -66,0" />
+                            <path id="txtP" fill="none" d="M 50,50 m -33,0 a 33,33 0 1,1 66,0 a 33,33 0 1,1 -66,0" />
                             <text font-size="6.5" font-weight="700" fill="#c5a059">
-                                <textPath xlink:href="#pathT">EDESOFT ACADEMY • OFFICIAL VALIDATION • VERIFIED</textPath>
+                                <textPath xlink:href="#txtP">EDESOFT ACADEMY • OFFICIAL VALIDATION • VERIFIED</textPath>
                             </text>
                             <path d="M42 50 L48 56 L58 44" fill="none" stroke="#c5a059" stroke-width="3" stroke-linecap="round"/>
                         </svg>
@@ -1109,7 +1109,7 @@ window.gerarAtestado = (id) => {
                     </div>
                 </div>
 
-                <div style="position:absolute; bottom:15px; width: 100%; left:0; text-align: center; color:#cbd5e1; font-size:9px; font-family:monospace; opacity: 0.6;">
+                <div style="position:absolute; bottom:12px; width: 100%; left:0; text-align: center; color:#cbd5e1; font-size:8px; font-family:monospace; opacity: 0.6;">
                     VERIFICATION HASH: ${btoa(hashUnico).substring(0, 24).toUpperCase()}
                 </div>
             </div>
@@ -1118,12 +1118,12 @@ window.gerarAtestado = (id) => {
     `);
     janelaAtestado.document.close();
 };
-
         
         
     </script>
 </body>
 </html>
+
 
 
 
