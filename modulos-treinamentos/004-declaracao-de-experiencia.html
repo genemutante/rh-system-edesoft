@@ -494,8 +494,9 @@ tr:hover td { background: #fcfdfe; }
       ✔️
     </div>
     <div class="text-box">
-      <strong>Notório Saber</strong><br>
-      <small>Experiência prática comprovada.</small>
+      <strong>Atestado Técnico</strong>
+<small>Validação por experiência profissional.</small>
+
     </div>
   </button>
 
@@ -539,9 +540,9 @@ tr:hover td { background: #fcfdfe; }
 
                     <div id="form-atestado" style="display: none;">
                         <span class="field-label">Justificativa do RH</span>
-                        <textarea id="notorioJustificativa" class="input-full" style="height: 120px;" placeholder="Detalhes da validação..."></textarea>
+                        <textarea id="atestadoJustificativa" class="input-full" style="height: 120px;" placeholder="Detalhes da validação..."></textarea>
                         <span class="field-label">Aprovador Técnico</span>
-                        <input type="text" id="notorioAprovador" class="input-full" placeholder="Nome do gestor responsável">
+                        <input type="text" id="atestadoAprovador" class="input-full" placeholder="Nome do gestor responsável">
                         <div id="rhCheckRow" style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
                             <input type="checkbox" id="checkRH" style="width: 18px; height: 18px;">
                             <span style="font-size: 11px; font-weight: 700;">REGISTRO VALIDADO CONFORME POLÍTICA INTERNA.</span>
@@ -645,7 +646,7 @@ function renderizarTabela(lista) {
 <button class="btn-action" 
         style="background: #f8fafc; color: #1e293b; border: 1px solid #cbd5e1;" 
         onclick="${item.atividade_externa === 'ATESTADO' ? `window.gerarAtestado(${item.id})` : `window.gerarCertificado(${item.id})`}">
-    ${item.atividade_externa === 'NOTORIO' ? '⚖️' : '📜'}
+    ${item.atividade_externa === 'ATESTADO' ? '⚖️' : '📜'}
 </button>
 
                 ${session.role === 'ADMIN' ? `
@@ -721,8 +722,8 @@ window.salvarHomologacao = async () => {
         atividade_externa: currentMode,
         data_homologacao: currentMode === 'CERTIFICADO' ? document.getElementById('certData').value : new Date().toISOString().split('T')[0],
         nota: (currentMode === 'CERTIFICADO' && !document.getElementById('checkNotaNA').checked) ? document.getElementById('certNota').value : null,
-        instrutor: currentMode === 'CERTIFICADO' ? document.getElementById('certInstituicao').value : document.getElementById('notorioAprovador').value,
-        observacoes: currentMode === 'NOTORIO' ? document.getElementById('notorioJustificativa').value : document.getElementById('certLink').value
+        instrutor: currentMode === 'CERTIFICADO' ? document.getElementById('certInstituicao').value : document.getElementById('atestadoAprovador').value,
+        observacoes: currentMode === 'ATESTADO' ? document.getElementById('atestadoJustificativa').value : document.getElementById('certLink').value
     };
 
     try {
@@ -802,8 +803,8 @@ window.salvarHomologacao = async () => {
             document.getElementById('selectTreinamento').value = d.treinamento_id;
 if (d.atividade_externa === 'ATESTADO') {
     window.selectMode('atestado');
-                document.getElementById('notorioJustificativa').value = d.observacoes || "";
-                document.getElementById('notorioAprovador').value = d.instrutor || "";
+                document.getElementById('atestadoJustificativa').value = d.observacoes || "";
+                document.getElementById('atestadoAprovador').value = d.instrutor || "";
             } else {
                 window.selectMode('certificado', document.getElementById('btn-cert'));
                 document.getElementById('certInstituicao').value = d.instrutor;
@@ -1128,6 +1129,7 @@ window.gerarAtestado = (id) => {
     </script>
 </body>
 </html>
+
 
 
 
