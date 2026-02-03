@@ -10,202 +10,125 @@
       --primary: #3b82f6;
       --primary-hover: #2563eb;
       --border: #e2e8f0;
-      --bg: #f8fafc;
+      --bg: #f9fafb;
       --text: #0f172a;
       --muted: #64748b;
+      --card-bg: #ffffff;
     }
 
-    * {
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
+    * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
-    body {
-      margin: 0;
-      background-color: #f1f5f9;
-      color: var(--text);
-    }
+    body { margin: 0; background-color: var(--bg); color: var(--text); }
 
-    .container {
-      display: flex;
-      height: 100vh;
-    }
+    .container { display: flex; min-height: 100vh; }
 
     .sidebar {
-      width: 320px;
-      padding: 24px;
-      background: white;
-      border-right: 1px solid var(--border);
+      width: 320px; padding: 32px 24px; background: var(--card-bg);
+      border-right: 1px solid var(--border); display: flex;
+      flex-direction: column; gap: 24px;
     }
 
-    .content {
-      flex: 1;
-      padding: 32px;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-    }
+    .content { flex: 1; padding: 40px; display: flex; flex-direction: column; }
 
-    h2 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 24px;
-    }
+    h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
 
-    .section {
-      margin-bottom: 32px;
-    }
-
-    label {
-      font-size: 14px;
-      font-weight: 600;
-      display: block;
-      margin-bottom: 6px;
-    }
+    label { font-size: 14px; font-weight: 600; display: block; margin-bottom: 6px; }
 
     select, input, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: white;
+      width: 100%; padding: 10px 12px; font-size: 14px;
+      border: 1px solid var(--border); border-radius: 6px; background: white;
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 100px;
+    textarea { resize: vertical; min-height: 100px; }
+
+    .section-title {
+      text-transform: uppercase; font-size: 12px; font-weight: 700;
+      color: var(--muted); margin-bottom: 12px;
     }
 
     .evidence-button {
-      display: flex;
-      align-items: center;
-      padding: 14px 16px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: white;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--text);
-      transition: 0.2s;
+      padding: 14px 16px; border: 1px solid var(--border);
+      border-radius: 8px; background: var(--card-bg); cursor: pointer;
+      font-weight: 600; font-size: 14px; margin-bottom: 12px;
+      transition: 0.2s; display: flex; flex-direction: column;
     }
 
     .evidence-button.active {
-      border-color: var(--primary);
-      background: #eff6ff;
-      color: var(--primary);
+      border-color: var(--primary); background: #eff6ff; color: var(--primary);
     }
 
     .warning-box {
-      background: #fff7ed;
-      border: 1px solid #fcd34d;
-      color: #92400e;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 20px;
+      background: #fff7ed; border: 1px solid #fde68a; color: #92400e;
+      padding: 12px 16px; border-radius: 8px; font-size: 13px;
+      font-weight: 600; margin-bottom: 20px;
     }
 
-    .row {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
+    .row { display: flex; gap: 16px; margin-bottom: 20px; }
+    .row > div { flex: 1; }
 
-    .row > div {
-      flex: 1;
-    }
+    .checkbox { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-top: 16px; }
 
-    .checkbox {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      margin-top: 16px;
-    }
+    .footer { margin-top: auto; display: flex; justify-content: flex-end; gap: 12px; padding-top: 40px; }
 
-    .footer {
-      margin-top: auto;
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      font-weight: 600;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .btn-outline {
-      background: white;
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
+    .btn { padding: 10px 24px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; }
+    .btn-outline { background: white; border: 1px solid var(--border); color: var(--muted); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="sidebar">
-    <h2>1. Configuração</h2>
-    <div class="section">
-      <label for="colaborador">Colaborador</label>
-      <select id="colaborador">
-        <option>Selecione o colaborador...</option>
-      </select>
-    </div>
-    <div class="section">
-      <label for="curso">Curso / Competência</label>
-      <select id="curso">
-        <option>Selecione o curso...</option>
-      </select>
-    </div>
-    <h2>2. Tipo de Evidência</h2>
     <div>
-      <div class="evidence-button active" onclick="selectMode('certificado', this)">📄 Certificado<br><small>Curso realizado em outra instituição.</small></div>
-      <div class="evidence-button" onclick="selectMode('notorio', this)">✅ Notório Saber<br><small>Experiência prática comprovada.</small></div>
+      <div class="section-title">1. Configuração</div>
+      <label>Colaborador</label>
+      <select id="selectColaborador"><option value="">Carregando...</option></select>
+      
+      <label style="margin-top: 16px;">Curso / Competência</label>
+      <select id="selectTreinamento"><option value="">Carregando...</option></select>
+    </div>
+    <div>
+      <div class="section-title">2. Tipo de Evidência</div>
+      <div id="btn-cert" class="evidence-button active" onclick="selectMode('certificado', this)">
+        <span style="font-weight: 600; color: inherit;">Certificado</span>
+        <small style="font-weight: 400; color: var(--muted);">Curso realizado em outra instituição.</small>
+      </div>
+      <div id="btn-notorio" class="evidence-button" onclick="selectMode('notorio', this)">
+        <span style="font-weight: 600; color: inherit;">Notório Saber</span>
+        <small style="font-weight: 400; color: var(--muted);">Experiência prática comprovada.</small>
+      </div>
     </div>
   </div>
+
   <div class="content">
     <h2>3. Detalhes da Homologação</h2>
 
-    <!-- CERTIFICADO -->
     <div id="form-certificado">
       <div class="row">
         <div>
           <label>Instituição Emissora</label>
-          <input type="text" placeholder="Ex: Alura, Udemy, Coursera...">
+          <input type="text" id="certInstituicao" placeholder="Ex: Alura, Udemy, Coursera...">
         </div>
       </div>
       <div class="row">
         <div>
           <label>Nome no Certificado</label>
-          <input type="text" placeholder="Nome exato do curso...">
+          <input type="text" id="certNome" placeholder="Nome exato do curso...">
         </div>
         <div>
           <label>Data de Conclusão</label>
-          <input type="date">
+          <input type="date" id="certData">
         </div>
       </div>
       <div class="row">
         <div>
           <label>Link de Validação (URL)</label>
-          <input type="url" placeholder="https://...">
+          <input type="url" id="certLink" placeholder="https://...">
+          <small style="color: var(--muted); font-size: 12px;">Cole o link público para visualizar o certificado.</small>
         </div>
       </div>
     </div>
 
-    <!-- NOTÓRIO SABER -->
     <div id="form-notorio" style="display: none">
       <div class="warning-box">
         <strong>Processo de Auditoria:</strong> Esta declaração será enviada para validação técnica do gestor da área.
@@ -213,33 +136,116 @@
       <div class="row">
         <div style="flex: 1">
           <label>Contexto de Aplicação</label>
-          <textarea placeholder="Descreva em quais projetos ou situações reais você utilizou este conhecimento..."></textarea>
+          <textarea id="notorioContexto" placeholder="Descreva em quais projetos você utilizou este conhecimento..."></textarea>
         </div>
       </div>
       <div class="row">
         <div>
           <label>Ferramentas Relacionadas</label>
-          <input type="text" placeholder="Ex: Jira, Excel, SAP, Python...">
+          <input type="text" id="notorioFerramentas" placeholder="Ex: Jira, Excel, SAP, Python...">
         </div>
       </div>
       <div class="checkbox">
-        <input type="checkbox" id="declaracao">
-        <label for="declaracao">Declaro ser verdade que possuo o conhecimento necessário para esta competência.</label>
+        <input type="checkbox" id="declaracaoCheck">
+        <label for="declaracaoCheck">Declaro ser verdade que possuo o conhecimento necessário.</label>
       </div>
     </div>
 
     <div class="footer">
-      <button class="btn btn-outline">Cancelar</button>
-      <button class="btn btn-primary">Registrar Homologação</button>
+      <button class="btn btn-outline" onclick="window.location.reload()">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvar" onclick="salvarHomologacao()">Registrar Homologação</button>
     </div>
   </div>
 </div>
-<script>
-  function selectMode(mode, el) {
+
+<script type="module">
+  import { DBHandler } from '../bd-treinamentos/db-handler.js';
+
+  let currentMode = 'certificado';
+  let COLABORADORES = [];
+  let TREINAMENTOS = [];
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await carregarDadosIniciais();
+  });
+
+  async function carregarDadosIniciais() {
+    try {
+      // 1. Carregar Colaboradores
+      COLABORADORES = await DBHandler.listarColaboradores({ somenteAtivos: true });
+      const selColab = document.getElementById('selectColaborador');
+      selColab.innerHTML = '<option value="">Selecione o colaborador...</option>' + 
+          COLABORADORES.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+
+      // 2. Carregar Cursos
+      const dados = await DBHandler.carregarDadosIniciais();
+      TREINAMENTOS = dados.treinamentos;
+      const selTreino = document.getElementById('selectTreinamento');
+      selTreino.innerHTML = '<option value="">Selecione o curso...</option>' + 
+          TREINAMENTOS.map(t => `<option value="${t.id}">${t.nome}</option>`).join('');
+    } catch (e) { console.error(e); }
+  }
+
+  window.selectMode = function(mode, el) {
+    currentMode = mode;
     document.querySelectorAll('.evidence-button').forEach(btn => btn.classList.remove('active'));
     el.classList.add('active');
     document.getElementById('form-certificado').style.display = (mode === 'certificado') ? 'block' : 'none';
     document.getElementById('form-notorio').style.display = (mode === 'notorio') ? 'block' : 'none';
+  }
+
+  window.salvarHomologacao = async function() {
+    const session = JSON.parse(localStorage.getItem('rh_session'));
+    const btn = document.getElementById('btnSalvar');
+
+    const payload = {
+      colaborador_id: document.getElementById('selectColaborador').value,
+      treinamento_id: document.getElementById('selectTreinamento').value,
+      tipo_evidencia: currentMode.toUpperCase(),
+      usuario_registro: session.user,
+      status: 'Pendente Validação',
+      // Campos Certificado
+      instituicao: document.getElementById('certInstituicao').value,
+      nome_certificado: document.getElementById('certNome').value,
+      data_homologacao: document.getElementById('certData').value || new Date().toISOString().slice(0,10),
+      link_validacao: document.getElementById('certLink').value,
+      // Campos Notório
+      observacoes: currentMode === 'notorio' ? 
+        `Contexto: ${document.getElementById('notorioContexto').value}\nFerramentas: ${document.getElementById('notorioFerramentas').value}` : null
+    };
+
+    if (!payload.colaborador_id || !payload.treinamento_id) {
+      alert("Selecione o colaborador e o curso.");
+      return;
+    }
+
+    if (currentMode === 'notorio' && !document.getElementById('declaracaoCheck').checked) {
+      alert("Você precisa marcar a declaração de veracidade.");
+      return;
+    }
+
+    try {
+      btn.disabled = true;
+      btn.textContent = "Gravando...";
+
+      // Salvamento no Banco (Usando a tabela de homologações criada anteriormente)
+      await DBHandler.salvarHomologacao(payload);
+
+      // Registro do Log de Auditoria
+      const colabNome = document.getElementById('selectColaborador').options[document.getElementById('selectColaborador').selectedIndex].text;
+      const treinoNome = document.getElementById('selectTreinamento').options[document.getElementById('selectTreinamento').selectedIndex].text;
+      
+      const detalhesLog = `• Colaborador: ${colabNome}\n• Competência: ${treinoNome}\n• Tipo: ${currentMode.toUpperCase()}\n• Detalhe: ${payload.instituicao || 'Notório Saber'}`;
+      
+      await DBHandler.registrarLog(session.user, "HOMOLOGAR_COMPETENCIA", detalhesLog, "Homologação de Competência");
+
+      alert("Homologação registrada com sucesso!");
+      window.location.reload();
+    } catch (e) {
+      alert("Erro ao salvar: " + e.message);
+      btn.disabled = false;
+      btn.textContent = "Registrar Homologação";
+    }
   }
 </script>
 </body>
