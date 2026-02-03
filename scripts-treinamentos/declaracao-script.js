@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Se for novo registro, define a data de hoje como padrão
         const hoje = new Date().toISOString().split('T')[0];
         if (document.getElementById('certData')) document.getElementById('certData').value = hoje;
+        if (document.getElementById('notorioData')) document.getElementById('notorioData').value = hoje;
     }
 });
 
@@ -55,12 +56,12 @@ async function carregarParaEdicao(id) {
         document.getElementById('selectColaborador').value = dado.colaborador_id;
         document.getElementById('selectTreinamento').value = dado.treinamento_id;
 
-        // Define o modo e preenche detalhes específicos
-        if (dado.atividade_externa === 'NOTORIO') {
+        // Define o modo e preenche detalhes específicos baseado na coluna atividade_externa
+        if (dado.atividade_externa === 'NOTORIO' || dado.atividade_externa === 'NOTORIO_SABER') {
             window.selectMode('notorio', document.getElementById('btn-notorio'));
             document.getElementById('notorioJustificativa').value = dado.observacoes || "";
             document.getElementById('notorioAprovador').value = dado.instrutor || "";
-            document.getElementById('checkRH').checked = true;
+            if(document.getElementById('checkRH')) document.getElementById('checkRH').checked = true;
         } else {
             window.selectMode('certificado', document.getElementById('btn-cert'));
             document.getElementById('certInstituicao').value = dado.instrutor || "";
@@ -68,22 +69,19 @@ async function carregarParaEdicao(id) {
             
             // Lógica de Instituição Edesoft
             const isEdesoft = dado.instrutor === "Edesoft-Academy";
-            document.getElementById('checkEdesoft').checked = isEdesoft;
-            window.toggleInstituicao(isEdesoft);
+            if(document.getElementById('checkEdesoft')) {
+                document.getElementById('checkEdesoft').checked = isEdesoft;
+                window.toggleInstituicao(isEdesoft);
+            }
 
             // Lógica de Nota N/A
             if (dado.nota !== null && dado.nota !== undefined) {
-                document.getElementById('checkNotaNA').checked = false;
+                if(document.getElementById('checkNotaNA')) document.getElementById('checkNotaNA').checked = false;
                 window.toggleNota(false);
                 document.getElementById('certNota').value = dado.nota;
             } else {
-                document.getElementById('checkNotaNA').checked = true;
+                if(document.getElementById('checkNotaNA')) document.getElementById('checkNotaNA').checked = true;
                 window.toggleNota(true);
-            }
-            
-            // Observações (Link)
-            if (dado.observacoes && dado.observacoes.startsWith("Link: ")) {
-                document.getElementById('certLink').value = dado.observacoes.replace("Link: ", "");
             }
         }
     } catch (e) {
@@ -95,7 +93,7 @@ function travarLeitura() {
     const elementos = document.querySelectorAll('input, select, textarea, .evidence-button');
     elementos.forEach(el => {
         el.disabled = true;
-        el.style.pointerEvents = 'none'; // Garante que botões de evidência não sejam clicáveis
+        el.style.pointerEvents = 'none'; // Impede cliques em botões estilizados
     });
     
     const btnSalvar = document.getElementById('btnSalvar');
@@ -105,7 +103,7 @@ function travarLeitura() {
     if (title) title.textContent += " (Modo Leitura)";
 }
 
-// --- FUNÇÕES EXPOSTAS PARA O WINDOW ---
+// --- FUNÇÕES EXPOSTAS PARA O WINDOW (Essenciais para o HTML acessar via onclick/onchange) ---
 
 window.selectMode = function(mode, el) {
     currentMode = mode.toUpperCase();
@@ -150,13 +148,14 @@ window.salvarHomologacao = async function() {
 
     if (!idColab || !idTreino) return alert("Por favor, selecione o Colaborador e a Competência.");
 
+    // Montagem do Payload conforme a tabela public.homologacoes_treinamentos
     let payload = {
         colaborador_id: idColab,
         treinamento_id: idTreino,
         usuario_registro: session.user,
         status: 'Homologado (RH)',
         atividade_externa: currentMode,
-        validade_meses: 12 // Padrão conforme schema
+        validade_meses: 12 
     };
 
     if (currentMode === 'CERTIFICADO') {
@@ -166,7 +165,7 @@ window.salvarHomologacao = async function() {
         payload.nota = notaNA ? null : document.getElementById('certNota').value;
         payload.observacoes = document.getElementById('certLink').value ? `Link: ${document.getElementById('certLink').value}` : null;
     } else {
-        if (!document.getElementById('checkRH').checked) return alert("É necessário confirmar a validação técnica para Notório Saber.");
+        if (!document.getElementById('checkRH').checked) return alert("É necessário confirmar a validação técnica.");
         payload.data_homologacao = new Date().toISOString().split('T')[0];
         payload.instrutor = document.getElementById('notorioAprovador').value;
         payload.nota = null;
@@ -177,10 +176,10 @@ window.salvarHomologacao = async function() {
         btn.disabled = true;
         btn.textContent = "Gravando...";
 
-        // Se currentId existir, o DBHandler realizará o UPDATE (Upsert)
+        // Realiza o Upsert (Update se currentId existir, senão Insert)
         await DBHandler.salvarHomologacao({ ...(currentId ? { id: currentId } : {}), ...payload });
 
-        // Geração do rastro de auditoria
+        // Log de Auditoria
         const colabNome = document.getElementById('selectColaborador').options[document.getElementById('selectColaborador').selectedIndex].text;
         const treinoNome = document.getElementById('selectTreinamento').options[document.getElementById('selectTreinamento').selectedIndex].text;
         const acaoLog = currentId ? "EDITAR_HOMOLOGACAO" : "CRIAR_HOMOLOGACAO";
@@ -190,6 +189,7 @@ window.salvarHomologacao = async function() {
         await DBHandler.registrarLog(session.user, acaoLog, detalhesLog, "Homologação de Competência");
 
         alert("✅ Homologação processada com sucesso!");
+        // Retorna para a lista após salvar
         window.location.href = '004-lista-homologacoes.html';
         
     } catch (e) {
