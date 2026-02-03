@@ -998,108 +998,119 @@ window.gerarAtestado = (id) => {
         <head>
             <meta charset="UTF-8">
             <title>Atestado de Equivalência - ${nomeColaborador}</title>
-            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Pinyon+Script&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&display=swap" rel="stylesheet">
             <style>
                 :root { 
-                    --primary-slate: #1e293b; 
-                    --accent-gold: #c5a059; 
-                    --text-muted: #64748b; 
+                    --slate-900: #0f172a; 
+                    --gold: #c5a059; 
+                    --gray-muted: #64748b; 
                 }
 
-                body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f1f5f9; font-family: 'Montserrat', sans-serif; }
+                body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: flex-start; background: #f1f5f9; font-family: 'Montserrat', sans-serif; }
                 
-                /* CANVAS COMPACTO */
+                /* CANVAS - AJUSTE DE ALTURA PARA PÁGINA ÚNICA */
                 .canvas { 
-                    width: 297mm; height: 210mm; background: #fff; position: relative; 
-                    display: flex; flex-direction: column; padding: 40px 80px; box-sizing: border-box; 
-                    overflow: hidden; border: 1px solid #e2e8f0;
+                    width: 297mm; height: 205mm; /* Altura reduzida para segurança na impressão */
+                    background: #fff; position: relative; 
+                    display: flex; flex-direction: column; padding: 35px 70px; box-sizing: border-box; 
+                    border: 1px solid #e2e8f0;
                 }
 
+                /* Barra lateral sóbria do atestado */
                 .canvas::before {
-                    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
-                    background: var(--primary-slate);
+                    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 10px;
+                    background: var(--slate-900);
                 }
 
-                .header { border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 25px; }
-                .header h1 { font-size: 32px; font-weight: 900; color: var(--primary-slate); margin: 0; letter-spacing: -1px; text-transform: uppercase; }
-                .header p { font-size: 11px; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; margin: 2px 0 0 0; letter-spacing: 2px; }
+                .header { border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 30px; }
+                .header p { font-size: 10px; font-weight: 800; color: var(--gray-muted); text-transform: uppercase; margin: 0; letter-spacing: 2px; }
+                .header h1 { font-size: 30px; font-weight: 900; color: var(--slate-900); margin: 2px 0 0 0; text-transform: uppercase; }
 
-                .main-text { flex: 1; font-size: 19px; color: #334155; line-height: 1.5; text-align: justify; }
-                .main-text b { color: var(--primary-slate); }
+                /* Texto principal sem o "flex:1" que causava o buraco */
+                .text-body { font-size: 19px; color: #334155; line-height: 1.6; text-align: justify; margin-bottom: 20px; }
+                .text-body b { color: var(--slate-900); }
 
-                .student-name { font-family: 'Pinyon Script', cursive; font-size: 68px; color: var(--primary-slate); margin: 10px 0; text-align: center; }
+                /* Caixa de Parecer Técnico compacta */
+                .parecer-box { 
+                    background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0; 
+                    padding: 20px; margin: 20px 0; font-size: 15px; color: #475569;
+                }
+                .parecer-box b { font-size: 11px; text-transform: uppercase; color: var(--gray-muted); display: block; margin-bottom: 5px; }
 
-                /* RODAPÉ INTEGRADO (IGUAL AO CERTIFICADO) */
-                .bottom-row { 
-                    width: 100%; display: flex; justify-content: space-between; 
-                    align-items: flex-end; margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 20px;
+                /* Rodapé colado ao conteúdo para evitar 2ª página */
+                .footer { 
+                    margin-top: auto; display: flex; justify-content: space-between; 
+                    align-items: flex-end; padding-top: 20px; border-top: 1px solid #f1f5f9;
                 }
 
-                .info-block { width: 220px; text-align: left; }
-                .info-label { font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
-                .info-value { font-size: 14px; font-weight: 600; color: var(--primary-slate); border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; }
+                .footer-col { width: 250px; }
+                .f-label { font-size: 10px; font-weight: 700; color: var(--gray-muted); text-transform: uppercase; margin-bottom: 5px; }
+                .f-value { font-size: 15px; font-weight: 700; color: var(--slate-900); border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
 
-                .seal-container { width: 90px; height: 90px; }
+                .seal-svg { width: 95px; height: 95px; }
 
-                .platform-signature { text-align: right; width: 280px; }
-                .platform-name { font-weight: 900; font-size: 18px; color: var(--primary-slate); letter-spacing: 1px; margin-bottom: 4px; }
-                .platform-badge { font-size: 10px; color: var(--text-muted); line-height: 1.4; border-right: 4px solid var(--accent-gold); padding-right: 12px; }
+                .signature-box { text-align: right; width: 300px; }
+                .platform-name { font-weight: 900; font-size: 20px; color: var(--slate-900); letter-spacing: 1px; margin-bottom: 5px; }
+                .platform-badge { font-size: 10px; color: var(--gray-muted); line-height: 1.4; border-right: 4px solid var(--gold); padding-right: 12px; }
 
                 @media print { 
                     body { background: white; } 
                     @page { size: A4 landscape; margin: 0; } 
-                    .canvas { border: none; padding: 30px 60px; height: 210mm; } 
+                    .canvas { border: none; height: 210mm; padding: 30px 60px; } 
                 }
             </style>
         </head>
         <body onload="window.print()">
             <div class="canvas">
                 <div class="header">
+                    <p>Edesoft Academy // Gestão de Talentos</p>
                     <h1>Atestado de Equivalência Técnica</h1>
-                    <p>Validação de Proficiência por Experiência Profissional</p>
                 </div>
 
-                <div class="main-text">
-                    A <b>Edesoft Academy</b> atesta que o colaborador:
-                    <div class="student-name">${nomeColaborador}</div>
-                    demonstrou domínio prático integral e competência técnica avançada no tema <b>${nomeCurso.toUpperCase()}</b>. 
-                    Esta homologação baseia-se na análise técnica de seu histórico profissional e evidências de desempenho, 
-                    conferindo-lhe equivalência plena à conclusão do treinamento regular nesta plataforma.
-                    
-                    <div style="margin-top: 20px; font-size: 15px; color: #64748b; font-style: italic; border-left: 3px solid #e2e8f0; padding-left: 15px;">
-                        <b>Parecer de Homologação:</b> "${justificativa}"
-                    </div>
+                <div class="text-body">
+                    Declaramos para os devidos fins que o colaborador <b>${nomeColaborador}</b> teve sua experiência profissional 
+                    validada pela plataforma <b>Academy</b>, demonstrando proficiência prática integral nos temas abordados pelo treinamento:
+                    <br><br>
+                    <span style="font-size: 24px; font-weight: 900; color: var(--slate-900); letter-spacing: 1px;">${nomeCurso.toUpperCase()}</span>
+                    <br><br>
+                    Esta validação reconhece que o histórico profissional do colaborador supre a necessidade de realização do curso supracitado, 
+                    conferindo-lhe o status de <b>Habilitado</b> por equivalência de funções e liberando-o das obrigatoriedades acadêmicas sobre o tema.
                 </div>
 
-                <div class="bottom-row">
-                    <div class="info-block">
-                        <div class="info-value">${dataEmissao}</div>
-                        <div class="info-label">Data de Emissão</div>
+                <div class="parecer-box">
+                    <b>Parecer de Homologação:</b>
+                    "${justificativa}"
+                </div>
+
+                <div class="footer">
+                    <div class="footer-col">
+                        <div class="f-value">São Paulo, ${dataEmissao}</div>
+                        <div class="f-label">Data de Emissão</div>
                     </div>
 
-                    <div class="seal-container">
+                    <div class="seal-svg">
                         <svg viewBox="0 0 100 100">
                             <circle cx="50" cy="50" r="45" fill="none" stroke="#c5a059" stroke-width="2"/>
-                            <path id="pathSeal" fill="none" d="M 50,50 m -33,0 a 33,33 0 1,1 66,0 a 33,33 0 1,1 -66,0" />
+                            <path id="pathT" fill="none" d="M 50,50 m -33,0 a 33,33 0 1,1 66,0 a 33,33 0 1,1 -66,0" />
                             <text font-size="6.5" font-weight="700" fill="#c5a059">
-                                <textPath xlink:href="#pathSeal">EDESOFT ACADEMY • OFFICIAL VALIDATION • VERIFIED</textPath>
+                                <textPath xlink:href="#pathT">EDESOFT ACADEMY • OFFICIAL VALIDATION • VERIFIED</textPath>
                             </text>
                             <path d="M42 50 L48 56 L58 44" fill="none" stroke="#c5a059" stroke-width="3" stroke-linecap="round"/>
                         </svg>
                     </div>
 
-                    <div class="platform-signature">
+                    <div class="signature-box">
                         <div class="platform-name">EDESOFT ACADEMY</div>
                         <div class="platform-badge">
-                            Validado via <strong>Management System</strong>.<br>
-                            ID de Registro: <strong>${hashUnico}</strong><br>
-                            Este documento substitui a necessidade de certificação acadêmica.
+                            Validado via <strong>Edesoft Management System</strong>.<br>
+                            ID de Autenticidade: <strong>${hashUnico}</strong><br>
+                            Validação técnica confirmada por avaliadores especialistas.
                         </div>
                     </div>
                 </div>
 
-                <div style="position:absolute; bottom:15px; width: 100%; left:0; text-align: center; color:#cbd5e1; font-size:9px; font-family:monospace;">
-                    AUTHENTICITY HASH: ${btoa(hashUnico).substring(0, 24).toUpperCase()}
+                <div style="position:absolute; bottom:15px; width: 100%; left:0; text-align: center; color:#cbd5e1; font-size:9px; font-family:monospace; opacity: 0.6;">
+                    VERIFICATION HASH: ${btoa(hashUnico).substring(0, 24).toUpperCase()}
                 </div>
             </div>
         </body>
@@ -1113,6 +1124,7 @@ window.gerarAtestado = (id) => {
     </script>
 </body>
 </html>
+
 
 
 
