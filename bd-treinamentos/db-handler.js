@@ -296,7 +296,7 @@ async registrarLog(usuario, acao, detalhes, tela) {
 
     async reativarColaborador(id) {
         return this.atualizarColaborador(id, { data_demissao: null, motivo_demissao: null });
-    }
+    },
 
 // Dentro do export const DBHandler = { ... }
 
@@ -339,6 +339,7 @@ async registrarLog(usuario, acao, detalhes, tela) {
 
     
 };
+
 
 
 
