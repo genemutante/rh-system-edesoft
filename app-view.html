@@ -59,6 +59,20 @@
     appearance: none;            /* Remove o estilo nativo (opcional) */
 }
 
+.module-switcher {
+    position: relative;
+}
+
+.module-switcher::after {
+    content: "▼";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #f1f5f9;
+    font-size: 10px;
+    pointer-events: none;
+}
 
         .header-right { display: flex; align-items: center; gap: 16px; }
         .user-profile {
@@ -287,4 +301,5 @@
     </script>
 </body>
 </html>
+
 
