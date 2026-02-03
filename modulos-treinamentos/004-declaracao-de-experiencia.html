@@ -998,64 +998,63 @@ window.gerarAtestado = (id) => {
         <head>
             <meta charset="UTF-8">
             <title>Atestado - ${nomeColaborador}</title>
-            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=Pinyon+Script&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Pinyon+Script&display=swap" rel="stylesheet">
             <style>
-                :root { 
-                    --slate-900: #0f172a; 
-                    --gold: #c5a059; 
-                    --gray-muted: #64748b; 
-                }
-
-                body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: flex-start; background: #f1f5f9; font-family: 'Montserrat', sans-serif; }
+                :root { --slate: #0f172a; --gold: #c5a059; --gray: #64748b; }
                 
-                /* CANVAS - ALTURA RECALCULADA PARA PÁGINA ÚNICA */
+                body { margin: 0; padding: 0; background: #eee; display: flex; justify-content: center; align-items: flex-start; }
+                
+                /* CANVAS - ALTURA REDUZIDA PARA SEGURANÇA TOTAL */
                 .canvas { 
-                    width: 297mm; height: 200mm; /* Reduzido para garantir margem de segurança */
-                    background: #fff; position: relative; 
-                    display: flex; flex-direction: column; padding: 30px 70px; box-sizing: border-box; 
-                    border: 1px solid #e2e8f0;
+                    width: 297mm; height: 200mm; background: #fff; position: relative; 
+                    display: flex; flex-direction: column; padding: 30px 80px; box-sizing: border-box; 
+                    font-family: 'Montserrat', sans-serif;
                 }
 
                 .canvas::before {
                     content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 10px;
-                    background: var(--slate-900);
+                    background: var(--slate);
                 }
 
-                .header { border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 20px; }
-                .header p { font-size: 10px; font-weight: 800; color: var(--gray-muted); text-transform: uppercase; margin: 0; letter-spacing: 2px; }
-                .header h1 { font-size: 28px; font-weight: 900; color: var(--slate-900); margin: 2px 0 0 0; text-transform: uppercase; }
+                .header { margin-bottom: 20px; }
+                .header p { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; margin: 0; letter-spacing: 2px; }
+                .header h1 { font-size: 26px; font-weight: 900; color: var(--slate); margin: 0; text-transform: uppercase; }
 
-                .text-body { font-size: 18px; color: #334155; line-height: 1.5; text-align: justify; margin-bottom: 10px; }
-                .text-body b { color: var(--slate-900); }
+                .text-body { font-size: 18px; color: #334155; line-height: 1.4; text-align: justify; }
+                .text-body b { color: var(--slate); }
 
-                .student-name { font-family: 'Pinyon Script', cursive; font-size: 62px; color: var(--slate-900); margin: 0; text-align: center; }
+                /* NOME RESTAURADO - PINYON SCRIPT */
+                .student-name { 
+                    font-family: 'Pinyon Script', cursive; font-size: 80px; 
+                    color: var(--slate); margin: 10px 0; text-align: center; line-height: 1;
+                }
 
                 .parecer-box { 
                     background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0; 
-                    padding: 15px; margin: 15px 0; font-size: 14px; color: #475569;
+                    padding: 12px 20px; margin: 15px 0; font-size: 14px; color: #475569;
                 }
-                .parecer-box b { font-size: 10px; text-transform: uppercase; color: var(--gray-muted); display: block; margin-bottom: 3px; }
+                .parecer-box b { font-size: 10px; text-transform: uppercase; color: var(--gray); display: block; margin-bottom: 2px; }
 
-                /* RODAPÉ COMPACTO */
+                /* RODAPÉ SEM VÃO EXCESSIVO */
                 .footer { 
                     margin-top: auto; display: flex; justify-content: space-between; 
                     align-items: flex-end; padding-top: 15px; border-top: 1px solid #f1f5f9;
                 }
 
                 .footer-col { width: 250px; }
-                .f-label { font-size: 9px; font-weight: 700; color: var(--gray-muted); text-transform: uppercase; margin-bottom: 4px; }
-                .f-value { font-size: 14px; font-weight: 700; color: var(--slate-900); border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+                .f-label { font-size: 9px; font-weight: 700; color: var(--gray); text-transform: uppercase; }
+                .f-value { font-size: 14px; font-weight: 700; color: var(--slate); border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; margin-bottom: 4px; }
 
                 .seal-svg { width: 85px; height: 85px; }
 
                 .signature-box { text-align: right; width: 300px; }
-                .platform-name { font-weight: 900; font-size: 18px; color: var(--slate-900); margin-bottom: 3px; }
-                .platform-badge { font-size: 9px; color: var(--gray-muted); line-height: 1.3; border-right: 4px solid var(--gold); padding-right: 12px; }
+                .platform-name { font-weight: 900; font-size: 18px; color: var(--slate); margin-bottom: 2px; }
+                .platform-badge { font-size: 9px; color: var(--gray); line-height: 1.3; border-right: 4px solid var(--gold); padding-right: 12px; }
 
                 @media print { 
                     body { background: white; } 
                     @page { size: A4 landscape; margin: 0; } 
-                    .canvas { border: none; height: 210mm; padding: 25px 60px; } 
+                    .canvas { border: none; height: 210mm; } 
                 }
             </style>
         </head>
@@ -1068,11 +1067,14 @@ window.gerarAtestado = (id) => {
 
                 <div class="text-body">
                     Declaramos para os devidos fins que o colaborador:
-                    <div class="student-name">${nomeColaborador}</div>
+                </div>
+                
+                <div class="student-name">${nomeColaborador}</div>
+                
+                <div class="text-body">
                     teve sua experiência profissional validada pela plataforma <b>Academy</b>, demonstrando proficiência prática integral nos temas abordados pelo treinamento:
-                    <br><br>
-                    <span style="font-size: 22px; font-weight: 900; color: var(--slate-900);">${nomeCurso.toUpperCase()}</span>
-                    <br><br>
+                    <br>
+                    <span style="font-size: 22px; font-weight: 900; color: var(--slate); display:block; margin: 10px 0;">${nomeCurso.toUpperCase()}</span>
                     Esta validação reconhece que o histórico do colaborador supre a necessidade de treinamento formal, 
                     conferindo-lhe o status de <b>Habilitado</b> por equivalência de funções.
                 </div>
@@ -1103,14 +1105,14 @@ window.gerarAtestado = (id) => {
                         <div class="platform-name">EDESOFT ACADEMY</div>
                         <div class="platform-badge">
                             Validado via <strong>Edesoft Management System</strong>.<br>
-                            ID de Autenticidade: <strong>${hashUnico}</strong><br>
-                            Validação técnica confirmada por avaliadores especialistas.
+                            ID: <strong>${hashUnico}</strong><br>
+                            Documento com validade institucional plena.
                         </div>
                     </div>
                 </div>
 
-                <div style="position:absolute; bottom:12px; width: 100%; left:0; text-align: center; color:#cbd5e1; font-size:8px; font-family:monospace; opacity: 0.6;">
-                    VERIFICATION HASH: ${btoa(hashUnico).substring(0, 24).toUpperCase()}
+                <div style="position:absolute; bottom:12px; width: 100%; left:0; text-align: center; color:#cbd5e1; font-size:8px; font-family:monospace; opacity: 0.5;">
+                    AUTHENTICITY HASH: ${btoa(hashUnico).substring(0, 24).toUpperCase()}
                 </div>
             </div>
         </body>
@@ -1123,6 +1125,7 @@ window.gerarAtestado = (id) => {
     </script>
 </body>
 </html>
+
 
 
 
