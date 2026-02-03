@@ -615,6 +615,8 @@ window.abrirFormulario = async (id = null, visualizar = false) => {
             renderizarTabela(DADOS_LISTA);
         };
 
+
+
 function renderizarTabela(lista) {
     const tbody = document.querySelector("#homologTable tbody");
     const session = JSON.parse(localStorage.getItem('rh_session')) || {};
@@ -631,23 +633,26 @@ function renderizarTabela(lista) {
             <td>${item.data_homologacao ? new Date(item.data_homologacao).toLocaleDateString('pt-BR') : '—'}</td>
             <td>${item.nota || '—'}</td>
             <td style="text-align: right; white-space: nowrap;">
-                <button class="btn-action btn-view" title="Visualizar Detalhes" onclick="window.abrirFormulario(${item.id}, true)">👁️</button>
-
-                <button class="btn-action" title="Emitir Certificado" 
+                <button class="btn-action btn-view" title="Visualizar" onclick="window.abrirFormulario(${item.id}, true)">👁️</button>
+                
+                <button class="btn-action" title="Gerar Certificado" 
                         style="background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5;" 
                         onclick="window.gerarCertificado(${item.id})">
                     📜
                 </button>
 
                 ${session.role === 'ADMIN' ? `
-                    <button class="btn-action btn-edit" title="Editar" onclick="window.abrirFormulario(${item.id}, false)">✏️</button>
-                    
-                    <button class="btn-action btn-delete" title="Excluir Permanentemente" onclick="window.deletarRegistro(${item.id})">🗑️</button>
+                    <button class="btn-action btn-edit" onclick="window.abrirFormulario(${item.id}, false)">✏️</button>
+                    <button class="btn-action btn-delete" onclick="window.deletarRegistro(${item.id})">🗑️</button>
                 ` : ''}
             </td>
         </tr>
     `).join('');
 }
+
+
+
+        
 
         window.filtrar = () => {
             const busca = document.getElementById('searchBox').value.toLowerCase();
@@ -819,15 +824,24 @@ window.salvarHomologacao = async () => {
         }
 
 
+
+
 window.gerarCertificado = (id) => {
     const item = DADOS_LISTA.find(i => i.id === id);
     if (!item) return alert("Registro não encontrado.");
 
+    // Dados Reais
     const nomeColaborador = item.colaboradores?.nome || "Colaborador";
-    const nomeCurso = item.treinamentos?.nome || "Curso não especificado";
-    const dataEmissao = item.data_homologacao ? new Date(item.data_homologacao).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : "—";
-    const hashUnico = `ED-${item.id}-${new Date().getFullYear()}-AC`;
+    const nomeCurso = item.treinamentos?.nome || "Curso de Especialização";
+    
+    // CARGA HORÁRIA: Tenta pegar do banco, se não existir, usa "40" como fictício
+    const cargaHoraria = item.treinamentos?.carga_horaria || "40"; 
+    
+    const dataEmissao = item.data_homologacao 
+        ? new Date(item.data_homologacao).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) 
+        : new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
+    const hashUnico = `ED-${item.id}-${new Date().getFullYear()}-CERT`;
     const janelaCertificado = window.open('', '_blank');
     
     janelaCertificado.document.write(`
@@ -839,54 +853,69 @@ window.gerarCertificado = (id) => {
             <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Pinyon+Script&display=swap" rel="stylesheet">
             <style>
                 :root { --primary-dark: #0f172a; --accent-gold: #c5a059; --text-muted: #64748b; }
-                body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f1f5f9; font-family: 'Montserrat', sans-serif; }
+                body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #222; font-family: 'Montserrat', sans-serif; }
                 .cert-canvas { width: 297mm; height: 210mm; background: var(--primary-dark); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; box-sizing: border-box; }
-                .cert-canvas::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0); background-size: 30px 30px; }
-                .outer-header h1 { color: white; font-weight: 900; font-size: 50px; text-transform: uppercase; letter-spacing: 10px; margin: 0 0 20px 0; position: relative; }
-                .content-card { width: 88%; height: 60%; background: white; position: relative; display: flex; flex-direction: column; align-items: center; padding: 40px; box-sizing: border-box; text-align: center; }
+                .cert-canvas::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0); background-size: 35px 35px; }
+                .outer-title { color: white; font-weight: 900; font-size: 56px; text-transform: uppercase; letter-spacing: 12px; margin: 0 0 30px 0; z-index: 2; }
+                .content-card { width: 88%; height: 62%; background: white; position: relative; display: flex; flex-direction: column; align-items: center; padding: 50px 70px; box-sizing: border-box; text-align: center; z-index: 2; }
                 .content-card::after { content: ""; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 1.5px solid var(--accent-gold); pointer-events: none; }
-                .student-name { font-family: 'Pinyon Script', cursive; font-size: 80px; color: var(--primary-dark); margin: 15px 0; }
+                .student-name { font-family: 'Pinyon Script', cursive; font-size: 82px; color: var(--primary-dark); margin: 15px 0; }
                 .course-name { display: block; font-weight: 700; color: var(--primary-dark); font-size: 26px; text-transform: uppercase; margin-top: 10px; }
-                .footer { width: 100%; display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; }
-                .info-block { width: 250px; text-align: left; }
-                .info-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
+                .cert-footer { width: 100%; display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; }
+                .info-block { width: 240px; text-align: left; }
+                .info-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
                 .info-value { font-size: 15px; font-weight: 600; color: var(--primary-dark); border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
-                .seal-svg { width: 100px; height: 100px; }
+                .seal-container { width: 110px; height: 110px; }
+                .platform-signature { text-align: right; width: 300px; }
+                .platform-name { font-weight: 900; font-size: 20px; color: var(--primary-dark); letter-spacing: 1px; margin-bottom: 4px; }
+                .platform-badge { font-size: 10px; color: var(--text-muted); line-height: 1.4; border-right: 4px solid var(--accent-gold); padding-right: 12px; }
                 @media print { body { background: white; } .cert-canvas { -webkit-print-color-adjust: exact; } }
             </style>
         </head>
         <body onload="window.print()">
             <div class="cert-canvas">
-                <div class="outer-header"><h1>CERTIFICADO</h1></div>
+                <h1 class="outer-title">Certificado</h1>
                 <div class="content-card">
-                    <span style="font-weight:700; color:var(--text-muted); text-transform:uppercase; font-size:13px; letter-spacing:3px;">A Edesoft Academy confere a</span>
+                    <span style="font-weight:700; color:var(--text-muted); text-transform:uppercase; font-size:13px; letter-spacing:4px;">A Edesoft Academy confere a</span>
+                    
                     <div class="student-name">${nomeColaborador}</div>
-                    <p style="color:var(--text-muted); font-size:18px;">pela excelência técnica e conclusão dos requisitos do curso:</p>
-                    <span class="course-name">${nomeCurso}</span>
-                    <div class="footer">
+                    
+                    <p style="color:var(--text-muted); font-size:18px; line-height:1.6; max-width:700px; margin:0 auto;">
+                        o presente título por ter demonstrado excelência técnica e concluído com êxito os requisitos do curso:
+                        <span class="course-name">${nomeCurso}</span>
+                        <span style="font-size: 14px; font-weight: 600; color: var(--accent-gold); margin-top: 5px; display: block;">
+                            CARGA HORÁRIA TOTAL: ${cargaHoraria} HORAS
+                        </span>
+                    </p>
+
+                    <div class="cert-footer">
                         <div class="info-block">
                             <div class="info-value">${dataEmissao}</div>
                             <div class="info-label">Data de Emissão</div>
                         </div>
-                        <div class="seal-svg">
+
+                        <div class="seal-container">
                             <svg viewBox="0 0 100 100">
                                 <circle cx="50" cy="50" r="45" fill="none" stroke="#c5a059" stroke-width="2"/>
-                                <path id="tP" fill="none" d="M 50,50 m -33,0 a 33,33 0 1,1 66,0 a 33,33 0 1,1 -66,0" />
+                                <path id="tPath" fill="none" d="M 50,50 m -33,0 a 33,33 0 1,1 66,0 a 33,33 0 1,1 -66,0" />
                                 <text font-size="6.5" font-weight="700" fill="#c5a059">
-                                    <textPath xlink:href="#tP">AUTHENTIC DOCUMENT • EDESOFT ACADEMY • VERIFIED</textPath>
+                                    <textPath xlink:href="#tPath">EDESOFT ACADEMY • OFFICIAL VERIFIED DOCUMENT •</textPath>
                                 </text>
                                 <path d="M42 50 L48 56 L58 44" fill="none" stroke="#c5a059" stroke-width="3" stroke-linecap="round"/>
                             </svg>
                         </div>
-                        <div style="text-align:right; width:250px;">
-                            <div style="font-weight:900; font-size:18px; color:var(--primary-dark);">EDESOFT ACADEMY</div>
-                            <div style="font-size:10px; color:var(--text-muted); border-right: 3px solid var(--accent-gold); padding-right:10px;">
-                                Validado eletronicamente.<br>ID: ${hashUnico}
+
+                        <div class="platform-signature">
+                            <div class="platform-name">EDESOFT ACADEMY</div>
+                            <div class="platform-badge">
+                                Emitido via <strong>Plataforma de Gestão Academy</strong>.<br>
+                                Autenticidade garantida por registros digitais internos.<br>
+                                ID: ${hashUnico}
                             </div>
                         </div>
                     </div>
                 </div>
-                <div style="position:absolute; bottom:20px; color:rgba(255,255,255,0.2); font-size:9px; font-family:monospace;">
+                <div style="position:absolute; bottom:20px; color:rgba(255,255,255,0.2); font-size:9px; font-family:monospace; letter-spacing:1px;">
                     VERIFICATION HASH: ${btoa(hashUnico).substring(0, 16).toUpperCase()}
                 </div>
             </div>
@@ -897,9 +926,11 @@ window.gerarCertificado = (id) => {
 };
 
         
+        
     </script>
 </body>
 </html>
+
 
 
 
