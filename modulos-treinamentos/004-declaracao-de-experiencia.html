@@ -984,11 +984,10 @@ window.gerarAtestado = (id) => {
     const nomeColaborador = item.colaboradores?.nome || "Colaborador";
     const nomeCurso = item.treinamentos?.nome || "Competência Técnica";
     const dataEmissao = item.data_homologacao 
-        ? new Date(item.data_homologacao).toLocaleDateString('pt-BR') 
-        : new Date().toLocaleDateString('pt-BR');
+        ? new Date(item.data_homologacao).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) 
+        : new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
     
     const justificativa = item.observacoes || "Experiência prática comprovada no exercício das funções.";
-    const aprovador = item.instrutor || "Gestão de Talentos";
     const hashUnico = `ED-VAL-${item.id}-${new Date().getFullYear()}`;
 
     const janelaAtestado = window.open('', '_blank');
@@ -998,88 +997,109 @@ window.gerarAtestado = (id) => {
         <html lang="pt-BR">
         <head>
             <meta charset="UTF-8">
-            <title>Validação de Competência - ${nomeColaborador}</title>
-            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+            <title>Atestado de Equivalência - ${nomeColaborador}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Pinyon+Script&display=swap" rel="stylesheet">
             <style>
-                body { margin: 0; padding: 0; background: #f1f5f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Montserrat', sans-serif; }
+                :root { 
+                    --primary-slate: #1e293b; 
+                    --accent-gold: #c5a059; 
+                    --text-muted: #64748b; 
+                }
+
+                body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f1f5f9; font-family: 'Montserrat', sans-serif; }
                 
+                /* CANVAS COMPACTO */
                 .canvas { 
                     width: 297mm; height: 210mm; background: #fff; position: relative; 
-                    display: flex; flex-direction: column; padding: 80px; box-sizing: border-box; 
-                    border: 1px solid #e2e8f0;
+                    display: flex; flex-direction: column; padding: 40px 80px; box-sizing: border-box; 
+                    overflow: hidden; border: 1px solid #e2e8f0;
                 }
 
-                /* Detalhe lateral de cor para diferenciar do certificado */
                 .canvas::before {
-                    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 12px;
-                    background: #64748b; /* Cinza sóbrio */
+                    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+                    background: var(--primary-slate);
                 }
 
-                .header { border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 40px; }
-                .header h1 { font-size: 28px; color: #0f172a; margin: 0; letter-spacing: -1px; }
-                .header p { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; margin: 5px 0 0 0; }
+                .header { border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 25px; }
+                .header h1 { font-size: 32px; font-weight: 900; color: var(--primary-slate); margin: 0; letter-spacing: -1px; text-transform: uppercase; }
+                .header p { font-size: 11px; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; margin: 2px 0 0 0; letter-spacing: 2px; }
 
-                .main-text { flex: 1; font-size: 20px; color: #334155; line-height: 1.6; }
-                .main-text b { color: #0f172a; }
+                .main-text { flex: 1; font-size: 19px; color: #334155; line-height: 1.5; text-align: justify; }
+                .main-text b { color: var(--primary-slate); }
 
-                .box-evidencia { 
-                    margin: 40px 0; padding: 25px; background: #f8fafc; 
-                    border-radius: 8px; border-left: 4px solid #cbd5e1;
+                .student-name { font-family: 'Pinyon Script', cursive; font-size: 68px; color: var(--primary-slate); margin: 10px 0; text-align: center; }
+
+                /* RODAPÉ INTEGRADO (IGUAL AO CERTIFICADO) */
+                .bottom-row { 
+                    width: 100%; display: flex; justify-content: space-between; 
+                    align-items: flex-end; margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 20px;
                 }
-                .box-evidencia small { display: block; color: #94a3b8; text-transform: uppercase; font-weight: 800; font-size: 10px; margin-bottom: 10px; }
 
-                .footer { display: flex; justify-content: space-between; align-items: flex-end; }
-                
-                .signature-box { text-align: left; }
-                .line { border-top: 2px solid #0f172a; width: 250px; margin-bottom: 8px; }
-                .label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+                .info-block { width: 220px; text-align: left; }
+                .info-label { font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+                .info-value { font-size: 14px; font-weight: 600; color: var(--primary-slate); border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; }
 
-                .seal-simple {
-                    border: 2px solid #f1f5f9; padding: 15px; border-radius: 8px;
-                    color: #cbd5e1; font-weight: 800; font-size: 12px; text-transform: uppercase;
-                }
+                .seal-container { width: 90px; height: 90px; }
+
+                .platform-signature { text-align: right; width: 280px; }
+                .platform-name { font-weight: 900; font-size: 18px; color: var(--primary-slate); letter-spacing: 1px; margin-bottom: 4px; }
+                .platform-badge { font-size: 10px; color: var(--text-muted); line-height: 1.4; border-right: 4px solid var(--accent-gold); padding-right: 12px; }
 
                 @media print { 
                     body { background: white; } 
                     @page { size: A4 landscape; margin: 0; } 
-                    .canvas { border: none; } 
+                    .canvas { border: none; padding: 30px 60px; height: 210mm; } 
                 }
             </style>
         </head>
         <body onload="window.print()">
             <div class="canvas">
                 <div class="header">
-                    <p>Edesoft Academy // Gestão de Talentos</p>
                     <h1>Atestado de Equivalência Técnica</h1>
+                    <p>Validação de Proficiência por Experiência Profissional</p>
                 </div>
 
                 <div class="main-text">
-                    Declaramos para os devidos fins que o colaborador <b>${nomeColaborador}</b> teve sua experiência profissional 
-                    validada pela plataforma <b>Academy</b>, demonstrando proficiência prática integral nos temas abordados pelo treinamento:
-                    <br><br>
-                    <b>${nomeCurso.toUpperCase()}</b>
-                    <br><br>
-                    Esta validação reconhece que o histórico profissional do colaborador supre a necessidade de realização do curso supracitado, 
-                    conferindo-lhe o status de <b>Habilitado</b> por equivalência de funções.
+                    A <b>Edesoft Academy</b> atesta que o colaborador:
+                    <div class="student-name">${nomeColaborador}</div>
+                    demonstrou domínio prático integral e competência técnica avançada no tema <b>${nomeCurso.toUpperCase()}</b>. 
+                    Esta homologação baseia-se na análise técnica de seu histórico profissional e evidências de desempenho, 
+                    conferindo-lhe equivalência plena à conclusão do treinamento regular nesta plataforma.
+                    
+                    <div style="margin-top: 20px; font-size: 15px; color: #64748b; font-style: italic; border-left: 3px solid #e2e8f0; padding-left: 15px;">
+                        <b>Parecer de Homologação:</b> "${justificativa}"
+                    </div>
                 </div>
 
-                <div class="box-evidencia">
-                    <small>Fundamentação da Homologação</small>
-                    "${justificativa}"
+                <div class="bottom-row">
+                    <div class="info-block">
+                        <div class="info-value">${dataEmissao}</div>
+                        <div class="info-label">Data de Emissão</div>
+                    </div>
+
+                    <div class="seal-container">
+                        <svg viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#c5a059" stroke-width="2"/>
+                            <path id="pathSeal" fill="none" d="M 50,50 m -33,0 a 33,33 0 1,1 66,0 a 33,33 0 1,1 -66,0" />
+                            <text font-size="6.5" font-weight="700" fill="#c5a059">
+                                <textPath xlink:href="#pathSeal">EDESOFT ACADEMY • OFFICIAL VALIDATION • VERIFIED</textPath>
+                            </text>
+                            <path d="M42 50 L48 56 L58 44" fill="none" stroke="#c5a059" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+
+                    <div class="platform-signature">
+                        <div class="platform-name">EDESOFT ACADEMY</div>
+                        <div class="platform-badge">
+                            Validado via <strong>Management System</strong>.<br>
+                            ID de Registro: <strong>${hashUnico}</strong><br>
+                            Este documento substitui a necessidade de certificação acadêmica.
+                        </div>
+                    </div>
                 </div>
 
-                <div class="footer">
-                    <div class="signature-box">
-                        <div style="font-size: 16px; font-weight: 700; margin-bottom: 5px;">${aprovador}</div>
-                        <div class="line"></div>
-                        <div class="label">Validação Institucional</div>
-                    </div>
-
-                    <div style="text-align: right;">
-                        <div class="seal-simple">Autenticidade Verificada</div>
-                        <div class="label" style="margin-top: 10px;">ID: ${hashUnico}</div>
-                        <div class="label" style="font-size: 9px; font-weight: 400;">Emissão: ${dataEmissao}</div>
-                    </div>
+                <div style="position:absolute; bottom:15px; width: 100%; left:0; text-align: center; color:#cbd5e1; font-size:9px; font-family:monospace;">
+                    AUTHENTICITY HASH: ${btoa(hashUnico).substring(0, 24).toUpperCase()}
                 </div>
             </div>
         </body>
@@ -1088,12 +1108,12 @@ window.gerarAtestado = (id) => {
     janelaAtestado.document.close();
 };
 
-
         
         
     </script>
 </body>
 </html>
+
 
 
 
