@@ -989,6 +989,34 @@ window.gerarAtestado = (id) => {
     const justificativa = item.observacoes || "Experiência prática comprovada no exercício das funções.";
     const hashUnico = `ED-VAL-${item.id}-${new Date().getFullYear()}`;
 
+    // --- LÓGICA DE GÊNERO: VERSÕES COMPLETAS DO TEXTO ---
+    const genero = (item.colaboradores?.genero || "M").toUpperCase();
+    let textoPrincipalHTML = "";
+
+    if (genero === 'F' || genero === 'FEMININO') {
+        textoPrincipalHTML = `
+            <div class="text-body">
+                Declaramos para os devidos fins que a <b>colaboradora ${nomeColaborador}</b> teve sua experiência profissional 
+                validada pela plataforma <b>Academy</b>, demonstrando proficiência prática integral nos temas abordados pelo treinamento:
+                <br><br>
+                <span style="font-size: 20px; font-weight: 800; color: var(--slate-900); letter-spacing: 1px;">${nomeCurso.toUpperCase()}</span>
+                <br><br>
+                Esta validação reconhece que o histórico profissional da colaboradora supre a necessidade de realização do curso supracitado, 
+                conferindo-lhe o status de <b>Habilitada</b> por equivalência de funções.
+            </div>`;
+    } else {
+        textoPrincipalHTML = `
+            <div class="text-body">
+                Declaramos para os devidos fins que o <b>colaborador ${nomeColaborador}</b> teve sua experiência profissional 
+                validada pela plataforma <b>Academy</b>, demonstrando proficiência prática integral nos temas abordados pelo treinamento:
+                <br><br>
+                <span style="font-size: 20px; font-weight: 800; color: var(--slate-900); letter-spacing: 1px;">${nomeCurso.toUpperCase()}</span>
+                <br><br>
+                Esta validação reconhece que o histórico profissional do colaborador supre a necessidade de realização do curso supracitado, 
+                conferindo-lhe o status de <b>Habilitado</b> por equivalência de funções.
+            </div>`;
+    }
+
     const janelaAtestado = window.open('', '_blank');
 
     janelaAtestado.document.write(`
@@ -1002,18 +1030,15 @@ window.gerarAtestado = (id) => {
                 :root { --slate-900: #0f172a; --gold: #c5a059; --gray-muted: #64748b; }
 
                 body {
-                    margin: 0;
-                    padding: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: flex-start;
-                    background: #f1f5f9;
+                    margin: 0; padding: 0;
+                    display: flex; justify-content: center;
+                    align-items: flex-start; background: #f1f5f9;
                     font-family: 'Montserrat', sans-serif;
                 }
 
                 .canvas {
                     width: 297mm;
-                    height: 190mm; /* Reduzido para caber */
+                    height: 190mm; 
                     background: #fff;
                     position: relative;
                     display: flex;
@@ -1038,105 +1063,71 @@ window.gerarAtestado = (id) => {
                 }
 
                 .header p {
-                    font-size: 10px;
-                    font-weight: 800;
-                    color: var(--gray-muted);
-                    text-transform: uppercase;
-                    margin: 0;
-                    letter-spacing: 2px;
+                    font-size: 10px; font-weight: 800;
+                    color: var(--gray-muted); text-transform: uppercase;
+                    margin: 0; letter-spacing: 2px;
                 }
 
                 .header h1 {
-                    font-size: 26px;
-                    font-weight: 900;
-                    color: var(--slate-900);
-                    margin: 0;
+                    font-size: 26px; font-weight: 900;
+                    color: var(--slate-900); margin: 0;
                     text-transform: uppercase;
                 }
 
                 .text-body {
-                    font-size: 17px;
-                    color: #334155;
-                    line-height: 1.3;
-                    text-align: justify;
+                    font-size: 17px; color: #334155;
+                    line-height: 1.3; text-align: justify;
                     margin-bottom: 14px;
                 }
 
-                .text-body b {
-                    color: var(--slate-900);
-                }
+                .text-body b { color: var(--slate-900); }
 
                 .parecer-box {
-                    background: #f8fafc;
-                    border-radius: 6px;
-                    border: 1px solid #e2e8f0;
-                    padding: 8px 16px;
-                    margin: 12px 0;
-                    font-size: 13px;
-                    color: #475569;
+                    background: #f8fafc; border-radius: 6px;
+                    border: 1px solid #e2e8f0; padding: 8px 16px;
+                    margin: 12px 0; font-size: 13px; color: #475569;
                 }
 
                 .parecer-box b {
-                    font-size: 10px;
-                    text-transform: uppercase;
-                    color: var(--gray-muted);
-                    display: block;
+                    font-size: 10px; text-transform: uppercase;
+                    color: var(--gray-muted); display: block;
                     margin-bottom: 3px;
                 }
 
                 .footer {
                     margin-top: auto;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-end;
-                    padding-top: 20px;
+                    display: flex; justify-content: space-between;
+                    align-items: flex-end; padding-top: 20px;
                     border-top: 1px solid #f1f5f9;
                 }
 
-                .footer-col {
-                    width: 250px;
-                }
+                .footer-col { width: 250px; }
 
                 .f-label {
-                    font-size: 9px;
-                    font-weight: 700;
-                    color: var(--gray-muted);
-                    text-transform: uppercase;
+                    font-size: 9px; font-weight: 700;
+                    color: var(--gray-muted); text-transform: uppercase;
                     margin-bottom: 3px;
                 }
 
                 .f-value {
-                    font-size: 13px;
-                    font-weight: 700;
-                    color: var(--slate-900);
-                    border-bottom: 1px solid #e2e8f0;
-                    padding-bottom: 3px;
-                    white-space: nowrap; /* <-- força a data em uma única linha */
+                    font-size: 13px; font-weight: 700;
+                    color: var(--slate-900); border-bottom: 1px solid #e2e8f0;
+                    padding-bottom: 3px; white-space: nowrap;
                 }
 
-                .seal-svg {
-                    width: 80px;
-                    height: 80px;
-                }
+                .seal-svg { width: 80px; height: 80px; }
 
-                .signature-box {
-                    text-align: right;
-                    width: 300px;
-                }
+                .signature-box { text-align: right; width: 300px; }
 
                 .platform-name {
-                    font-weight: 900;
-                    font-size: 17px;
-                    color: var(--slate-900);
-                    letter-spacing: 1px;
+                    font-weight: 900; font-size: 17px;
+                    color: var(--slate-900); letter-spacing: 1px;
                     margin-bottom: 3px;
                 }
 
                 .platform-badge {
-                    font-size: 9px;
-                    color: var(--gray-muted);
-                    line-height: 1.3;
-                    border-right: 4px solid var(--gold);
+                    font-size: 9px; color: var(--gray-muted);
+                    line-height: 1.3; border-right: 4px solid var(--gold);
                     padding-right: 12px;
                 }
 
@@ -1147,6 +1138,7 @@ window.gerarAtestado = (id) => {
                         height: 190mm !important;
                         padding: 16px 50px !important;
                         border: none !important;
+                        -webkit-print-color-adjust: exact;
                     }
                 }
             </style>
@@ -1158,15 +1150,7 @@ window.gerarAtestado = (id) => {
                     <h1>Atestado de Equivalência Técnica</h1>
                 </div>
 
-                <div class="text-body">
-                    Declaramos para os devidos fins que o colaborador <b>${nomeColaborador}</b> teve sua experiência profissional 
-                    validada pela plataforma <b>Academy</b>, demonstrando proficiência prática integral nos temas abordados pelo treinamento:
-                    <br><br>
-                    <span style="font-size: 20px; font-weight: 800; color: var(--slate-900); letter-spacing: 1px;">${nomeCurso.toUpperCase()}</span>
-                    <br><br>
-                    Esta validação reconhece que o histórico profissional do colaborador supre a necessidade de realização do curso supracitado, 
-                    conferindo-lhe o status de <b>Habilitado</b> por equivalência de funções.
-                </div>
+                ${textoPrincipalHTML}
 
                 <div class="parecer-box">
                     <b>Parecer de Homologação:</b>
@@ -1212,13 +1196,12 @@ window.gerarAtestado = (id) => {
 };
 
 
-
-
         
         
     </script>
 </body>
 </html>
+
 
 
 
