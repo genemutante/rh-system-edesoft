@@ -138,7 +138,7 @@ async registrarLog(usuario, acao, detalhes, tela) {
     } catch (err) {
         console.error("Erro ao gravar log de auditoria:", err);
     }
-}
+},
 
     // =========================
     // 5) CARGOS
@@ -298,4 +298,5 @@ async registrarLog(usuario, acao, detalhes, tela) {
         return this.atualizarColaborador(id, { data_demissao: null, motivo_demissao: null });
     }
 };
+
 
