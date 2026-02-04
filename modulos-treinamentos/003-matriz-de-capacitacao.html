@@ -24,33 +24,53 @@ html, body {
     flex-direction: column;
 }
 
-        /* 1. Header Fixo */
+/* 1. RESET GLOBAL - ESSENCIAL PARA ALINHAMENTO */
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+}
+
+/* 2. HEADER - IGUAL À 001 */
 .page-header {
     flex-shrink: 0;
-    height: 56px !important; /* Altura exata da 001 */
-    min-height: 56px !important;
+    height: 56px !important; /* Altura fixa sem sobras */
     background: #ffffff !important;
-    border-bottom: 1px solid #e2e8f0 !important; /* Cor de borda da 001 */
-    padding: 0 1.5rem !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 0 1.5rem !important; /* Apenas nas laterais */
     display: flex; 
     align-items: center; 
     justify-content: space-between;
-    z-index: 100; /* Garante que fique acima de tudo */
-    margin-top: 0 !important; /* Remove qualquer folga no topo */
+    z-index: 100;
 }
+
+/* 3. TÍTULO AZUL - SEM MARGENS QUE EMPURRAM */
+.header-brand {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #4f46e5 !important; /* Azul exato da 001 */
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 56px; /* Força o alinhamento central pela altura da barra */
+}
+
+/* 4. REMOVE ESPAÇO ENTRE HEADER E FILTROS */
+.filter-bar {
+    flex-shrink: 0;
+    margin-top: 0 !important; /* Garante que encoste na faixa branca */
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 8px 1.5rem;
+}   
+        
 /* Remova ou neutralize o seletor .page-header h1 antigo */
 .page-header h1 { 
     display: none; /* Se você estiver usando a div .header-brand, não precisa do h1 */
 }
 
-        /* 2. Barra de Filtros Fixa */
-        .filter-bar {
-            flex-shrink: 0;
-            background: #fff;
-            border-bottom: 1px solid #cbd5e1;
-            padding: 10px 24px;
-            z-index: 40;
-        }
+
 
         /* 3. Área da Tabela (Flexível e com Scroll Próprio) */
         .table-wrapper {
@@ -185,19 +205,6 @@ html, body {
 /* Ajuste para as classes legadas continuarem funcionando igual ao Hex */
 .role-wrapper.b-red { border-top: 4px solid #ef4444 !important; }
 .role-wrapper.b-black { border-top: 4px solid #000000 !important; }
-
-
-
-.header-brand {
-    font-size: 13px !important; 
-    font-weight: 700 !important;
-    color: #4f46e5 !important; /* Azul da 001 */
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    line-height: 1; /* Evita que o texto empurre a altura */
-    display: flex;
-    align-items: center;
-}
 
 
 
@@ -513,6 +520,7 @@ html, body {
 
 </body>
 </html>
+
 
 
 
