@@ -23,14 +23,15 @@
         /* 1. Ajuste do Header para ficar fixo */
 /* Aplicar na 002-cadastro-de-colaborador.html para ficar igual à 001 */
 .top-bar {
-    height: 70px; /* Alinhado ao padrão da 001 */
-    background-color: #1e293b; /* Fundo Azul Escuro */
+    height: 64px; /* Altura padrão da 001 */
+    background-color: #ffffff; /* Fundo BRANCO */
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 1.5rem;
-    color: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #e2e8f0; /* Linha sutil inferior */
+    flex-shrink: 0;
+    z-index: 50;
 }
 
 .top-bar h1 {
@@ -93,15 +94,20 @@
         body.is-admin button.btn-primary-glow.admin-only { display: flex !important; }
 
         /* Badge no Cabeçalho */
-        .viewer-badge {
-            display: none; align-items: center; gap: 6px;
-            background-color: #fff7ed; color: #c2410c; 
-            border: 1px solid #ffedd5;
-            font-size: 11px; font-weight: 600; 
-            padding: 4px 12px; border-radius: 100px;
-            margin-left: 16px;
-            animation: fadeIn 0.3s ease-out;
-        }
+/* Ajuste do Modo Leitura para não colidirem as cores */
+.viewer-badge {
+    display: none; 
+    align-items: center; 
+    gap: 6px;
+    background-color: #f1f5f9; 
+    color: #64748b; 
+    border: 1px solid #e2e8f0;
+    font-size: 11px; 
+    font-weight: 600; 
+    padding: 4px 12px; 
+    border-radius: 100px;
+    margin-left: 16px;
+}
         .viewer-badge svg { width: 14px; height: 14px; stroke-width: 2; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
@@ -137,11 +143,12 @@
         }
    
 .header-brand {
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--primary);
-    letter-spacing: 0.05em;
-}	
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #4f46e5; /* AZUL padrão da 001 */
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+}
 	
 	</style>
 </head>
@@ -420,6 +427,7 @@
 </body>
 
 <
+
 
 
 
