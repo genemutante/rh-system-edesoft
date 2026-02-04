@@ -15,25 +15,28 @@
         /* =========================================================
            LAYOUT 100VH (TELA ÚNICA FIXA)
            ========================================================= */
-        html, body {
-            height: 100%; margin: 0; padding: 0;
-            overflow: hidden; /* Trava a rolagem da página inteira */
-            display: flex; flex-direction: column;
-            background-color: #f1f5f9;
-            font-family: 'Inter', sans-serif;
-        }
+html, body {
+    height: 100%; 
+    margin: 0 !important; 
+    padding: 0 !important;
+    overflow: hidden;
+    display: flex; 
+    flex-direction: column;
+}
 
         /* 1. Header Fixo */
 .page-header {
     flex-shrink: 0;
-    height: 56px !important; /* Altura padrão 001 */
-    background: #ffffff !important; /* Fundo Branco */
-    border-bottom: 1px solid #e2e8f0 !important; /* Borda cinza clara da 001 */
+    height: 56px !important; /* Altura exata da 001 */
+    min-height: 56px !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important; /* Cor de borda da 001 */
     padding: 0 1.5rem !important;
     display: flex; 
     align-items: center; 
     justify-content: space-between;
-    z-index: 50;
+    z-index: 100; /* Garante que fique acima de tudo */
+    margin-top: 0 !important; /* Remove qualquer folga no topo */
 }
 /* Remova ou neutralize o seletor .page-header h1 antigo */
 .page-header h1 { 
@@ -188,9 +191,10 @@
 .header-brand {
     font-size: 13px !important; 
     font-weight: 700 !important;
-    color: #4f46e5 !important; /* Azul exato da 001 */
-    letter-spacing: 0.03em;
+    color: #4f46e5 !important; /* Azul da 001 */
     text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 1; /* Evita que o texto empurre a altura */
     display: flex;
     align-items: center;
 }
@@ -509,6 +513,7 @@
 
 </body>
 </html>
+
 
 
 
