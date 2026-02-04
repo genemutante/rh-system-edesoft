@@ -48,52 +48,102 @@
 </head>
 <body class="individual-dashboard">
 
-<header class="page-header">
-    <div style="display: flex; align-items: center;">
-        <h1>Painel de Desenvolvimento Individual</h1>
+<header class="page-header" style="
+    flex-shrink: 0;
+    height: 56px !important;
+    min-height: 56px !important;
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 0 1.5rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    z-index: 100;
+">
+    <div style="display: flex; align-items: center; margin: 0; padding: 0;">
+        <div class="header-brand" style="
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #4f46e5 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+            font-family: 'Inter', sans-serif;
+        ">Painel de Desenvolvimento Individual</div>
         
-        <div id="viewerWarning" class="viewer-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <div id="viewerWarning" class="viewer-badge" style="
+            display: none; 
+            align-items: center; 
+            gap: 6px;
+            background-color: #f8fafc; 
+            color: #64748b; 
+            border: 1px solid #e2e8f0;
+            font-size: 10px; 
+            font-weight: 600; 
+            padding: 2px 10px; 
+            border-radius: 100px;
+            margin-left: 16px;
+        ">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 12px; height: 12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             <span>Modo Leitura</span>
         </div>
     </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+        </div>
 </header>
 
-<nav class="filter-bar">
-    <div class="filter-group-left">
-        <div class="filter-wrapper">
-            <span class="filter-label">Colaborador(a)</span>
-            <input type="search" list="colabList" id="colabFilter" class="filter-select compact combobox" placeholder="Selecionar..." oninput="selecionarColaborador()" onmousedown="forcarListaCompleta(this)">
+<nav class="filter-bar" style="
+    flex-shrink: 0;
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 1.5rem !important;
+    margin-top: 0 !important;
+    display: flex;
+    align-items: center;
+    z-index: 40;
+">
+    <div class="filter-group-left" style="display: flex; align-items: center; width: 100%; gap: 15px;">
+        
+        <div class="filter-wrapper" style="display: flex; flex-direction: column; gap: 4px;">
+            <span class="filter-label" style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Colaborador(a)</span>
+            <input type="search" list="colabList" id="colabFilter" class="filter-select compact combobox" 
+                   style="height: 32px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 8px; font-size: 12px; width: 220px;" 
+                   placeholder="Selecionar..." oninput="selecionarColaborador()" onmousedown="forcarListaCompleta(this)">
             <datalist id="colabList"></datalist>
         </div>
 		
-        <div id="lenteWrapper" class="filter-wrapper" style="display: none;">
-            <span class="filter-label">Visualizar Requisitos de:</span>
-            <select id="lenteFilter" class="filter-select compact" onchange="renderizarPainel()"></select>
+        <div id="lenteWrapper" class="filter-wrapper" style="display: none; flex-direction: column; gap: 4px;">
+            <span class="filter-label" style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Visualizar Requisitos de:</span>
+            <select id="lenteFilter" class="filter-select compact" style="height: 32px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" onchange="renderizarPainel()"></select>
         </div>
 		
-        <div id="statusFiltroWrapper" class="filter-wrapper" style="display: none;">
-            <span class="filter-label">Filtrar por Status:</span>
-            <select id="statusSelect" class="filter-select compact" onchange="renderizarPainel()">
+        <div id="statusFiltroWrapper" class="filter-wrapper" style="display: none; flex-direction: column; gap: 4px;">
+            <span class="filter-label" style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Filtrar por Status:</span>
+            <select id="statusSelect" class="filter-select compact" style="height: 32px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" onchange="renderizarPainel()">
                 <option value="todos">Todos os Status</option>
             </select>
         </div>
 		
-        <div class="filter-wrapper">
-            <span class="filter-label">EXIBIR:</span>
-             <div class="status-toggles" id="typeFilterGroup">
-                <button class="btn-toggle active" data-target="todos">Todos</button>
-                <button class="btn-toggle" data-target="mandatory">Obrigatórios</button>
-                <button class="btn-toggle" data-target="recommended">Recomendados</button>
-                <button class="btn-toggle" data-target="none">Não Obrigatórios</button>
+        <div class="filter-wrapper" style="display: flex; flex-direction: column; gap: 4px;">
+            <span class="filter-label" style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">EXIBIR:</span>
+             <div class="status-toggles" id="typeFilterGroup" style="display: flex; gap: 2px; background: #f1f5f9; padding: 2px; border-radius: 6px;">
+                <button class="btn-toggle active" data-target="todos" style="padding: 4px 10px; font-size: 10px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer;">Todos</button>
+                <button class="btn-toggle" data-target="mandatory" style="padding: 4px 10px; font-size: 10px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer;">Obrigatórios</button>
+                <button class="btn-toggle" data-target="recommended" style="padding: 4px 10px; font-size: 10px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer;">Recomendados</button>
+                <button class="btn-toggle" data-target="none" style="padding: 4px 10px; font-size: 10px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer;">Não Obrigatórios</button>
              </div>
         </div>
 
-        <div class="filter-wrapper" style="margin-left: auto; border-left: 1px solid #e2e8f0; padding-left: 15px;">
-            <button class="btn-clear" onclick="limparFiltros()" title="Limpar todos os filtros">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="filter-wrapper" style="margin-left: auto; border-left: 1px solid #e2e8f0; padding-left: 15px; height: 32px; display: flex; align-items: center;">
+            <button class="btn-clear" onclick="limparFiltros()" title="Limpar todos os filtros" style="background: none; border: none; cursor: pointer; color: #64748b;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                    <line x1="2" y1="2" x2="22" y2="22" stroke="red" stroke-width="2"></line> 
+                    <line x1="2" y1="2" x2="22" y2="22" stroke="#ef4444" stroke-width="2"></line> 
                 </svg>
             </button>
         </div>
@@ -310,4 +360,5 @@
 </body>
 
 </html>
+
 
