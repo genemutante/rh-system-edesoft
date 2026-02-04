@@ -24,23 +24,21 @@
         }
 
         /* 1. Header Fixo */
-        .page-header {
-            flex-shrink: 0;
-            height: 56px !important;
-            background: #ffffff !important;
-            border-bottom: 1px solid #cbd5e1 !important;
-            padding: 0 24px !important;
-            display: flex; align-items: center; justify-content: space-between;
-            z-index: 50;
-        }
-        .page-header h1 { 
-            color: #0f172a !important; 
-            font-size: 16px !important; 
-            font-weight: 700 !important; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 0 !important; 
-        }
+.page-header {
+    flex-shrink: 0;
+    height: 56px !important; /* Altura padrão 001 */
+    background: #ffffff !important; /* Fundo Branco */
+    border-bottom: 1px solid #e2e8f0 !important; /* Borda cinza clara da 001 */
+    padding: 0 1.5rem !important;
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    z-index: 50;
+}
+/* Remova ou neutralize o seletor .page-header h1 antigo */
+.page-header h1 { 
+    display: none; /* Se você estiver usando a div .header-brand, não precisa do h1 */
+}
 
         /* 2. Barra de Filtros Fixa */
         .filter-bar {
@@ -67,17 +65,19 @@
         body.is-admin .admin-only { display: inline-flex !important; }
 
         /* Badge de Modo Leitura */
-        .viewer-badge {
-            display: none; /* Controlado via JS */
-            align-items: center; gap: 6px;
-            background-color: #fff7ed; 
-            color: #c2410c; 
-            border: 1px solid #ffedd5;
-            font-size: 11px; font-weight: 600; 
-            padding: 4px 12px; border-radius: 100px;
-            margin-left: 16px;
-            animation: fadeIn 0.3s ease-out;
-        }
+.viewer-badge {
+    display: none;
+    align-items: center; 
+    gap: 6px;
+    background-color: #f8fafc; /* Mais neutro */
+    color: #64748b; 
+    border: 1px solid #e2e8f0;
+    font-size: 10px; 
+    font-weight: 600; 
+    padding: 2px 10px; 
+    border-radius: 100px;
+    margin-left: 12px;
+}
         .viewer-badge svg { width: 14px; height: 14px; stroke-width: 2; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
@@ -88,14 +88,22 @@
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
         
         /* Botão Novo Curso */
-        .btn-new-course {
-            display: flex; align-items: center; gap: 6px;
-            background-color: #0f172a; color: #fff;
-            border: 1px solid #0f172a; border-radius: 6px;
-            padding: 0 16px; height: 32px;
-            font-size: 11px; font-weight: 700; text-transform: uppercase;
-            cursor: pointer; transition: all 0.2s;
-        }
+.btn-new-course {
+    display: flex; 
+    align-items: center; 
+    gap: 6px;
+    background-color: #4f46e5; /* Azul padrão */
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0 12px; 
+    height: 32px; /* Altura reduzida */
+    font-size: 10px; /* Fonte menor */
+    font-weight: 700; 
+    text-transform: uppercase;
+    cursor: pointer; 
+    transition: all 0.2s;
+}
         .btn-new-course:hover { background-color: #334155; transform: translateY(-1px); }
 /* Garante que os menus de contexto fiquem acima de tudo (Header Fixo e Tabela) */
 .context-menu {
@@ -178,10 +186,13 @@
 
 
 .header-brand {
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--primary);
-    letter-spacing: 0.05em;
+    font-size: 13px !important; 
+    font-weight: 700 !important;
+    color: #4f46e5 !important; /* Azul exato da 001 */
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
 }
 
 
@@ -498,6 +509,7 @@
 
 </body>
 </html>
+
 
 
 
