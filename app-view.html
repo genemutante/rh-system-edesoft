@@ -34,11 +34,21 @@
         }
 
         .header-left { display: flex; align-items: center; gap: 20px; }
-        .brand-minimal {
-            display: flex; align-items: center; gap: 8px; text-decoration: none;
-            color: white; font-weight: 700; font-size: 14px; padding-right: 16px;
-            border-right: 1px solid var(--header-border);
-        }
+/* Ajuste para permitir que o texto quebre em duas linhas */
+.brand-minimal span {
+    display: block;      /* Faz o span se comportar como bloco */
+    line-height: 1.1;    /* Reduz o espaçamento entre as linhas */
+    font-size: 11px;     /* Ajuste leve no tamanho para caber na altura do header */
+    text-transform: uppercase; /* Opcional: deixa o estilo mais profissional */
+}
+
+/* Garante que o container do logo e texto estejam bem alinhados */
+.brand-minimal {
+    display: flex;
+    align-items: center; /* Centraliza verticalmente o ícone com o bloco de texto */
+    gap: 8px;
+    height: 100%;        /* Ocupa a altura total disponível */
+}
         .brand-logo {
             background: var(--primary); width: 28px; height: 28px;
             border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px;
@@ -139,10 +149,13 @@ select option {
 
     <header class="app-header">
         <div class="header-left">
-            <a href="app-view.html" class="brand-minimal">
-                <div class="brand-logo">EA</div>
-                <span>Academy</span>
-            </a>
+<a href="app-view.html" class="brand-minimal">
+    <div class="brand-logo">EA</div>
+    <span>
+        Edesoft<br>
+        Academy
+    </span>
+</a>
             <div class="module-switcher">
                 <select id="moduleSelect"></select>
             </div>
@@ -315,6 +328,7 @@ select option {
     </script>
 </body>
 </html>
+
 
 
 
