@@ -23,15 +23,14 @@
         /* 1. Ajuste do Header para ficar fixo */
 /* Aplicar na 002-cadastro-de-colaborador.html para ficar igual à 001 */
 .top-bar {
-    height: 64px; /* Altura padrão da 001 */
-    background-color: #ffffff; /* Fundo BRANCO */
+    height: 56px !important; /* Altura exata da barra 001 */
+    background-color: #ffffff !important;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 1.5rem;
-    border-bottom: 1px solid #e2e8f0; /* Linha sutil inferior */
+    padding: 0 1.25rem !important; /* Padding lateral levemente menor */
+    border-bottom: 1px solid #e2e8f0;
     flex-shrink: 0;
-    z-index: 50;
 }
 
 .top-bar h1 {
@@ -108,6 +107,14 @@
     border-radius: 100px;
     margin-left: 16px;
 }
+
+/* Ajuste do Badge para não empurrar a altura da barra */
+.viewer-badge {
+    padding: 2px 8px !important;
+    font-size: 10px !important;
+    margin-left: 12px;
+}
+		
         .viewer-badge svg { width: 14px; height: 14px; stroke-width: 2; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
@@ -143,11 +150,13 @@
         }
    
 .header-brand {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #4f46e5; /* AZUL padrão da 001 */
-    letter-spacing: -0.02em;
+    font-size: 13px !important; /* Letra menor para igualar a 001 */
+    font-weight: 700 !important;
+    color: #4f46e5 !important; /* Azul exato da 001 */
+    letter-spacing: 0.03em;
     text-transform: uppercase;
+    display: flex;
+    align-items: center;
 }
 	
 	</style>
@@ -427,6 +436,7 @@
 </body>
 
 <
+
 
 
 
