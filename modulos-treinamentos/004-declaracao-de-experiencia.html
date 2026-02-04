@@ -452,6 +452,30 @@ tr:hover td { background: #fcfdfe; }
   justify-content: center;
 }
 
+.btn.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #4f46e5;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.2s ease;
+}
+
+.btn.btn-primary i {
+  font-size: 14px;
+}
+
+.btn.btn-primary:hover {
+  background-color: #4338ca;
+}
 
     
 </style>
@@ -461,7 +485,10 @@ tr:hover td { background: #fcfdfe; }
 
     <header class="app-header">
         <div class="header-brand">ACADEMY // GESTÃO DE COMPETÊNCIAS</div>
-        <button class="btn btn-primary admin-only" id="btnNovo" onclick="window.abrirFormulario()">➕ NOVO REGISTRO</button>
+        <button class="btn btn-primary admin-only" id="btnNovo" onclick="window.abrirFormulario()">
+  <i class="fas fa-plus"></i> Novo Registro
+</button>
+
     </header>
 
     <div id="view-lista" class="active">
@@ -1191,6 +1218,7 @@ window.gerarAtestado = (id) => {
     </script>
 </body>
 </html>
+
 
 
 
