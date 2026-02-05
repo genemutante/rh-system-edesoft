@@ -184,12 +184,19 @@ async function inicializarApp() {
         // 1. Chama o DBHandler para buscar os dados reais do Supabase
         const dadosDoBanco = await DBHandler.listarTreinamentos();
 
-        // 2. Mapeamento: Converte snake_case (banco) para camelCase (código)
+// 2. Mapeamento: Converte snake_case (banco) para camelCase (código) e previne erros de null
         cursos = dadosDoBanco.map(item => ({
             ...item,
-            quantidadeAulas: item.quantidade_aulas,
-            duracaoMinutos: item.duracao_minutos
-            // trilha, subtrilha, nome, descricao, status, link já estão ok
+            // Tradução de nomes e garantia de valores numéricos
+            quantidadeAulas: item.quantidade_aulas || 0,
+            duracaoMinutos: item.duracao_minutos || 0,
+            
+            // PROTEÇÃO CRÍTICA: Garante que strings nunca sejam null (evita erro de .split)
+            trilha: item.trilha || "", 
+            subtrilha: item.subtrilha || "",
+            descricao: item.descricao || "",
+            nome: item.nome || "Sem Nome",
+            status: item.status || "BACKLOG"
         }));
 
         // 3. Preenche a interface
@@ -223,4 +230,5 @@ document.addEventListener("DOMContentLoaded", () => {
   filtroBusca.addEventListener("input", aplicarFiltros);
   btnLimpar.addEventListener("click", limparFiltros);
 });
+
 
