@@ -778,7 +778,8 @@ footer.page-footer {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 0px;
+  margin-bottom: 0;
 }
 .brand-identity { display: flex; align-items: center; gap: 12px; }
 .app-header h1 {
@@ -954,6 +955,7 @@ footer.page-footer {
   .toolbar-filters { flex-direction: column; width: 100%; }
   .btn-reset { width: 100%; }
 }
+
 
 
 
