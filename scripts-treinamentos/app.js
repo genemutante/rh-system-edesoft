@@ -1,7 +1,9 @@
 /* =============================================================
-   APP.JS - Lógica Principal
-   (Ordenação Alfabética + Regra de Botão por Qtd. Aulas)
+   APP.JS - Lógica Principal (Conectada ao Supabase)
    ============================================================= */
+
+// Variável global que armazenará os cursos vindos do banco
+let cursos = [];
 
 // --- Utilitários ---
 function formatarDuracao(minutos) {
@@ -34,212 +36,120 @@ function renderCursos(lista) {
     return;
   }
 
-  // Ordenação Alfabética (Trilha > Subtrilha > Nome)
+  // A ordenação agora é prioritariamente feita pela coluna 'ordem_curso_modulo' vinda do banco
   const listaOrdenada = [...lista].sort((a, b) => {
-    const t = (a.trilha || "").localeCompare(b.trilha || "");
-    if (t !== 0) return t;
-    const s = (a.subtrilha || "").localeCompare(b.subtrilha || "");
-    if (s !== 0) return s;
+    const trilhaA = (a.trilha || "").toUpperCase();
+    const trilhaB = (b.trilha || "").toUpperCase();
+    if (trilhaA !== trilhaB) return trilhaA.localeCompare(trilhaB);
+
+    const subA = (a.subtrilha || "").toUpperCase();
+    const subB = (b.subtrilha || "").toUpperCase();
+    if (subA !== subB) return subA.localeCompare(subB);
+
+    // Se estiverem no mesmo módulo/subtrilha, usa a ordem definida
+    const ordemA = a.ordem_curso_modulo || 0;
+    const ordemB = b.ordem_curso_modulo || 0;
+    if (ordemA !== ordemB) return ordemA - ordemB;
+
     return (a.nome || "").localeCompare(b.nome || "");
   });
 
-  let trilhaAtual = null;
-  let subAtual = null;
+  listaOrdenada.forEach((c) => {
+    const card = document.createElement("div");
+    card.className = "curso-card";
 
-  listaOrdenada.forEach((curso) => {
-    // Cabeçalho de Trilha
-    if (curso.trilha !== trilhaAtual) {
-      trilhaAtual = curso.trilha;
-      subAtual = null;
+    // Lógica de cores baseada na trilha (opcional, pode ser vinda do campo 'cor' do banco)
+    const trilhaLimpa = normalizarTexto(c.trilha.split("-")[1] || c.trilha);
+    card.setAttribute("data-trilha", trilhaLimpa);
 
-      const headerTrilha = document.createElement("div");
-      headerTrilha.className = "header-trilha";
-      headerTrilha.innerHTML = `
-        <span>${trilhaAtual}</span>
-        <small>Trilha principal</small>
-      `;
-      container.appendChild(headerTrilha);
-    }
+    const labelStatus = c.status === "EM DESENVOLVIMENTO" ? "EM DEV" : c.status;
+    const statusClass = "status-" + normalizarTexto(c.status).replace(/\s+/g, "-");
 
-    // Cabeçalho de Subtrilha
-    if (curso.subtrilha && curso.subtrilha !== subAtual) {
-      subAtual = curso.subtrilha;
-      const headerSub = document.createElement("div");
-      headerSub.className = "header-subtrilha";
-      headerSub.innerHTML = `
-        <span>${subAtual}</span>
-        <small>Subtrilha</small>
-      `;
-      container.appendChild(headerSub);
-    }
+    // Regra: Se quantidadeAulas for 0, o botão fica desabilitado (Backlog)
+    const isDisabled = !c.quantidadeAulas || c.quantidadeAulas === 0;
+    const btnHtml = isDisabled
+      ? `<button class="btn-assistir btn-disabled" disabled title="Conteúdo em breve">Em breve</button>`
+      : `<a href="${c.link}" target="_blank" class="btn-assistir">Assistir agora</a>`;
 
-    // --- NOVA LÓGICA DO BOTÃO ---
-    const qtdAulas = Number(curso.quantidadeAulas) || 0;
-    const temLink = Boolean(curso.link && curso.link.trim());
-    
-    // Só pode acessar se tiver link E aulas > 0
-    const podeAcessar = temLink && qtdAulas > 0;
-    // ----------------------------
-
-    const card = document.createElement("article");
-    card.className = "card-curso";
-
-    const statusClass = curso.status
-      ? curso.status.toLowerCase().replace(/\s+/g, "-").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      : "indefinido";
-      
-    card.classList.add(`status-${statusClass}`);
-
-card.innerHTML = `
-      <header class="card-header">
-        <div class="card-trilhas">
-          <span class="badge-trilha">${curso.trilha}</span>
-          ${curso.subtrilha ? `<span class="badge-subtrilha">${curso.subtrilha}</span>` : ""}
-        </div>
-        <span class="badge-status ${statusClass}">
-          ${curso.status}
-        </span>
-      </header>
-
-      <h2 class="card-titulo">${curso.nome}</h2>
-      <p class="card-descricao">${curso.descricao || ""}</p>
-
-      <div class="card-info">
-        
-        <div class="info-item">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-          </svg>
-          <span>${qtdAulas} aula(s)</span>
-        </div>
-
-        <div class="info-item">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>${formatarDuracao(curso.duracaoMinutos)}</span>
-        </div>
-
+    card.innerHTML = `
+      <div class="curso-header">
+        <span class="curso-status ${statusClass}">${labelStatus}</span>
+        <span class="curso-duracao">${formatarDuracao(c.duracaoMinutos)}</span>
       </div>
-
-      <footer class="card-footer">
-        <button
-          class="btn-link"
-          ${podeAcessar ? `onclick="window.open('${curso.link}', '_blank')"` : "disabled"}
-        >
-          ${podeAcessar ? "Acessar curso" : "Em breve"}
-        </button>
-        
-        <div class="pill-duracao">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <strong>${curso.duracaoMinutos || 0}</strong> min
-        </div>
-      </footer>
+      <div class="curso-info">
+        <p class="curso-trilha-label">${c.trilha}${c.subtrilha ? " • " + c.subtrilha : ""}</p>
+        <h3 class="curso-nome">${c.nome}</h3>
+        <p class="curso-desc">${c.descricao || ""}</p>
+      </div>
+      <div class="curso-footer">
+        <span class="curso-aulas">${c.quantidadeAulas || 0} aulas</span>
+        ${btnHtml}
+      </div>
     `;
-
     container.appendChild(card);
   });
 }
 
-// --- Resumo ---
+// --- Dashboard / Resumo ---
 function atualizarResumo(lista) {
-  const total = lista.length;
-  const disponiveis = lista.filter((c) => c.status === "DISPONÍVEL").length;
-  const emDev = lista.filter((c) => c.status === "EM DESENVOLVIMENTO").length;
-  const backlog = lista.filter((c) => c.status === "BACKLOG").length;
+  document.getElementById("resumo-total").textContent = lista.length;
+  document.getElementById("resumo-disponivel").textContent = lista.filter(c => c.status === "DISPONÍVEL").length;
+  document.getElementById("resumo-em-dev").textContent = lista.filter(c => c.status === "EM DESENVOLVIMENTO").length;
+  document.getElementById("resumo-backlog").textContent = lista.filter(c => c.status === "BACKLOG").length;
 
-  // Soma aulas
-  const totalAulas = lista.reduce((acc, c) => {
-    const q = Number(c.quantidadeAulas);
-    if (isNaN(q) || q <= 0) return acc;
-    return acc + q;
-  }, 0);
-
-  // --- NOVO: Soma Minutos Totais ---
-  const totalMinutos = lista.reduce((acc, c) => {
-    const m = Number(c.duracaoMinutos);
-    if (isNaN(m) || m <= 0) return acc;
-    return acc + m;
-  }, 0);
-
-  // Atualiza os elementos na tela
-  document.getElementById("resumo-total").textContent = total;
-  document.getElementById("resumo-disponivel").textContent = disponiveis;
-  document.getElementById("resumo-em-dev").textContent = emDev;
-  document.getElementById("resumo-backlog").textContent = backlog;
-  
-  const aulasEl = document.getElementById("total-aulas");
-  if (aulasEl) aulasEl.textContent = totalAulas;
-
-  // --- NOVO: Atualiza o card de tempo ---
-  const tempoEl = document.getElementById("resumo-tempo");
-  if (tempoEl) {
-    // Usa sua função formatarDuracao existente para exibir bonito (ex: 10 h 30 min)
-    tempoEl.textContent = formatarDuracao(totalMinutos);
-  }
+  const totalMinutos = lista.reduce((acc, cur) => acc + (cur.duracaoMinutos || 0), 0);
+  document.getElementById("resumo-horas").textContent = Math.floor(totalMinutos / 60) + "h";
 }
 
 // --- Filtros ---
 function preencherOpcoesTrilha() {
-  const trilhasUnicas = Array.from(
-    new Set(cursos.map((c) => c.trilha).filter(Boolean))
-  ).sort((a, b) => a.localeCompare(b));
-
-  const selectTrilha = document.getElementById("filtro-trilha");
-  selectTrilha.innerHTML = '<option value="">Todas</option>';
-
-  trilhasUnicas.forEach((trilha) => {
+  const select = document.getElementById("filtro-trilha");
+  const trilhas = [...new Set(cursos.map((c) => c.trilha))].sort();
+  
+  // Mantém a opção "Todas" e adiciona as do banco
+  select.innerHTML = '<option value="">Todas as Trilhas</option>';
+  trilhas.forEach((t) => {
     const opt = document.createElement("option");
-    opt.value = trilha;
-    opt.textContent = trilha;
-    selectTrilha.appendChild(opt);
+    opt.value = t;
+    opt.textContent = t;
+    select.appendChild(opt);
   });
 }
 
 function preencherOpcoesSubtrilha(trilhaSelecionada) {
-  const selectSub = document.getElementById("filtro-subtrilha");
-  const valorAnterior = selectSub.value;
+  const select = document.getElementById("filtro-subtrilha");
+  select.innerHTML = '<option value="">Todas as Subtrilhas</option>';
 
-  selectSub.innerHTML = "";
-  const optAll = document.createElement("option");
-  optAll.value = "";
-  optAll.textContent = "Todas";
-  selectSub.appendChild(optAll);
-
-  let base = cursos;
-  if (trilhaSelecionada) {
-    base = cursos.filter((c) => c.trilha === trilhaSelecionada);
+  if (!trilhaSelecionada) {
+    select.disabled = true;
+    return;
   }
 
-  const subtrilhasUnicas = Array.from(
-    new Set(base.map((c) => c.subtrilha).filter(Boolean))
-  ).sort((a, b) => a.localeCompare(b));
+  const subs = [...new Set(cursos.filter((c) => c.trilha === trilhaSelecionada && c.subtrilha).map((c) => c.subtrilha))].sort();
 
-  subtrilhasUnicas.forEach((sub) => {
-    const opt = document.createElement("option");
-    opt.value = sub;
-    opt.textContent = sub;
-    selectSub.appendChild(opt);
-  });
-
-  if (valorAnterior && subtrilhasUnicas.includes(valorAnterior)) {
-    selectSub.value = valorAnterior;
+  if (subs.length > 0) {
+    select.disabled = false;
+    subs.forEach((s) => {
+      const opt = document.createElement("option");
+      opt.value = s;
+      opt.textContent = s;
+      select.appendChild(opt);
+    });
+  } else {
+    select.disabled = true;
   }
 }
 
 function obterCursosFiltrados() {
   const trilha = document.getElementById("filtro-trilha").value;
-  const subtrilha = document.getElementById("filtro-subtrilha").value;
+  const sub = document.getElementById("filtro-subtrilha").value;
   const status = document.getElementById("filtro-status").value;
   const busca = normalizarTexto(document.getElementById("filtro-busca").value);
 
   return cursos.filter((c) => {
     if (trilha && c.trilha !== trilha) return false;
-    if (subtrilha && c.subtrilha !== subtrilha) return false;
+    if (sub && c.subtrilha !== sub) return false;
     if (status && c.status !== status) return false;
-
     if (busca) {
       const texto = normalizarTexto(c.nome) + " " + normalizarTexto(c.descricao);
       if (!texto.includes(busca)) return false;
@@ -263,10 +173,37 @@ function limparFiltros() {
   aplicarFiltros();
 }
 
-// Inicialização
+// --- INICIALIZAÇÃO ASSÍNCRONA (CONEXÃO COM BANCO) ---
+async function inicializarApp() {
+    const listaCursosContainer = document.getElementById("lista-cursos");
+    listaCursosContainer.innerHTML = '<div class="lista-cursos-vazia">Carregando catálogo...</div>';
+
+    try {
+        // 1. Chama o DBHandler para buscar os dados reais do Supabase
+        const dadosDoBanco = await DBHandler.listarTreinamentos();
+
+        // 2. Mapeamento: Converte snake_case (banco) para camelCase (código)
+        cursos = dadosDoBanco.map(item => ({
+            ...item,
+            quantidadeAulas: item.quantidade_aulas,
+            duracaoMinutos: item.duracao_minutos
+            // trilha, subtrilha, nome, descricao, status, link já estão ok
+        }));
+
+        // 3. Preenche a interface
+        preencherOpcoesTrilha();
+        aplicarFiltros(); // Renderiza e atualiza resumo
+
+    } catch (error) {
+        console.error("Erro ao inicializar catálogo:", error);
+        listaCursosContainer.innerHTML = '<div class="lista-cursos-vazia text-red">Erro ao carregar dados do servidor.</div>';
+    }
+}
+
+// Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
-  preencherOpcoesTrilha();
-  preencherOpcoesSubtrilha("");
+  // Inicia a carga dos dados
+  inicializarApp();
 
   const filtroTrilha = document.getElementById("filtro-trilha");
   const filtroSub = document.getElementById("filtro-subtrilha");
@@ -283,6 +220,4 @@ document.addEventListener("DOMContentLoaded", () => {
   filtroStatus.addEventListener("change", aplicarFiltros);
   filtroBusca.addEventListener("input", aplicarFiltros);
   btnLimpar.addEventListener("click", limparFiltros);
-
-  aplicarFiltros();
 });
