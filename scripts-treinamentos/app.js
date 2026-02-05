@@ -59,7 +59,9 @@ function renderCursos(lista) {
     card.className = "curso-card";
 
     // Lógica de cores baseada na trilha (opcional, pode ser vinda do campo 'cor' do banco)
-    const trilhaLimpa = normalizarTexto(c.trilha.split("-")[1] || c.trilha);
+// Adicionamos (c.trilha || "") para garantir que nunca seja null
+const trilhaTexto = c.trilha || "Sem Trilha"; 
+const trilhaLimpa = normalizarTexto(trilhaTexto.includes("-") ? trilhaTexto.split("-")[1] : trilhaTexto);
     card.setAttribute("data-trilha", trilhaLimpa);
 
     const labelStatus = c.status === "EM DESENVOLVIMENTO" ? "EM DEV" : c.status;
@@ -221,3 +223,4 @@ document.addEventListener("DOMContentLoaded", () => {
   filtroBusca.addEventListener("input", aplicarFiltros);
   btnLimpar.addEventListener("click", limparFiltros);
 });
+
