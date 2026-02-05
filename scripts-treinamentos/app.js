@@ -18,12 +18,14 @@ function normalizarTexto(str) {
   return (str || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-// --- Resumo (Dashboard) ---
+// =============================================================
+// CORREÇÃO: Função atualizarResumo com os IDs Corretos
+// =============================================================
 function atualizarResumo(lista) {
   console.log("📊 [Resumo] Processando lista de cursos:", lista.length, "itens");
 
   const total = lista.length;
-  // Proteção para Case Sensitivity (Maiúsculas/Minúsculas do Banco)
+  // Proteção para Case Sensitivity
   const disponiveis = lista.filter((c) => (c.status || "").toUpperCase() === "DISPONÍVEL").length;
   const emDev = lista.filter((c) => (c.status || "").toUpperCase() === "EM DESENVOLVIMENTO").length;
   const backlog = lista.filter((c) => (c.status || "").toUpperCase() === "BACKLOG").length;
@@ -43,19 +45,32 @@ function atualizarResumo(lista) {
   console.log("Cálculos:", { totalAulas, totalMinutos });
   console.groupEnd();
 
-  // Atualiza HTML
-  document.getElementById("resumo-total").textContent = total;
-  document.getElementById("resumo-disponivel").textContent = disponiveis;
-  document.getElementById("resumo-em-dev").textContent = emDev;
-  document.getElementById("resumo-backlog").textContent = backlog;
+  // --- ATUALIZAÇÃO DO DOM (IDs Corrigidos) ---
   
-  if (document.getElementById("total-aulas")) 
-      document.getElementById("total-aulas").textContent = totalAulas;
+  // Total de Cursos
+  const elTotal = document.getElementById("resumo-total");
+  if (elTotal) elTotal.textContent = total;
 
-  if (document.getElementById("resumo-tempo")) 
-      document.getElementById("resumo-tempo").textContent = formatarDuracao(totalMinutos);
+  // Total Disponível
+  const elDisp = document.getElementById("resumo-disponivel");
+  if (elDisp) elDisp.textContent = disponiveis;
+
+  // Total em Desenvolvimento
+  const elDev = document.getElementById("resumo-em-dev");
+  if (elDev) elDev.textContent = emDev;
+
+  // Total Backlog
+  const elBack = document.getElementById("resumo-backlog");
+  if (elBack) elBack.textContent = backlog;
+  
+  // CORREÇÃO 1: ID ajustado de "total-aulas" para "resumo-total-aulas"
+  const elTotalAulas = document.getElementById("resumo-total-aulas");
+  if (elTotalAulas) elTotalAulas.textContent = totalAulas;
+
+  // CORREÇÃO 2: ID ajustado de "resumo-tempo" para "resumo-horas"
+  const elHoras = document.getElementById("resumo-horas");
+  if (elHoras) elHoras.textContent = formatarDuracao(totalMinutos);
 }
-
 // --- Renderização do Catálogo ---
 function renderCursos(lista) {
   const container = document.getElementById("lista-cursos");
@@ -169,6 +184,9 @@ function aplicarFiltros() {
 }
 
 // --- Inicialização ---
+// =============================================================
+// CORREÇÃO: Inicialização Robusta
+// =============================================================
 async function inicializarApp() {
   console.log("🚀 Iniciando App...");
   try {
@@ -184,10 +202,18 @@ async function inicializarApp() {
     }));
 
     preencherOpcoesTrilha();
-    aplicarFiltros();
+    aplicarFiltros(); // Isso chama o atualizarResumo internamente
   } catch (e) {
     console.error("❌ Falha na inicialização:", e);
   }
+}
+
+// Verifica se o DOM já foi carregado para evitar perder o evento
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", inicializarApp);
+} else {
+    // Se o script carregou depois do HTML estar pronto, inicia direto
+    inicializarApp();
 }
 
 document.addEventListener("DOMContentLoaded", inicializarApp);
@@ -207,3 +233,4 @@ document.getElementById("btn-limpar-filtros").addEventListener("click", () => {
   preencherOpcoesSubtrilha("");
   aplicarFiltros();
 });
+
