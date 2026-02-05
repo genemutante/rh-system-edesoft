@@ -113,14 +113,42 @@ function renderCursos(lista) {
 
 // --- Dashboard / Resumo ---
 function atualizarResumo(lista) {
-  document.getElementById("resumo-total").textContent = lista.length;
-  document.getElementById("resumo-disponivel").textContent = lista.filter(c => c.status === "DISPONÍVEL").length;
-  document.getElementById("resumo-em-dev").textContent = lista.filter(c => c.status === "EM DESENVOLVIMENTO").length;
-  document.getElementById("resumo-backlog").textContent = lista.filter(c => c.status === "BACKLOG").length;
+  const total = lista.length;
+  const disponiveis = lista.filter((c) => c.status === "DISPONÍVEL").length;
+  const emDev = lista.filter((c) => c.status === "EM DESENVOLVIMENTO").length;
+  const backlog = lista.filter((c) => c.status === "BACKLOG").length;
 
-  const totalMinutos = lista.reduce((acc, cur) => acc + (cur.duracaoMinutos || 0), 0);
-  document.getElementById("resumo-horas").textContent = Math.floor(totalMinutos / 60) + "h";
+  // Soma aulas
+  const totalAulas = lista.reduce((acc, c) => {
+    const q = Number(c.quantidadeAulas);
+    if (isNaN(q) || q <= 0) return acc;
+    return acc + q;
+  }, 0);
+
+  // --- NOVO: Soma Minutos Totais ---
+  const totalMinutos = lista.reduce((acc, c) => {
+    const m = Number(c.duracaoMinutos);
+    if (isNaN(m) || m <= 0) return acc;
+    return acc + m;
+  }, 0);
+
+  // Atualiza os elementos na tela
+  document.getElementById("resumo-total").textContent = total;
+  document.getElementById("resumo-disponivel").textContent = disponiveis;
+  document.getElementById("resumo-em-dev").textContent = emDev;
+  document.getElementById("resumo-backlog").textContent = backlog;
+  
+  const aulasEl = document.getElementById("total-aulas");
+  if (aulasEl) aulasEl.textContent = totalAulas;
+
+  // --- NOVO: Atualiza o card de tempo ---
+  const tempoEl = document.getElementById("resumo-tempo");
+  if (tempoEl) {
+    // Usa sua função formatarDuracao existente para exibir bonito (ex: 10 h 30 min)
+    tempoEl.textContent = formatarDuracao(totalMinutos);
+  }
 }
+
 
 // --- Filtros ---
 function preencherOpcoesTrilha() {
@@ -249,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
   filtroBusca.addEventListener("input", aplicarFiltros);
   btnLimpar.addEventListener("click", limparFiltros);
 });
+
 
 
 
