@@ -953,4 +953,5 @@ footer.page-footer {
   .header-top { flex-direction: column; align-items: flex-start; gap: 8px; }
   .toolbar-filters { flex-direction: column; width: 100%; }
   .btn-reset { width: 100%; }
+
 }
