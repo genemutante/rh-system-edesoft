@@ -371,6 +371,8 @@ async buscarHomologacaoPorId(id) {
 };
 
 
+// No final do ficheiro db-handler.js
+window.DBHandler = DBHandler;
 
 
 
