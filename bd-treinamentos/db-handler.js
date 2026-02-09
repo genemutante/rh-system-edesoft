@@ -393,12 +393,38 @@ async buscarHomologacaoPorId(id) {
         if (error) throw error;
     }
     
+
+    // =========================
+    // 10) INTEGRAÇÃO YOUTUBE
+    // =========================
+    async sincronizarAulasPorPlaylist(cursoId, novasAulas) {
+        // 1. Remove todas as aulas atuais deste curso (Limpeza)
+        const { error: deleteError } = await supabaseClient
+            .from("aulas_treinamentos")
+            .delete()
+            .eq("treinamento_id", cursoId);
+
+        if (deleteError) throw deleteError;
+
+        // 2. Insere as novas aulas vindas do YouTube
+        const { data, error: insertError } = await supabaseClient
+            .from("aulas_treinamentos")
+            .insert(novasAulas)
+            .select();
+
+        if (insertError) throw insertError;
+
+        return data;
+    },
+
+
     
 };
 
 
 // No final do ficheiro db-handler.js
 window.DBHandler = DBHandler;
+
 
 
 
