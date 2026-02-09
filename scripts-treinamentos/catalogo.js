@@ -134,6 +134,24 @@ function renderCursos(lista) {
     card.setAttribute("data-status-text", curso.status || "Indefinido");
     if(statusClass) card.classList.add(`status-${statusClass}`);
 
+    // LOGICA DO BOTÃO DE ACESSO (Ícone vs Texto)
+    let botaoAcessoHtml = "";
+    if (podeAcessar) {
+        // Opção 1: Tem Link -> Mostra Ícone de Seta (Compacto e Bonito)
+        botaoAcessoHtml = `
+            <button class="btn-icon-acessar" onclick="window.open('${curso.link}', '_blank')" title="Acessar Curso">
+               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+            </button>
+        `;
+    } else {
+        // Opção 2: Não tem Link -> Mostra texto "Em breve" (Disabled)
+        botaoAcessoHtml = `
+            <button class="btn-disabled-text" disabled>
+               Em breve
+            </button>
+        `;
+    }
+
     card.innerHTML = `
       <header class="card-header">
         <div class="card-trilhas">
@@ -143,7 +161,6 @@ function renderCursos(lista) {
       </header>
 
       <h2 class="card-titulo">${curso.nome}</h2>
-      
       <p class="card-descricao">${curso.descricao || "Sem descrição disponível."}</p>
 
       <footer class="card-footer">
@@ -159,9 +176,7 @@ function renderCursos(lista) {
                 <span class="grade-count">${qtdAulas}</span>
             </button>
 
-            <button class="btn-link" onclick="window.open('${curso.link}', '_blank')" ${!podeAcessar ? "disabled" : ""}>
-               ${podeAcessar ? "Acessar" : "Em breve"}
-            </button>
+            ${botaoAcessoHtml}
         </div>
       </footer>
     `;
@@ -180,7 +195,6 @@ function renderCursos(lista) {
       });
   });
 }
-
 
 
 // --- Filtros ---
@@ -553,58 +567,4 @@ function abrirModalAulas(id) {
     modalAulas.style.display = "flex";
 }
 
-/* ==========================================================================
-   AJUSTE DE LAYOUT: Botão Acessar virou Ícone (Economia de Espaço)
-   ========================================================================== */
 
-/* Garante que o rodapé nunca quebre a linha */
-.card-footer {
-  flex-wrap: nowrap !important; 
-  gap: 8px; /* Espaço mínimo entre tempo e botões */
-}
-
-/* O tempo não pode encolher, mas se for muito longo, usa reticências */
-.pill-duracao {
-  flex-shrink: 0; 
-  white-space: nowrap;
-}
-
-/* Novo estilo para o botão "Acessar" quando for ícone */
-.btn-icon-acessar {
-  background: var(--accent);
-  color: #ffffff;
-  border: none;
-  
-  /* Tamanho fixo para ser um círculo perfeito */
-  width: 36px; 
-  height: 36px;
-  border-radius: 50%;
-  
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
-}
-
-.btn-icon-acessar:hover {
-  background: var(--accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
-}
-
-/* Mantém o estilo "Em breve" como texto (pílula cinza), pois ícone seria confuso */
-.btn-disabled-text {
-  background: #e2e8f0;
-  color: #94a3b8;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0 12px;
-  height: 36px;
-  border-radius: 999px;
-  border: none;
-  cursor: default;
-  white-space: nowrap;
-}
