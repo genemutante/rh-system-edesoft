@@ -1012,17 +1012,44 @@ footer.page-footer {
     align-items: center;
 }
 
+/* =========================
+   AJUSTE DE TAMANHO DO MODAL
+   ========================= */
+
 .modal-content {
     background: #ffffff;
-    width: 90%; max-width: 700px;
+    
+    /* LARGURA MAIOR: Aumentamos de 700px para 900px */
+    width: 95%; 
+    max-width: 900px; 
+    
     border-radius: 16px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
-    max-height: 90vh;
+    
+    /* ALTURA FLEXÍVEL: Cresce conforme o conteúdo, mas não passa de 90% da tela */
+    max-height: 90vh; 
+    
+    /* Animação suave */
     animation: modalSlideIn 0.3s ease-out;
 }
 
+/* Garante que o corpo do modal tenha espaço e scroll apenas se for REALMENTE necessário */
+.modal-body { 
+    padding: 32px; /* Mais respiro interno */
+    overflow-y: auto; 
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Espaçamento padrão entre campos */
+}
+
+/* Ajuste para telas muito grandes (Monitores Wide) */
+@media (min-width: 1400px) {
+    .modal-content {
+        max-width: 1000px;
+    }
+}
 @keyframes modalSlideIn {
     from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
@@ -1400,3 +1427,4 @@ input:checked + .slider:before {
     cursor: not-allowed;
     filter: grayscale(100%);
 }
+
