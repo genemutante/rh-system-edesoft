@@ -454,11 +454,11 @@ async buscarHomologacaoPorId(id) {
 
         if (erroCurso) throw erroCurso;
 
-        // 2. Se houver aulas pendentes (Sync foi feito), substitui as aulas
-        if (aulasPendentes && aulasPendentes.length > 0) {
+        // 2. ALTERAÇÃO AQUI: Verificamos se é um Array (mesmo vazio), e não null.
+        if (Array.isArray(aulasPendentes)) {
             const cursoId = cursoSalvo.id;
 
-            // Remove antigas
+            // Remove antigas (Sempre limpa se entrou aqui)
             const { error: erroDelete } = await supabaseClient
                 .from("aulas_treinamentos")
                 .delete()
@@ -466,18 +466,19 @@ async buscarHomologacaoPorId(id) {
             
             if (erroDelete) throw erroDelete;
 
-            // Prepara as novas com o ID correto do curso (caso seja curso novo)
-            const aulasParaInserir = aulasPendentes.map(a => ({
-                ...a,
-                treinamento_id: cursoId
-            }));
+            // Só tenta inserir se houver novas aulas na lista
+            if (aulasPendentes.length > 0) {
+                const aulasParaInserir = aulasPendentes.map(a => ({
+                    ...a,
+                    treinamento_id: cursoId
+                }));
 
-            // Insere novas
-            const { error: erroInsert } = await supabaseClient
-                .from("aulas_treinamentos")
-                .insert(aulasParaInserir);
+                const { error: erroInsert } = await supabaseClient
+                    .from("aulas_treinamentos")
+                    .insert(aulasParaInserir);
 
-            if (erroInsert) throw erroInsert;
+                if (erroInsert) throw erroInsert;
+            }
         }
 
         return cursoSalvo;
@@ -489,6 +490,7 @@ async buscarHomologacaoPorId(id) {
 
 // No final do ficheiro db-handler.js
 window.DBHandler = DBHandler;
+
 
 
 
