@@ -824,15 +824,21 @@ if(btnSyncRapido) {
             document.getElementById("meta-qtd-aulas").textContent = totalAulas;
             document.getElementById("meta-tempo-total").textContent = formatarDuracao(totalMinutos);
             
-            // Simula a nova data
+            // Simula a nova data e FORÇA a cor verde (para tirar o vermelho de erro/limpeza se houver)
             const agora = new Date();
-            document.getElementById("meta-data-sync").textContent = agora.toLocaleString('pt-BR');
-            document.getElementById("meta-data-sync").style.color = "#16a34a"; // Verde
-            document.getElementById("meta-data-sync").style.fontWeight = "bold";
+            const elData = document.getElementById("meta-data-sync");
+            elData.textContent = agora.toLocaleString('pt-BR');
+            elData.style.color = "#16a34a"; // Volta para Verde
+            elData.style.fontWeight = "bold";
 
-            // Mostra badge
+            // Mostra badge e FORÇA o texto/cor de "Pendente" (para tirar o "Limpeza" se houver)
             const badge = document.getElementById("badge-pendente");
-            if(badge) badge.style.display = "block";
+            if(badge) {
+                badge.style.display = "block";
+                badge.textContent = "Pendentes de Salvar"; // Texto correto
+                badge.style.backgroundColor = "#fef3c7";   // Fundo Amarelo
+                badge.style.color = "#d97706";             // Texto Laranja
+            }
 
             // Habilita Botão Salvar
             marcarAlteracao();
@@ -974,6 +980,7 @@ document.getElementById("btn-toggle-trilha").addEventListener("click", () => {
     const isInputMode = inputTexto.style.display === "block";
     alternarModoTrilha(isInputMode ? "select" : "input");
 });
+
 
 
 
