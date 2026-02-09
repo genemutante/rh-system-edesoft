@@ -84,22 +84,15 @@ function renderCursos(lista) {
     return;
   }
 
-  // 1. Ordenação (Trilha > Subtrilha > Ordem do Módulo > Nome)
+  // 1. Ordenação
   const listaOrdenada = [...lista].sort((a, b) => {
-    // Ordem 1: Trilha
     const t = (a.trilha || "Geral").localeCompare(b.trilha || "Geral");
     if (t !== 0) return t;
-    
-    // Ordem 2: Subtrilha
     const s = (a.subtrilha || "").localeCompare(b.subtrilha || "");
     if (s !== 0) return s;
-    
-    // Ordem 3: Sequência Pedagógica (se existir no banco)
     const ordemA = a.ordem_curso_modulo || 999;
     const ordemB = b.ordem_curso_modulo || 999;
     if (ordemA !== ordemB) return ordemA - ordemB;
-
-    // Ordem 4: Nome Alfabético
     return (a.nome || "").localeCompare(b.nome || "");
   });
 
@@ -107,19 +100,16 @@ function renderCursos(lista) {
   let subAtual = null;
 
   listaOrdenada.forEach((curso) => {
-    // --- Lógica de Cabeçalhos (Agrupamento) ---
+    // --- Cabeçalhos ---
     const trilhaDoCurso = curso.trilha || "Geral";
-    
     if (trilhaDoCurso !== trilhaAtual) {
       trilhaAtual = trilhaDoCurso;
-      subAtual = null; // Reseta subtrilha ao mudar de trilha
-      
+      subAtual = null; 
       const h = document.createElement("div");
       h.className = "header-trilha";
       h.innerHTML = `<span>${trilhaAtual}</span><small>Trilha principal</small>`;
       container.appendChild(h);
     }
-
     if (curso.subtrilha && curso.subtrilha !== subAtual) {
       subAtual = curso.subtrilha;
       const h = document.createElement("div");
@@ -128,23 +118,20 @@ function renderCursos(lista) {
       container.appendChild(h);
     }
 
-    // --- Preparação dos Dados ---
+    // --- Dados ---
     const qtdAulas = Number(curso.quantidadeAulas) || 0;
     const temLink = Boolean(curso.link && curso.link.trim());
-    const podeAcessar = temLink; // Regra de negócio: se tem link, pode clicar
+    const podeAcessar = temLink; 
     
-    // Normaliza status para classe CSS (ex: "Em Desenvolvimento" -> "em-desenvolvimento")
     const statusClass = (curso.status || "")
         .toLowerCase()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         .replace(/\s+/g, "-");
 
-    // --- Criação do Card ---
+    // --- HTML do Card ---
     const card = document.createElement("article");
     card.className = "card-curso";
     card.setAttribute("data-status-text", curso.status || "Indefinido");
-    
-    // Adiciona classes para estilização específica
     if(statusClass) card.classList.add(`status-${statusClass}`);
 
     card.innerHTML = `
@@ -156,14 +143,8 @@ function renderCursos(lista) {
       </header>
 
       <h2 class="card-titulo">${curso.nome}</h2>
+      
       <p class="card-descricao">${curso.descricao || "Sem descrição disponível."}</p>
-
-      <div class="card-info">
-        <div class="info-item">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-            <span>${qtdAulas} aula(s)</span>
-        </div>
-      </div>
 
       <footer class="card-footer">
         <div class="pill-duracao">
@@ -172,8 +153,10 @@ function renderCursos(lista) {
         </div>
 
         <div style="display: flex; gap: 8px;">
+            
             <button class="btn-icon-grade btn-abrir-grade" data-id="${curso.id}" title="Ver Grade Curricular">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+                <span class="grade-count">${qtdAulas}</span>
             </button>
 
             <button class="btn-link" onclick="window.open('${curso.link}', '_blank')" ${!podeAcessar ? "disabled" : ""}>
@@ -186,23 +169,17 @@ function renderCursos(lista) {
     container.appendChild(card);
   });
 
-  // --- ATIVAÇÃO DOS BOTÕES DE GRADE ---
-  // Necessário adicionar o listener após criar os elementos no DOM
+  // --- Listeners ---
   document.querySelectorAll('.btn-abrir-grade').forEach(btn => {
       btn.addEventListener('click', (e) => {
-          // Para evitar propagação se o card tiver clique
           e.stopPropagation(); 
           const id = e.currentTarget.dataset.id;
-          // Chama a função global definida no passo anterior
           if(typeof abrirModalAulas === 'function') {
               abrirModalAulas(id); 
-          } else {
-              console.error("Função abrirModalAulas não encontrada.");
           }
       });
   });
 }
-
 
 
 
@@ -575,3 +552,4 @@ function abrirModalAulas(id) {
     // 4. Mostra Modal
     modalAulas.style.display = "flex";
 }
+
