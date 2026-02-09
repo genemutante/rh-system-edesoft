@@ -675,26 +675,33 @@ function editarCurso(id) {
 }
 
 // 3. Salvar (Create/Update)
-// C) Botão SALVAR (Lê o Switch e manda pro banco)
+// C) Botão SALVAR
 btnSalvarCurso.addEventListener("click", async () => {
     const id = document.getElementById("curso-id").value;
     const nome = document.getElementById("curso-nome").value;
     
+    // Pega o valor da Trilha
+    const trilhaValor = document.getElementById("curso-trilha").value || "Geral";
+
     if(!nome) { alert("O nome do curso é obrigatório."); return; }
 
     const payload = {
+        // --- REGRA DE NEGÓCIO: Categoria = Trilha ---
+        categoria: trilhaValor, 
+        // --------------------------------------------
+
         nome: nome,
         status: document.getElementById("curso-status").value,
-        trilha: document.getElementById("curso-trilha").value || "Geral",
+        trilha: trilhaValor, // Usa a mesma variável
         subtrilha: document.getElementById("curso-subtrilha").value,
         link: document.getElementById("curso-link").value,
         descricao: document.getElementById("curso-descricao").value,
         
-        // IMPORTANTE: Pega o valor booleano do Switch
+        // Switch de Exibição
         exibir_catalogo: document.getElementById("curso-exibir").checked
     };
 
-    if(id) payload.id = id; // Se tem ID, é update
+    if(id) payload.id = id; 
 
     btnSalvarCurso.innerText = "Salvando...";
     btnSalvarCurso.disabled = true;
@@ -703,7 +710,6 @@ btnSalvarCurso.addEventListener("click", async () => {
         await DBHandler.salvarCurso(payload);
         modalCurso.style.display = "none";
         
-        // Recarrega para ver a mudança (se ocultou, o curso deve sumir da lista principal)
         inicializarApp(); 
         
         alert("Curso salvo com sucesso!");
@@ -749,6 +755,7 @@ function atualizarDatalistTrilhas() {
         datalist.appendChild(opt);
     });
 }
+
 
 
 
