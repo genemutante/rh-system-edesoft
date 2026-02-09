@@ -631,9 +631,7 @@ const btnNovoCurso = document.getElementById("btn-novo-curso");
 const btnSalvarCurso = document.getElementById("btn-salvar-curso");
 const btnExcluirCurso = document.getElementById("btn-excluir-curso");
 const areaDelete = document.getElementById("area-delete");
-
 // 1. Abrir Modal para NOVO curso
-// A) Botão NOVO CURSO (Reseta o form e o Switch)
 if(btnNovoCurso) {
     btnNovoCurso.addEventListener("click", () => {
         formCurso.reset();
@@ -644,13 +642,15 @@ if(btnNovoCurso) {
         // PADRÃO: Novo curso já nasce Exibido (Switch Ligado)
         document.getElementById("curso-exibir").checked = true;
 
+        // NOVA LÓGICA DE TRILHA:
+        // Carrega o select com as trilhas existentes e reseta para o modo lista
+        popularSelectTrilhas("");
+
         modalCurso.style.display = "flex";
-        atualizarDatalistTrilhas();
     });
 }
 
 // 2. Abrir Modal para EDITAR curso
-// B) Função EDITAR CURSO (Carrega os dados e a posição do Switch)
 function editarCurso(id) {
     const curso = cursos.find(c => c.id == id);
     if (!curso) return;
@@ -658,7 +658,10 @@ function editarCurso(id) {
     document.getElementById("curso-id").value = curso.id;
     document.getElementById("curso-nome").value = curso.nome;
     document.getElementById("curso-status").value = (curso.status || "DISPONÍVEL").toUpperCase();
-    document.getElementById("curso-trilha").value = curso.trilha;
+    
+    // OBS: O campo trilha agora é preenchido pela função auxiliar abaixo, 
+    // não mais diretamente pelo value do input antigo.
+    
     document.getElementById("curso-subtrilha").value = curso.subtrilha || "";
     document.getElementById("curso-link").value = curso.link || "";
     document.getElementById("curso-descricao").value = curso.descricao || "";
@@ -670,7 +673,11 @@ function editarCurso(id) {
     document.getElementById("modal-curso-titulo").textContent = "Editar Curso";
     areaDelete.style.display = "block";
     
-    atualizarDatalistTrilhas();
+    // NOVA LÓGICA DE TRILHA:
+    // Identifica se a trilha do curso existe na lista (Select) 
+    // ou se é uma nova (Input Texto) e ajusta a tela automaticamente.
+    popularSelectTrilhas(curso.trilha);
+
     modalCurso.style.display = "flex";
 }
 
@@ -679,9 +686,21 @@ function editarCurso(id) {
 btnSalvarCurso.addEventListener("click", async () => {
     const id = document.getElementById("curso-id").value;
     const nome = document.getElementById("curso-nome").value;
-    
-    // Pega o valor da Trilha
-    const trilhaValor = document.getElementById("curso-trilha").value || "Geral";
+
+    // === LÓGICA INTELIGENTE DA TRILHA (Híbrido: Select ou Input) ===
+    let trilhaValor = "";
+    // Verifica se o modo de input textual está ativo (definido na função alternarModoTrilha)
+    const isInputMode = document.getElementById("curso-trilha-input").dataset.mode === "active";
+
+    if (isInputMode) {
+        // Se o usuário clicou no "+", pega o que ele digitou
+        trilhaValor = document.getElementById("curso-trilha-input").value.trim();
+        if(!trilhaValor) { alert("Digite o nome da nova trilha."); return; }
+    } else {
+        // Se não, pega do select (lista existente)
+        trilhaValor = document.getElementById("curso-trilha-select").value || "Geral";
+    }
+    // ===============================================================
 
     if(!nome) { alert("O nome do curso é obrigatório."); return; }
 
@@ -692,7 +711,9 @@ btnSalvarCurso.addEventListener("click", async () => {
 
         nome: nome,
         status: document.getElementById("curso-status").value,
-        trilha: trilhaValor, // Usa a mesma variável
+        
+        trilha: trilhaValor, // Usa a variável decidida acima
+        
         subtrilha: document.getElementById("curso-subtrilha").value,
         link: document.getElementById("curso-link").value,
         descricao: document.getElementById("curso-descricao").value,
@@ -710,6 +731,7 @@ btnSalvarCurso.addEventListener("click", async () => {
         await DBHandler.salvarCurso(payload);
         modalCurso.style.display = "none";
         
+        // Recarrega a aplicação para atualizar a lista, os filtros e o select de trilhas
         inicializarApp(); 
         
         alert("Curso salvo com sucesso!");
@@ -721,7 +743,6 @@ btnSalvarCurso.addEventListener("click", async () => {
         btnSalvarCurso.disabled = false;
     }
 });
-
 // 4. Excluir
 btnExcluirCurso.addEventListener("click", async () => {
     const id = document.getElementById("curso-id").value;
@@ -756,6 +777,65 @@ function atualizarDatalistTrilhas() {
     });
 }
 
+// Função auxiliar para popular o Select de Trilhas
+function popularSelectTrilhas(valorSelecionado = "") {
+    const select = document.getElementById("curso-trilha-select");
+    select.innerHTML = "";
+
+    // 1. Pega todas as trilhas únicas existentes
+    const trilhasUnicas = [...new Set(cursos.map(c => c.trilha || "Geral"))].sort();
+
+    // 2. Preenche o select
+    trilhasUnicas.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        select.appendChild(opt);
+    });
+
+    // 3. Seleciona o valor atual (se existir na lista)
+    if (valorSelecionado && trilhasUnicas.includes(valorSelecionado)) {
+        select.value = valorSelecionado;
+        alternarModoTrilha("select"); // Garante que mostre o select
+    } else if (valorSelecionado) {
+        // Se o valor não existe na lista (ex: edição de um nome exótico), força modo texto
+        document.getElementById("curso-trilha-input").value = valorSelecionado;
+        alternarModoTrilha("input");
+    } else {
+        alternarModoTrilha("select");
+    }
+}
+
+// Alterna visualmente entre Select e Input
+function alternarModoTrilha(modo) {
+    const boxSelect = document.getElementById("box-select-trilha");
+    const inputTexto = document.getElementById("curso-trilha-input");
+    const btnIcon = document.getElementById("btn-toggle-trilha");
+
+    if (modo === "input") {
+        boxSelect.style.display = "none";
+        inputTexto.style.display = "block";
+        inputTexto.focus();
+        // Muda ícone para "Lista" (voltar)
+        btnIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>`;
+        btnIcon.title = "Selecionar existente";
+        inputTexto.dataset.mode = "active"; // Marcador
+    } else {
+        boxSelect.style.display = "block";
+        inputTexto.style.display = "none";
+        // Muda ícone para "Mais" (criar novo)
+        btnIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>`;
+        btnIcon.title = "Criar nova trilha";
+        inputTexto.dataset.mode = "inactive";
+    }
+}
+
+// Listener do Botão de Alternância
+document.getElementById("btn-toggle-trilha").addEventListener("click", () => {
+    const inputTexto = document.getElementById("curso-trilha-input");
+    const isInputMode = inputTexto.style.display === "block";
+    alternarModoTrilha(isInputMode ? "select" : "input");
+});
 
 
 
