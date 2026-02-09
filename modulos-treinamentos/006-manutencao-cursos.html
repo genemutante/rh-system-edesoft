@@ -298,11 +298,24 @@
         </div>
 
         <div class="form-row">
-            <div class="form-group" style="flex: 1;">
-                <label>Trilha</label>
-                <input type="text" id="curso-trilha" class="input-premium" list="lista-trilhas" placeholder="Ex: Comercial">
-                <datalist id="lista-trilhas"></datalist>
-            </div>
+<div class="form-group" style="flex: 1;">
+    <label>Trilha</label>
+    
+    <div style="display: flex; gap: 8px;">
+        
+        <div class="select-wrapper" style="flex: 1;" id="box-select-trilha">
+            <select id="curso-trilha-select" class="input-premium">
+                </select>
+        </div>
+
+        <input type="text" id="curso-trilha-input" class="input-premium" style="display: none; flex: 1;" placeholder="Digite o nome da nova trilha...">
+
+        <button type="button" id="btn-toggle-trilha" class="btn-icon-editar" title="Criar nova trilha" style="border-radius: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+        </button>
+    </div>
+</div>
+			
             <div class="form-group" style="flex: 1;">
                 <label>Subtrilha</label>
                 <input type="text" id="curso-subtrilha" class="input-premium" placeholder="Ex: Vendas">
@@ -355,6 +368,7 @@
 	
 </body>
 </html>
+
 
 
 
