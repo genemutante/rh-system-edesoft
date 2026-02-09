@@ -353,19 +353,45 @@ async buscarHomologacaoPorId(id) {
     // 9) TREINAMENTOS (CATÁLOGO)
     // =========================
     async listarTreinamentos() {
+        // O select '*, aulas:aulas_treinamentos(*)' faz o JOIN automático
+        // A sintaxe aulas:aulas_treinamentos renomeia o retorno para "aulas" no JSON
         const { data, error } = await supabaseClient
             .from("treinamentos")
-            .select("*")
+            .select(`
+                *,
+                aulas:aulas_treinamentos (
+                    id,
+                    titulo,
+                    duracao_minutos,
+                    ordem
+                )
+            `)
             .order("trilha", { ascending: true })
             .order("subtrilha", { ascending: true })
             .order("ordem_curso_modulo", { ascending: true });
 
-        if (error) {
-            console.error("Erro ao buscar treinamentos:", error);
-            throw error;
-        }
+        if (error) throw error;
         return data;
     },
+    
+    // Método extra para facilitar a criação de aulas futura
+    async salvarAula(payload) {
+        const { data, error } = await supabaseClient
+            .from("aulas_treinamentos")
+            .upsert([payload])
+            .select()
+            .single();
+        if (error) throw error;
+        return data;
+    },
+
+    async excluirAula(id) {
+         const { error } = await supabaseClient
+            .from("aulas_treinamentos")
+            .delete()
+            .eq("id", id);
+        if (error) throw error;
+    }
     
     
 };
@@ -373,6 +399,7 @@ async buscarHomologacaoPorId(id) {
 
 // No final do ficheiro db-handler.js
 window.DBHandler = DBHandler;
+
 
 
 
