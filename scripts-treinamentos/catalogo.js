@@ -634,6 +634,7 @@ const areaDelete = document.getElementById("area-delete");
 if(btnNovoCurso) {
     btnNovoCurso.addEventListener("click", () => {
         formCurso.reset();
+        document.getElementById("curso-exibir").checked = true; // Padrão ligado
         document.getElementById("curso-id").value = ""; // Limpa ID
         document.getElementById("modal-curso-titulo").textContent = "Novo Curso";
         areaDelete.style.display = "none"; // Esconde botão de excluir
@@ -657,6 +658,9 @@ function editarCurso(id) {
     document.getElementById("curso-link").value = curso.link || "";
     document.getElementById("curso-descricao").value = curso.descricao || "";
 
+   // Configura o Switch (se for null/undefined, assume true)
+    document.getElementById("curso-exibir").checked = (curso.exibir_catalogo !== false);
+   
     document.getElementById("modal-curso-titulo").textContent = "Editar Curso";
     areaDelete.style.display = "block"; // Mostra botão de excluir
     
@@ -677,7 +681,8 @@ btnSalvarCurso.addEventListener("click", async () => {
         trilha: document.getElementById("curso-trilha").value || "Geral",
         subtrilha: document.getElementById("curso-subtrilha").value,
         link: document.getElementById("curso-link").value,
-        descricao: document.getElementById("curso-descricao").value
+        descricao: document.getElementById("curso-descricao").value,
+        exibir_catalogo: document.getElementById("curso-exibir").checked
     };
 
     // Se tiver ID, adiciona ao payload para virar Update
@@ -733,5 +738,6 @@ function atualizarDatalistTrilhas() {
         datalist.appendChild(opt);
     });
 }
+
 
 
