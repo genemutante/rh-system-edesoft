@@ -3,7 +3,7 @@
    ============================================================= */
 
 let cursos = [];
-
+const YOUTUBE_API_KEY_FIXA = "AIzaSyAJyCenPXn41mbjieW6wTzeaFPYFX5Xrzo";
 // --- Utilitários ---
 function formatarDuracao(minutos) {
   if (!minutos || isNaN(minutos)) return "0 min";
@@ -956,6 +956,7 @@ if(btnSyncRapido) {
         }
     });
 }
+
 
 
 
