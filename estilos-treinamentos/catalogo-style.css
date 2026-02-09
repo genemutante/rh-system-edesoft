@@ -1289,3 +1289,18 @@ footer.page-footer {
   cursor: default;
   white-space: nowrap;
 }
+
+.btn-icon-editar {
+  background: white;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-icon-editar:hover {
+  border-color: #f59e0b; color: #f59e0b; /* Laranja para edição */
+  background: #fffbeb;
+}
+
+
