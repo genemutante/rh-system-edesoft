@@ -184,25 +184,40 @@ function aplicarFiltros() {
 }
 
 // --- Inicialização ---
-// =============================================================
-// CORREÇÃO: Inicialização Robusta
-// =============================================================
+// --- Inicialização ---
 async function inicializarApp() {
   console.log("🚀 Iniciando App...");
   try {
     const dados = await DBHandler.listarTreinamentos();
-    console.log("📥 Dados brutos do banco:", dados.length, "cursos");
+    console.log("📥 Dados brutos do banco:", dados);
     
-    cursos = dados.map(item => ({
-      ...item,
-      quantidadeAulas: item.quantidade_aulas || 0,
-      duracaoMinutos: item.duracao_minutos || 0,
-      trilha: item.trilha || "Geral",
-      subtrilha: item.subtrilha || ""
-    }));
+    // Mapeamento com CÁLCULO DINÂMICO
+    cursos = dados.map(item => {
+      // 1. Verifica se existem aulas, senão é array vazio
+      const listaAulas = item.aulas || [];
+
+      // 2. Calcula o total de aulas
+      const qtdCalculada = listaAulas.length;
+
+      // 3. Calcula a duração total somando os minutos de cada aula
+      const duracaoCalculada = listaAulas.reduce((acc, aula) => {
+        return acc + (Number(aula.duracao_minutos) || 0);
+      }, 0);
+
+      return {
+        ...item,
+        // Agora usamos os valores calculados
+        quantidadeAulas: qtdCalculada, 
+        duracaoMinutos: duracaoCalculada,
+        
+        // Mantém o fallback para trilha
+        trilha: item.trilha || "Geral",
+        subtrilha: item.subtrilha || ""
+      };
+    });
 
     preencherOpcoesTrilha();
-    aplicarFiltros(); // Isso chama o atualizarResumo internamente
+    aplicarFiltros(); // Isso atualiza o resumo e os cards
   } catch (e) {
     console.error("❌ Falha na inicialização:", e);
   }
@@ -233,5 +248,6 @@ document.getElementById("btn-limpar-filtros").addEventListener("click", () => {
   preencherOpcoesSubtrilha("");
   aplicarFiltros();
 });
+
 
 
