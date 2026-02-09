@@ -998,4 +998,71 @@ footer.page-footer {
   color: #2563eb !important; /* Lupa azul quando focado */
 }
 
+/* =========================
+   ESTILOS DO MODAL PREMIUM
+   ========================= */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.8); /* Fundo escuro com blur */
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #ffffff;
+    width: 90%; max-width: 700px;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 { font-size: 1.25rem; color: #1e293b; font-weight: 700; }
+.btn-close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; }
+
+.modal-body { padding: 24px; overflow-y: auto; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; align-items: center; gap: 12px; background: #f8fafc; border-radius: 0 0 16px 16px;}
+
+/* Form Elements do Modal */
+.form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+.form-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.input-premium {
+    padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; width: 100%;
+}
+
+/* Tabela de Preview */
+.preview-table-wrapper { max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; }
+.preview-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.preview-table th { background: #f1f5f9; padding: 8px; text-align: left; position: sticky; top: 0; }
+.preview-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+
+/* Botões */
+.btn-primary-full {
+    width: 100%; background: #2563eb; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+.btn-primary-full:hover { background: #1d4ed8; }
+.btn-save {
+    background: #16a34a; color: white; padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;
+}
+.btn-save:disabled { background: #cbd5e1; cursor: not-allowed; }
+.status-msg { font-size: 0.85rem; font-weight: 500; margin-right: auto; }
 
