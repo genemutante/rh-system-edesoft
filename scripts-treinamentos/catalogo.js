@@ -75,6 +75,8 @@ function atualizarResumo(lista) {
 
 // --- Renderização do Catálogo ---
 
+
+
 function renderCursos(lista) {
   const container = document.getElementById("lista-cursos");
   container.innerHTML = "";
@@ -84,7 +86,7 @@ function renderCursos(lista) {
     return;
   }
 
-  // 1. Ordenação
+  // 1. Ordenação (Trilha > Subtrilha > Ordem > Nome)
   const listaOrdenada = [...lista].sort((a, b) => {
     const t = (a.trilha || "Geral").localeCompare(b.trilha || "Geral");
     if (t !== 0) return t;
@@ -100,8 +102,10 @@ function renderCursos(lista) {
   let subAtual = null;
 
   listaOrdenada.forEach((curso) => {
-    // --- Cabeçalhos ---
+    // --- Cabeçalhos (Agrupamento visual) ---
     const trilhaDoCurso = curso.trilha || "Geral";
+    
+    // Header da Trilha Principal
     if (trilhaDoCurso !== trilhaAtual) {
       trilhaAtual = trilhaDoCurso;
       subAtual = null; 
@@ -110,6 +114,8 @@ function renderCursos(lista) {
       h.innerHTML = `<span>${trilhaAtual}</span><small>Trilha principal</small>`;
       container.appendChild(h);
     }
+    
+    // Header da Subtrilha
     if (curso.subtrilha && curso.subtrilha !== subAtual) {
       subAtual = curso.subtrilha;
       const h = document.createElement("div");
@@ -118,7 +124,7 @@ function renderCursos(lista) {
       container.appendChild(h);
     }
 
-    // --- Dados ---
+    // --- Preparação dos Dados ---
     const qtdAulas = Number(curso.quantidadeAulas) || 0;
     const temLink = Boolean(curso.link && curso.link.trim());
     const podeAcessar = temLink; 
@@ -134,17 +140,15 @@ function renderCursos(lista) {
     card.setAttribute("data-status-text", curso.status || "Indefinido");
     if(statusClass) card.classList.add(`status-${statusClass}`);
 
-    // LOGICA DO BOTÃO DE ACESSO (Ícone vs Texto)
+    // Lógica do Botão de Acesso (Ícone Seta ou Texto 'Em breve')
     let botaoAcessoHtml = "";
     if (podeAcessar) {
-        // Opção 1: Tem Link -> Mostra Ícone de Seta (Compacto e Bonito)
         botaoAcessoHtml = `
             <button class="btn-icon-acessar" onclick="window.open('${curso.link}', '_blank')" title="Acessar Curso">
                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
             </button>
         `;
     } else {
-        // Opção 2: Não tem Link -> Mostra texto "Em breve" (Disabled)
         botaoAcessoHtml = `
             <button class="btn-disabled-text" disabled>
                Em breve
@@ -152,6 +156,7 @@ function renderCursos(lista) {
         `;
     }
 
+    // Template do Card
     card.innerHTML = `
       <header class="card-header">
         <div class="card-trilhas">
@@ -175,6 +180,10 @@ function renderCursos(lista) {
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
                 <span class="grade-count">${qtdAulas}</span>
             </button>
+            
+            <button class="btn-icon-editar" data-id="${curso.id}" title="Editar Cadastro">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </button>
 
             ${botaoAcessoHtml}
         </div>
@@ -184,7 +193,9 @@ function renderCursos(lista) {
     container.appendChild(card);
   });
 
-  // --- Listeners ---
+  // --- LISTENERS (Eventos de Clique) ---
+
+  // A) Botão Grade (Modal de Aulas)
   document.querySelectorAll('.btn-abrir-grade').forEach(btn => {
       btn.addEventListener('click', (e) => {
           e.stopPropagation(); 
@@ -194,7 +205,23 @@ function renderCursos(lista) {
           }
       });
   });
+
+  // B) Botão Editar (Modal de Manutenção)
+  document.querySelectorAll('.btn-icon-editar').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = e.currentTarget.dataset.id;
+          if(typeof editarCurso === 'function') {
+              editarCurso(id);
+          } else {
+              console.error("Função editarCurso não encontrada. Verifique se o módulo de manutenção foi carregado.");
+          }
+      });
+  });
 }
+
+
+
 
 
 // --- Filtros ---
