@@ -1173,3 +1173,15 @@ footer.page-footer {
     background: #e2e8f0;
     color: #334155;
 }
+
+
+
+
+/* Cole no CSS */
+.btn-icon-grade {
+    background: white; border: 1px solid #e2e8f0; color: #64748b;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s;
+}
+.btn-icon-grade:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
