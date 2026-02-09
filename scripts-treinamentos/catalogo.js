@@ -720,6 +720,41 @@ function editarCurso(id) {
 }
 
 // 3. Botão SYNC YOUTUBE (Modo Rascunho)
+// --- NOVO: Listener para limpar metadados ao apagar o link ---
+const inputLink = document.getElementById("curso-link");
+if (inputLink) {
+    inputLink.addEventListener("input", (e) => {
+        // Se o campo ficar vazio ou apenas com espaços
+        if (e.target.value.trim() === "") {
+            console.log("🧹 Link limpo: resetando metadados e pendências.");
+            
+            // 1. Zera a lista de pendência (Isso avisa o DBHandler para apagar tudo)
+            videosPendentes = []; 
+            
+            // 2. Atualiza a UI visualmente para Zero
+            document.getElementById("meta-qtd-aulas").textContent = "0";
+            document.getElementById("meta-tempo-total").textContent = "0 min";
+            
+            // 3. Atualiza status da sincrozinação para avisar que vai mudar
+            const elData = document.getElementById("meta-data-sync");
+            elData.textContent = "Remoção Pendente";
+            elData.style.color = "#ef4444"; // Vermelho alerta
+            
+            // 4. Mostra o badge de pendência
+            const badge = document.getElementById("badge-pendente");
+            if(badge) {
+                badge.style.display = "block";
+                badge.textContent = "Limpeza Pendente";
+            }
+
+            // 5. Força o botão de salvar a ficar habilitado
+            marcarAlteracao();
+        }
+    });
+}
+
+
+
 const btnSyncRapido = document.getElementById("btn-sync-youtube-rapido");
 if(btnSyncRapido) {
     btnSyncRapido.addEventListener("click", async () => {
@@ -939,6 +974,7 @@ document.getElementById("btn-toggle-trilha").addEventListener("click", () => {
     const isInputMode = inputTexto.style.display === "block";
     alternarModoTrilha(isInputMode ? "select" : "input");
 });
+
 
 
 
