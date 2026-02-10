@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agendamento | Enterprise</title>
+    <title>Gestão de Agenda | Enterprise</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -56,14 +56,13 @@
         .btn-action-main:disabled { background: #cbd5e1; cursor: not-allowed; }
 
         /* =================================================================
-           2. GRID INTELIGENTE (ESTILO PLANILHA)
+           2. GRID DE GESTÃO (COM AÇÕES)
            ================================================================= */
         .grid-container {
             flex: 1; overflow: hidden; padding: 20px;
             display: flex; flex-direction: column; gap: 10px;
         }
 
-        /* Toolbar do Grid */
         .grid-toolbar {
             display: flex; justify-content: space-between; align-items: center;
             background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;
@@ -75,7 +74,7 @@
         }
         .select-view-mode {
             padding: 6px 10px; border: 1px solid #2563eb; border-radius: 6px; font-size: 0.85rem; 
-            background: #eff6ff; color: #1e40af; font-weight: 600; cursor: pointer; outline: none;
+            background: #eff6ff; color: #1e40af; font-weight: 600; cursor: pointer;
         }
 
         .grid-wrapper {
@@ -86,9 +85,7 @@
 
         .grid-scroll { flex: 1; overflow-y: auto; }
 
-        /* Tabela Estilo Excel/Dados */
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        
         thead { position: sticky; top: 0; background: #f8fafc; z-index: 2; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         th { 
             padding: 10px 14px; font-size: 0.75rem; font-weight: 700; color: #64748b; 
@@ -100,21 +97,39 @@
         }
         tr:hover { background: #f8fafc; }
 
-        /* Cabeçalho de Agrupamento */
+        /* Agrupamento */
         tr.group-row td {
             background-color: #eef2ff; color: #1e3a8a; font-weight: 700; font-size: 0.9rem;
             padding: 10px 14px; border-top: 1px solid #e0e7ff; border-bottom: 1px solid #e0e7ff;
         }
         .group-meta { font-weight: 400; font-size: 0.8rem; color: #6366f1; margin-left: 8px; }
 
-        .btn-action-row {
-            width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;
-            border: none; border-radius: 4px; cursor: pointer; transition: background 0.1s;
+        /* Botões de Ação na Tabela */
+        .actions-cell { display: flex; gap: 6px; justify-content: flex-end; }
+        
+        .btn-mini {
+            width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center;
+            border: 1px solid transparent; border-radius: 4px; cursor: pointer; transition: all 0.1s;
+            background: #fff; border-color: #e2e8f0; color: #64748b;
         }
-        .btn-delete:hover { background: #fee2e2; color: #ef4444; }
+        .btn-mini:hover { transform: scale(1.05); }
+        
+        .btn-check:hover { background: #dcfce7; border-color: #22c55e; color: #15803d; }
+        .btn-miss:hover { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+        .btn-trash:hover { background: #f1f5f9; border-color: #94a3b8; color: #0f172a; }
+
+        /* Status Badges */
+        .tag-status { 
+            font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; 
+            text-transform: uppercase; display: inline-block; min-width: 80px; text-align: center;
+        }
+        
+        .st-agendado { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
+        .st-realizado { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .st-falta { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
         /* =================================================================
-           3. MODAIS (Mantidos funcionais)
+           3. MODAIS (Padrão)
            ================================================================= */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -146,8 +161,6 @@
         .btn-apply { background: #3b82f6; color: #fff; border: none; border-radius: 4px; padding: 6px 12px; font-size: 0.8rem; cursor: pointer; }
         .bulk-actions { padding: 10px 20px; background: #eff6ff; border-bottom: 1px solid #dbeafe; display: flex; align-items: center; gap: 15px; }
 
-        .tag-status { font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
-
     </style>
 </head>
 <body>
@@ -167,7 +180,7 @@
             </div>
         </div>
         <button id="btn-open-cronograma" class="btn-action-main" onclick="abrirCronograma()" disabled style="opacity: 0.5;">
-            <span>3. Agendar Aulas (Cronograma)</span>
+            <span>3. Agendar Aulas</span>
         </button>
     </div>
 
@@ -176,14 +189,21 @@
         <div class="grid-toolbar">
             <div class="grid-filters">
                 <select id="grid-view-mode" class="select-view-mode" onchange="renderizarGrid()">
-                    <option value="view_date">📅 Visão Cronograma (Por Data)</option>
-                    <option value="view_class">📖 Visão Conteúdo (Por Aula)</option>
-                    <option value="view_course">📚 Visão Turmas (Por Curso)</option>
-                    <option value="view_student">👤 Visão Aluno (Por Colaborador)</option>
-                    <option value="view_list">📋 Lista Geral (Sem Grupo)</option>
+                    <option value="view_date">📅 Cronograma Diário (Timeline)</option>
+                    <option value="view_student">👤 Visão Aluno (Histórico)</option>
+                    <option value="view_class">📖 Por Conteúdo (Chamada)</option>
+                    <option value="view_course">📚 Por Curso (Turmas)</option>
+                    <option value="view_list">📋 Lista Geral</option>
                 </select>
 
-                <input type="text" id="grid-search" class="search-grid" placeholder="Filtrar resultados..." oninput="renderizarGrid()">
+                <input type="text" id="grid-search" class="search-grid" placeholder="Buscar aluno, curso ou data..." oninput="renderizarGrid()">
+                
+                <select id="grid-filter-status" class="search-grid" style="width: 150px;" onchange="renderizarGrid()">
+                    <option value="">Todos Status</option>
+                    <option value="AGENDADO">Agendados</option>
+                    <option value="REALIZADO">Realizados</option>
+                    <option value="FALTA">Faltas</option>
+                </select>
             </div>
             <button onclick="carregarAgenda()" style="background:none; border:none; color:#2563eb; cursor:pointer; font-weight:600; font-size:0.85rem;">↻ Atualizar Dados</button>
         </div>
@@ -193,12 +213,12 @@
                 <table id="tabela-agenda">
                     <thead>
                         <tr>
-                            <th style="width: 140px;">Data/Hora</th>
+                            <th style="width: 140px;">Data</th>
                             <th>Colaborador</th>
                             <th>Treinamento</th>
-                            <th>Módulo / Conteúdo</th>
-                            <th>Status</th>
-                            <th style="width: 40px;"></th>
+                            <th>Conteúdo</th>
+                            <th style="text-align:center;">Status</th>
+                            <th style="text-align:right; padding-right:20px;">Ações (Chamada)</th>
                         </tr>
                     </thead>
                     <tbody id="tbody-agenda">
@@ -302,11 +322,19 @@
             document.getElementById('tbody-agenda').innerHTML = '';
 
             try {
-                agendaCache = await DBHandler.listarAgendamentosFuturos();
+                // NOTA: Certifique-se de que atualizou o db-handler.js para ter listarAgendamentos()
+                // Se não atualizou, ele vai tentar chamar listarAgendamentosFuturos e vai falhar ou trazer só futuro.
+                if (DBHandler.listarAgendamentos) {
+                    agendaCache = await DBHandler.listarAgendamentos();
+                } else {
+                    // Fallback se você esqueceu de atualizar o JS do banco
+                    agendaCache = await DBHandler.listarAgendamentosFuturos();
+                }
+                
                 renderizarGrid();
             } catch (e) {
                 console.error(e);
-                alert("Erro ao carregar dados.");
+                alert("Erro ao carregar dados. Verifique se atualizou o db-handler.js");
             } finally {
                 loading.style.display = 'none';
             }
@@ -316,6 +344,7 @@
             const tbody = document.getElementById('tbody-agenda');
             const termo = document.getElementById('grid-search').value.toLowerCase();
             const viewMode = document.getElementById('grid-view-mode').value;
+            const statusFilter = document.getElementById('grid-filter-status').value;
 
             tbody.innerHTML = '';
 
@@ -324,10 +353,12 @@
                 return;
             }
 
-            // 1. Filtragem Global
+            // 1. Filtragem Global (Texto + Status)
             let lista = agendaCache.filter(item => {
                 const txt = (item.colaborador?.nome + ' ' + item.treinamento?.nome + ' ' + (item.aula?.titulo || '')).toLowerCase();
-                return txt.includes(termo);
+                const matchTexto = txt.includes(termo);
+                const matchStatus = statusFilter ? item.status === statusFilter : true;
+                return matchTexto && matchStatus;
             });
 
             // 2. Agrupamento Inteligente
@@ -338,12 +369,12 @@
                 
                 lista.forEach(item => {
                     let chave = '';
-                    let ordem = ''; // Para ordenação das chaves
+                    let ordem = ''; 
 
                     if (viewMode === 'view_date') {
                         const d = new Date(item.data_hora);
                         chave = d.toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'2-digit', year:'numeric' });
-                        ordem = item.data_hora; // Ordena por timestamp
+                        ordem = item.data_hora; 
                     } 
                     else if (viewMode === 'view_course') {
                         chave = item.treinamento?.nome || 'Sem Curso';
@@ -354,29 +385,29 @@
                         ordem = chave;
                     }
                     else if (viewMode === 'view_class') {
-                        // Agrupa por Nome da Aula (E mostra o curso junto pra não confundir)
                         const nomeAula = item.aula ? item.aula.titulo : '(Curso Inteiro)';
                         const nomeCurso = item.treinamento?.nome || '';
                         chave = `${nomeAula} <span style='font-weight:400; color:#64748b; font-size:0.8rem;'>— ${nomeCurso}</span>`;
                         ordem = nomeAula;
                     }
 
-                    // Cria chave composta para ordenação correta se for data
+                    // Chave composta para ordenação correta de datas
                     const keyMap = viewMode === 'view_date' ? ordem.split('T')[0] + '||' + chave : chave;
                     
                     if (!grupos[keyMap]) grupos[keyMap] = { label: chave, items: [] };
                     grupos[keyMap].items.push(item);
                 });
 
-                // Renderiza Grupos Ordenados
-                Object.keys(grupos).sort().forEach(k => {
+                // Ordena as chaves (Datas DESC ou Alfabética)
+                const keysOrdenadas = Object.keys(grupos).sort();
+                if (viewMode === 'view_date') keysOrdenadas.reverse(); // Datas recentes primeiro
+
+                keysOrdenadas.forEach(k => {
                     const grupo = grupos[k];
-                    
                     const trHeader = document.createElement('tr');
                     trHeader.className = 'group-row';
                     trHeader.innerHTML = `<td colspan="6">${grupo.label} <span class="group-meta">(${grupo.items.length})</span></td>`;
                     tbody.appendChild(trHeader);
-
                     renderizarLinhas(grupo.items, tbody);
                 });
             }
@@ -391,25 +422,56 @@
                 const dataFmt = d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
                 const nomeAula = item.aula ? `${item.aula.ordem}. ${item.aula.titulo}` : 'Curso Completo';
                 
+                // Define classe da badge
+                let statusClass = 'st-agendado';
+                if(item.status === 'REALIZADO') statusClass = 'st-realizado';
+                if(item.status === 'FALTA') statusClass = 'st-falta';
+
+                // Botões de Ação (Só aparecem se Agendado ou Falta, ou sempre para correção)
+                let botoesHtml = '';
+                
+                if (item.status === 'AGENDADO' || item.status === 'FALTA') {
+                    botoesHtml += `<button class="btn-mini btn-check" title="Confirmar Presença" onclick="mudarStatus(${item.id}, 'REALIZADO')">✅</button>`;
+                }
+                
+                if (item.status === 'AGENDADO' || item.status === 'REALIZADO') {
+                    botoesHtml += `<button class="btn-mini btn-miss" title="Marcar Falta" onclick="mudarStatus(${item.id}, 'FALTA')">❌</button>`;
+                }
+
+                botoesHtml += `<button class="btn-mini btn-trash" title="Cancelar/Excluir" onclick="excluirAgendamento(${item.id})">🗑️</button>`;
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="font-weight:600;">${dataFmt}</td>
                     <td>${item.colaborador?.nome || '-'}</td>
                     <td style="color:#64748b;">${item.treinamento?.nome || '-'}</td>
                     <td>${nomeAula}</td>
-                    <td><span class="tag-status">${item.status}</span></td>
-                    <td style="text-align:center;">
-                        <button class="btn-action-row btn-delete" title="Excluir" onclick="excluirAgendamento(${item.id})">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
+                    <td style="text-align:center;"><span class="tag-status ${statusClass}">${item.status}</span></td>
+                    <td class="actions-cell">
+                        ${botoesHtml}
                     </td>
                 `;
                 container.appendChild(tr);
             });
         }
 
+        // --- AÇÕES DO GRID ---
+        window.mudarStatus = async function(id, novoStatus) {
+            // Otimisticamente atualiza a UI local antes do banco
+            const item = agendaCache.find(i => i.id === id);
+            if(item) item.status = novoStatus;
+            renderizarGrid(); // Renderiza rápido
+
+            try {
+                await DBHandler.atualizarStatusAgendamento(id, novoStatus);
+            } catch(e) {
+                alert("Erro ao salvar status: " + e.message);
+                carregarAgenda(); // Reverte em caso de erro
+            }
+        };
+
         window.excluirAgendamento = async function(id) {
-            if(!confirm("Cancelar este agendamento?")) return;
+            if(!confirm("Tem certeza que deseja cancelar este agendamento?")) return;
             try {
                 await DBHandler.supabaseClient.from('agendamentos').delete().eq('id', id);
                 agendaCache = agendaCache.filter(i => i.id !== id);
@@ -417,10 +479,7 @@
             } catch(e) { alert("Erro: " + e.message); }
         };
 
-        // =========================================================
-        // MANIPULAÇÃO DE DADOS (CRIAÇÃO)
-        // =========================================================
-        
+        // --- LÓGICA DE CRIAÇÃO (MODAIS) ---
         function renderizarListaAlunos() {
             const ul = document.getElementById('lista-alunos');
             ul.innerHTML = '';
@@ -509,7 +568,7 @@
 
         window.aplicarDataEmMassa = function() {
             const data = document.getElementById('bulk-date').value;
-            if(!data) return alert("Selecione uma data primeiro.");
+            if(!data) return alert("Selecione uma data acima primeiro.");
             document.querySelectorAll('.chk-aula-crono:checked').forEach(chk => {
                 chk.closest('tr').querySelector('.aula-date').value = data;
             });
@@ -545,18 +604,19 @@
                 alert(`✅ ${payload.length} agendamentos criados!`);
                 fecharModal('modal-cronograma');
                 
-                // Reset visual
+                // Reset
                 alunosSelecionadosIds.clear(); atualizarBadgeAlunos();
                 document.querySelectorAll('.chk-aluno').forEach(c => c.checked = false);
                 document.getElementById('sel-treino').value = "";
                 resetCronograma();
                 
-                carregarAgenda(); // Atualiza grid
+                carregarAgenda();
 
             } catch (e) { alert("Erro: " + e.message); } 
             finally { btn.innerText = "Confirmar Agendamento"; btn.disabled = false; }
         };
 
+        // Helpers UI
         window.abrirModalAlunos = () => document.getElementById('modal-alunos').style.display = 'flex';
         window.fecharModal = (id) => document.getElementById(id).style.display = 'none';
 
