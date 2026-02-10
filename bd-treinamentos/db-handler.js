@@ -542,42 +542,39 @@ async salvarCursoCompleto(dadosCurso, aulasPendentes = null) {
 
 
 
-// --- Adicione estas funções dentro do objeto DBHandler no arquivo db-handler.js ---
+// No db-handler.js
 
-    // Lista os agendamentos futuros, trazendo os nomes dos treinos e colaboradores
+    // 1. Atualize este método para trazer o título da aula
     async listarAgendamentosFuturos() {
         const hoje = new Date().toISOString();
         
-        // O 'select' faz o JOIN automático graças às Foreign Keys que criamos no SQL
         const { data, error } = await supabaseClient
             .from('agendamentos')
             .select(`
                 id,
                 data_hora,
                 status,
+                observacoes,
                 treinamento:treinamentos (nome),
-                colaborador:colaboradores (nome)
+                colaborador:colaboradores (nome),
+                aula:aulas_treinamentos (titulo, ordem)  // <--- NOVO
             `)
-            .gte('data_hora', hoje) // Apenas datas maiores ou iguais a hoje
+            .gte('data_hora', hoje)
             .order('data_hora', { ascending: true });
 
         if (error) throw error;
         return data;
     },
 
-    // Cria um novo agendamento
+    // 2. O método criarAgendamento já é genérico, então NÃO precisa mudar.
+    // Ele aceita qualquer objeto payload, então já vai aceitar o 'aula_id' que enviaremos.
     async criarAgendamento(payload) {
-        // payload deve ser: { treinamento_id, colaborador_id, data_hora, observacoes }
         const { data, error } = await supabaseClient
             .from('agendamentos')
-            .insert([payload]);
-            
+            .insert(payload); // Se payload for um array, ele insere múltiplos de uma vez!
         if (error) throw error;
         return data;
     },
-
-// -----------------------------------------------------------------------------------
-
     
     
 };
@@ -585,6 +582,7 @@ async salvarCursoCompleto(dadosCurso, aulasPendentes = null) {
 
 // No final do ficheiro db-handler.js
 window.DBHandler = DBHandler;
+
 
 
 
