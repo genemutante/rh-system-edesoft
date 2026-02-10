@@ -982,6 +982,132 @@ document.getElementById("btn-toggle-trilha").addEventListener("click", () => {
 });
 
 
+// --- LÓGICA DE ABAS ---
+window.alternarAba = function(btn) {
+    // 1. Visual dos Botões
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // 2. Visual do Conteúdo
+    const targetId = btn.dataset.target;
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    document.getElementById(targetId).style.display = 'block';
+    
+    // 3. Limpeza Opcional (se quiser limpar ao trocar de aba, descomente abaixo)
+    // Se trocar para manual, talvez queira manter o que veio do Youtube? 
+    // Por enquanto, vamos manter os dados compartilhados na mesma variável 'videosPendentes'.
+}
+
+
+// --- LÓGICA DE ADIÇÃO MANUAL ---
+const btnAddManual = document.getElementById("btn-add-manual");
+const inputManualTitulo = document.getElementById("manual-titulo");
+const inputManualLink = document.getElementById("manual-link");
+const inputManualMinutos = document.getElementById("manual-minutos");
+const listaManualUl = document.getElementById("lista-manual-preview");
+const btnLimparAulas = document.getElementById("btn-limpar-aulas");
+
+if(btnAddManual) {
+    btnAddManual.addEventListener("click", () => {
+        const titulo = inputManualTitulo.value.trim();
+        const link = inputManualLink.value.trim(); // Pode ser vazio
+        const minutos = parseInt(inputManualMinutos.value) || 0;
+
+        if(!titulo) {
+            alert("O título da aula é obrigatório.");
+            return;
+        }
+
+        // 1. Inicializa array se necessário
+        if(!videosPendentes) videosPendentes = [];
+
+        // 2. Adiciona ao Array Global
+        videosPendentes.push({
+            titulo: titulo,
+            link_video: link,
+            duracao_minutos: minutos,
+            ordem: videosPendentes.length + 1,
+            descricao: "Cadastrado manualmente"
+        });
+
+        // 3. Atualiza a UI
+        renderizarListaManual();
+        atualizarMetadadosGlobais();
+        marcarAlteracao();
+
+        // 4. Limpa inputs
+        inputManualTitulo.value = "";
+        inputManualLink.value = "";
+        inputManualMinutos.value = "";
+        inputManualTitulo.focus();
+    });
+}
+
+if(btnLimparAulas) {
+    btnLimparAulas.addEventListener("click", () => {
+        if(confirm("Remover todas as aulas pendentes?")) {
+            videosPendentes = [];
+            renderizarListaManual();
+            atualizarMetadadosGlobais();
+            marcarAlteracao();
+        }
+    });
+}
+
+// Função auxiliar para desenhar a lista manual
+function renderizarListaManual() {
+    listaManualUl.innerHTML = "";
+    if(!videosPendentes || videosPendentes.length === 0) return;
+
+    videosPendentes.forEach((video, index) => {
+        const li = document.createElement("li");
+        li.className = "item-manual";
+        li.innerHTML = `
+            <div style="display:flex; flex-direction:column; overflow:hidden;">
+                <strong style="color:#334155;">${index + 1}. ${video.titulo}</strong>
+                <span style="color:#94a3b8; font-size:0.7rem;">${video.link_video || 'Sem link'} • ${video.duracao_minutos} min</span>
+            </div>
+            <button type="button" class="btn-remove-item" onclick="removerItemManual(${index})">
+                &times;
+            </button>
+        `;
+        listaManualUl.appendChild(li);
+    });
+    
+    // Mostra botão de limpar se tiver itens
+    btnLimparAulas.style.display = "block";
+}
+
+// Tornar global para o onclick do HTML funcionar
+window.removerItemManual = function(index) {
+    videosPendentes.splice(index, 1);
+    // Reajusta a ordem
+    videosPendentes.forEach((v, i) => v.ordem = i + 1);
+    
+    renderizarListaManual();
+    atualizarMetadadosGlobais();
+    marcarAlteracao();
+}
+
+// Função Unificada de Metadados (Youtube + Manual usam essa agora)
+function atualizarMetadadosGlobais() {
+    const totalAulas = videosPendentes ? videosPendentes.length : 0;
+    const totalMinutos = videosPendentes ? videosPendentes.reduce((acc, v) => acc + (v.duracao_minutos || 0), 0) : 0;
+
+    document.getElementById("meta-qtd-aulas").textContent = totalAulas;
+    document.getElementById("meta-tempo-total").textContent = formatarDuracao(totalMinutos);
+
+    const badge = document.getElementById("badge-pendente");
+    if(totalAulas > 0 || houveAlteracao) {
+        badge.style.display = "block";
+        badge.textContent = "Pendentes de Salvar";
+        badge.style.backgroundColor = "#fef3c7";
+        badge.style.color = "#d97706";
+    } else {
+        badge.style.display = "none";
+        btnLimparAulas.style.display = "none";
+    }
+}
 
 
 
