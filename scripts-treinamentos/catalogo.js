@@ -1,7 +1,7 @@
 /* =============================================================
    catalogo.JS - Versão Consolidada com Logs de Auditoria
    ============================================================= */
-
+import { DBHandler } from "../bd-treinamentos/db-handler.js";
 let cursos = [];
 const YOUTUBE_API_KEY_FIXA = "AIzaSyAJyCenPXn41mbjieW6wTzeaFPYFX5Xrzo";
 // --- Utilitários ---
@@ -1090,6 +1090,7 @@ function atualizarMetadadosGlobais() {
         btnLimparAulas.style.display = "none";
     }
 }
+
 
 
 
