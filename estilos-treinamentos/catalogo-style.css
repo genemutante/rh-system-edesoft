@@ -1066,19 +1066,29 @@ footer.page-footer {
 .modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; align-items: center; gap: 12px; background: #f8fafc; border-radius: 0 0 16px 16px;}
 
 /* Form Elements do Modal */
-.form-group { 
-    /* Removemos margin-bottom pois estamos usando gap no container pai */
-    margin-bottom: 0; 
-    display: flex; 
-    flex-direction: column; 
-    gap: 5px; 
+/* =============================================================
+   AJUSTE DE PROXIMIDADE (LABEL + INPUT)
+   ============================================================= */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px; /* Espaço entre um bloco de pergunta e outro */
 }
 
-.form-row { 
-    display: flex; 
-    gap: 16px; 
-    align-items: flex-end; /* Alinha os campos pela base (input) */
-    width: 100%;
+.form-group label {
+    display: block;
+    margin-bottom: 4px;  /* Reduzido para o título "colar" no input */
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.85rem;
+}
+
+/* Opcional: Adicionar um pouco mais de respiro entre as linhas do formulário */
+.form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px; 
 }
 .input-premium {
     padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; width: 100%;
@@ -1544,3 +1554,4 @@ button, input, optgroup, select, textarea {
   letter-spacing: -0.025em; /* Tracking negativo moderno */
   color: #0f172a;
 }
+
