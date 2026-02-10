@@ -582,6 +582,25 @@ async salvarCursoCompleto(dadosCurso, aulasPendentes = null) {
         if (error) throw error;
         return data;
     },
+
+
+
+// =========================
+// MONITORAMENTO (RPC)
+// =========================
+async carregarMonitoramento({ ano = null, etapa = null, participante = null } = {}) {
+  const { data, error } = await supabaseClient.rpc("monitoramento_dados", {
+    p_ano: ano,
+    p_etapa: etapa,
+    p_participante: participante,
+  });
+
+  if (error) throw new Error(normalizeError(error));
+  return Array.isArray(data) ? data : (data ?? []);
+},
+
+	
+    
     
     
 };
@@ -589,6 +608,7 @@ async salvarCursoCompleto(dadosCurso, aulasPendentes = null) {
 
 // No final do ficheiro db-handler.js
 window.DBHandler = DBHandler;
+
 
 
 
