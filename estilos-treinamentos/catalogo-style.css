@@ -805,3 +805,100 @@ input:checked + .slider:before{ transform: translateX(18px) !important; }
   padding-bottom: 0 !important;
   justify-content: flex-end !important;
 }
+
+/* =========================
+   MODAL: MAIS PREMIUM + MAIS COMPACTO (SEM QUEBRAR)
+   ========================= */
+
+/* Modal maior e mais “wide” */
+.modal-content.modal-curso-wide{
+  width: min(1280px, 96vw) !important;
+  max-width: none !important;
+  max-height: 92vh !important;
+}
+
+/* Topo mais fino */
+#modal-curso .modal-header{
+  padding: 10px 18px !important;
+}
+#modal-curso .modal-body{
+  padding: 14px 18px !important;
+  gap: 10px !important;
+}
+
+/* ✅ GRID do topo (Nome / Status / Descrição / Exibir) */
+.curso-topo-grid{
+  display: grid;
+  grid-template-columns: 2.2fr 1.1fr 2.2fr auto;
+  gap: 10px 12px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+/* Linha Trilha/Subtrilha compacta */
+.form-row-trilhas{
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: end;
+}
+
+/* Descrição mais enxuta (não “engole” a tela) */
+#curso-descricao{
+  resize: none !important;
+  max-height: 58px !important;  /* ~2 linhas confortáveis */
+  overflow: auto !important;
+}
+
+/* Labels mais discretos e consistentes */
+#modal-curso .form-group label{
+  font-size: .72rem !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+}
+
+/* Origem das aulas: menos altura */
+#modal-curso .source-selector{
+  padding: 3px !important;
+  gap: 8px !important;
+  border-radius: 10px !important;
+}
+#modal-curso .radio-option label{
+  padding: 7px 10px !important;
+  font-size: .82rem !important;
+}
+
+/* Youtube wrapper mais “tight” */
+#modal-curso .youtube-wrapper{
+  padding: 10px 12px !important;
+  gap: 6px !important;
+  border-radius: 12px !important;
+}
+#modal-curso .btn-youtube-sync{
+  height: 34px !important;
+}
+
+/* Metadata vira faixa menor */
+#modal-curso .sync-metadata{
+  padding: 4px 10px !important;
+  font-size: .74rem !important;
+}
+
+/* Lista manual/preview: scroll só nela */
+#lista-manual-preview{
+  max-height: 120px !important;
+  overflow-y: auto !important;
+}
+
+/* Toggle alinhado e compacto */
+#modal-curso .toggle-wrapper{
+  min-height: unset !important;
+  padding-bottom: 0 !important;
+  justify-content: flex-end !important;
+}
+
+/* Rodapé mais fino */
+#modal-curso .modal-footer{
+  padding: 10px 18px !important;
+}
