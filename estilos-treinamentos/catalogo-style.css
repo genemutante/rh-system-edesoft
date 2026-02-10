@@ -1689,3 +1689,69 @@ textarea.input-premium {
     padding: 0 12px !important;   /* Botão sync mais compacto */
     height: 34px !important;      /* Altura fixa igual ao input slim */
 }
+
+/* ==========================================================================
+   CORREÇÃO DO BOTÃO EXIBIR (TOGGLE SWITCH SLIM)
+   ========================================================================== */
+
+.toggle-wrapper {
+    /* Remove a altura fixa antiga e usa flex para alinhar na base */
+    height: auto !important;
+    min-height: 50px; /* Garante altura mínima igual ao bloco do input vizinho */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important; /* Empurra o botão para baixo (base alinhada) */
+    align-items: center !important;       /* Centraliza horizontalmente */
+    padding-bottom: 5px; /* Ajuste fino para alinhar com a linha de base dos inputs */
+}
+
+/* Ajuste do Label "Exibir?" */
+.toggle-wrapper label:first-child {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 4px !important;
+    color: #64748b !important;
+}
+
+/* O Switch (Caixa) - Mais compacto e arredondado */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px !important;   /* Reduzido de 50px para 42px */
+  height: 22px !important;  /* Reduzido de 26px para 22px */
+  margin: 0 !important;
+}
+
+/* O Trilho (Fundo) */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #cbd5e1; /* Cinza suave quando desligado */
+  transition: .3s;
+  border-radius: 20px !important;
+}
+
+/* A Bolinha (Círculo Branco) */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px !important;  /* Menor para caber no trilho de 22px */
+  width: 16px !important;
+  left: 3px !important;     /* Espaço da esquerda */
+  bottom: 3px !important;   /* Espaço de baixo */
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2); /* Sombra suave na bolinha */
+}
+
+/* Estado ATIVO (Azul) */
+input:checked + .slider {
+  background-color: #2563eb;
+}
+
+/* Movimento da Bolinha quando Ativo */
+input:checked + .slider:before {
+  transform: translateX(20px); /* Ajustado para a nova largura (42 - 16 - 3 - 3 = 20) */
+}
