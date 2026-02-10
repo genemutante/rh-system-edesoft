@@ -413,40 +413,94 @@
             }
         };
 
-        function renderizarLinhas(lista, container) {
-            // Ordena internamente por data/hora
-            lista.sort((a,b) => new Date(a.data_hora) - new Date(b.data_hora));
+function renderizarLinhas(lista, container) {
+            const agora = new Date(); // Pega a data e hora exata de agora
+
+            // Ordena: Data mais recente primeiro
+            lista.sort((a,b) => new Date(b.data_hora) - new Date(a.data_hora));
 
             lista.forEach(item => {
-                const d = new Date(item.data_hora);
-                const dataFmt = d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                const dataItem = new Date(item.data_hora);
+                
+                // Formatação da data para o Brasil
+                const dataFmt = dataItem.toLocaleString('pt-BR', { 
+                    day: '2-digit', month: '2-digit', 
+                    hour: '2-digit', minute: '2-digit' 
+                });
+
                 const nomeAula = item.aula ? `${item.aula.ordem}. ${item.aula.titulo}` : 'Curso Completo';
                 
-                // Define classe da badge
+                // --- LÓGICA DE STATUS INTELIGENTE ---
+                let labelStatus = item.status;
                 let statusClass = 'st-agendado';
-                if(item.status === 'REALIZADO') statusClass = 'st-realizado';
-                if(item.status === 'FALTA') statusClass = 'st-falta';
+                let corTexto = '#2563eb'; // Azul padrão
 
-                // Botões de Ação (Só aparecem se Agendado ou Falta, ou sempre para correção)
+                // Se já foi marcado como Realizado ou Falta no banco, respeita o banco
+                if (item.status === 'REALIZADO') {
+                    statusClass = 'st-realizado';
+                    corTexto = '#15803d';
+                } else if (item.status === 'FALTA') {
+                    statusClass = 'st-falta';
+                    corTexto = '#b91c1c';
+                } else if (item.status === 'AGENDADO') {
+                    // Se ainda está 'AGENDADO' no banco, verificamos a data
+                    if (dataItem < agora) {
+                        // PASSADO: Virou Falta automaticamente (Visualmente)
+                        labelStatus = 'FALTA (N.C.)'; // Não Confirmado
+                        statusClass = 'st-falta'; // Usa estilo de falta
+                        corTexto = '#ea580c'; // Laranja escuro para diferenciar de falta explícita
+                    } else {
+                        // FUTURO: Continua Agendado
+                        labelStatus = 'AGENDADO';
+                    }
+                }
+
+                // --- BOTÕES DE AÇÃO ---
+                // Aparecem se for Agendado (Futuro) ou Falta N.C. (Passado não tratado)
                 let botoesHtml = '';
                 
-                if (item.status === 'AGENDADO' || item.status === 'FALTA') {
-                    botoesHtml += `<button class="btn-mini btn-check" title="Confirmar Presença" onclick="mudarStatus(${item.id}, 'REALIZADO')">✅</button>`;
+                // Botão PRESENÇA (Aparece se for Agendado ou Falta)
+                // Se for passado, é crucial para corrigir a falta automática
+                if (item.status !== 'REALIZADO') {
+                    botoesHtml += `
+                        <button class="btn-mini btn-check" title="Aluno esteve presente" onclick="mudarStatus(${item.id}, 'REALIZADO')">
+                            ✅
+                        </button>
+                    `;
                 }
                 
-                if (item.status === 'AGENDADO' || item.status === 'REALIZADO') {
-                    botoesHtml += `<button class="btn-mini btn-miss" title="Marcar Falta" onclick="mudarStatus(${item.id}, 'FALTA')">❌</button>`;
+                // Botão FALTA EXPLÍCITA (Opcional, já que o não marcar vira falta, mas bom para travar o registro)
+                if (item.status === 'AGENDADO' && dataItem < agora) {
+                     botoesHtml += `
+                        <button class="btn-mini btn-miss" title="Confirmar Falta no Banco" onclick="mudarStatus(${item.id}, 'FALTA')">
+                            ❌
+                        </button>
+                    `;
                 }
 
-                botoesHtml += `<button class="btn-mini btn-trash" title="Cancelar/Excluir" onclick="excluirAgendamento(${item.id})">🗑️</button>`;
+                // Botão EXCLUIR (Sempre disponível)
+                botoesHtml += `
+                    <button class="btn-mini btn-trash" title="Excluir Agendamento" onclick="excluirAgendamento(${item.id})">
+                        🗑️
+                    </button>
+                `;
 
                 const tr = document.createElement('tr');
+                // Se for passado e não realizado, deixa o fundo levemente avermelhado para chamar atenção
+                if (labelStatus.includes('FALTA')) {
+                    tr.style.backgroundColor = '#fff7ed'; 
+                }
+
                 tr.innerHTML = `
-                    <td style="font-weight:600;">${dataFmt}</td>
+                    <td style="font-weight:600; color:${dataItem < agora ? '#64748b' : '#1e293b'}">${dataFmt}</td>
                     <td>${item.colaborador?.nome || '-'}</td>
                     <td style="color:#64748b;">${item.treinamento?.nome || '-'}</td>
                     <td>${nomeAula}</td>
-                    <td style="text-align:center;"><span class="tag-status ${statusClass}">${item.status}</span></td>
+                    <td style="text-align:center;">
+                        <span class="tag-status ${statusClass}" style="color:${corTexto}; border-color:${corTexto}40; background-color:${corTexto}10;">
+                            ${labelStatus}
+                        </span>
+                    </td>
                     <td class="actions-cell">
                         ${botoesHtml}
                     </td>
@@ -623,3 +677,4 @@
     </script>
 </body>
 </html>
+
