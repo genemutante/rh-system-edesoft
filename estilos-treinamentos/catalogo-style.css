@@ -1018,30 +1018,26 @@ footer.page-footer {
 
 .modal-content {
     background: #ffffff;
-    
-    /* LARGURA MAIOR: Aumentamos de 700px para 900px */
-    width: 95%; 
-    max-width: 900px; 
-    
+    width: 100%; 
+    /* AUMENTO: De 900px para 1000px para caber tudo confortavelmente */
+    max-width: 1000px; 
     border-radius: 16px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
-    
-    /* ALTURA FLEXÍVEL: Cresce conforme o conteúdo, mas não passa de 90% da tela */
-    max-height: 90vh; 
-    
-    /* Animação suave */
+    /* TRAVA DE ALTURA: Evita que o modal estoure a tela, mas o conteúdo interno será ajustado para não precisar de scroll */
+    max-height: 95vh; 
     animation: modalSlideIn 0.3s ease-out;
 }
 
-/* Garante que o corpo do modal tenha espaço e scroll apenas se for REALMENTE necessário */
 .modal-body { 
-    padding: 32px; /* Mais respiro interno */
+    /* REDUÇÃO: Menos padding vertical (de 32px para 20px) para ganhar espaço útil */
+    padding: 20px 32px; 
     overflow-y: auto; 
     display: flex;
     flex-direction: column;
-    gap: 16px; /* Espaçamento padrão entre campos */
+    /* REDUÇÃO: Gap menor entre linhas (de 16px para 12px) */
+    gap: 12px; 
 }
 
 /* Ajuste para telas muito grandes (Monitores Wide) */
@@ -1070,10 +1066,37 @@ footer.page-footer {
 .modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; align-items: center; gap: 12px; background: #f8fafc; border-radius: 0 0 16px 16px;}
 
 /* Form Elements do Modal */
-.form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
-.form-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.form-group { 
+    /* Removemos margin-bottom pois estamos usando gap no container pai */
+    margin-bottom: 0; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 5px; 
+}
+
+.form-row { 
+    display: flex; 
+    gap: 16px; 
+    align-items: flex-end; /* Alinha os campos pela base (input) */
+    width: 100%;
+}
 .input-premium {
     padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; width: 100%;
+}
+/* Área de Descrição Flexível */
+textarea.input-premium {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+/* Ajuste Fino para o Toggle Switch ficar alinhado visualmente com Inputs */
+.toggle-wrapper {
+    height: 42px; /* Mesma altura aproximada dos inputs */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 2px;
 }
 
 /* Tabela de Preview */
@@ -1428,17 +1451,16 @@ input:checked + .slider:before {
     filter: grayscale(100%);
 }
 
-/* Barra de Metadados do Sync */
 .sync-metadata {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-top: 8px;
-    padding: 8px 12px;
+    margin-top: 4px; /* Mais colado no input */
+    padding: 6px 12px; /* Mais fino verticalmente */
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
-    font-size: 0.8rem;
+    font-size: 0.75rem; /* Fonte levemente menor */
 }
 
 .meta-item {
@@ -1469,3 +1491,4 @@ input:checked + .slider:before {
     cursor: not-allowed;
     opacity: 0.7;
 }
+
