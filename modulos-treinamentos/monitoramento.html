@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edesoft Treinamentos - Painel de Monitoramento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<div class="app-wrapper">
+  <header class="top-nav">
+    <div class="brand-area">
+      <div class="brand-icon">
+        <i class="fa-solid fa-cube"></i>
+      </div>
+      <span>Edesoft Treinamentos</span>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-item"><a href="../index.html">                                                     <i class="fa-solid fa-house"></i>               <span>Início</span></a></div>
+      <div class="nav-item active"><a href="monitoramento.html">                               <i class="fa-solid fa-video"></i>               <span>Monitoramento</span></a></div>
+      <div class="nav-item"><a href="../cronograma/cronograma.html">                              <i class="fa-solid fa-calendar-days"></i>       <span>Cronograma</span></a></div>
+      <div class="nav-item"><a href="https://doc.clickup.com/37021426/d/h/139tqj-53273/da550dced55a9e8"> <i class="fa-solid fa-magnifying-glass"></i>    <span>Levantamento Necessidades</span></a></div>
+      <div class="nav-item"><a href="https://doc.clickup.com/37021426/d/h/139tqj-53313/cf20432f8212588"> <i class="fa-solid fa-list-check"></i>          <span>Descrição de Competências</span></a></div>
+      <div class="nav-item"><a href="https://doc.clickup.com/37021426/d/h/139tqj-53293/66644c643488265"> <i class="fa-solid fa-triangle-exclamation"></i><span>Riscos</span></a></div>
+      <div class="nav-item"><a href="https://doc.clickup.com/37021426/d/h/139tqj-53233/0fdc7474e90133e"> <i class="fa-solid fa-chess"></i>               <span>Plano de Treinamentos</span></a></div>
+      <div class="nav-item"><a href="../comunicacao/comunicacao.html">                                   <i class="fa-solid fa-bullhorn"></i>            <span>Eventos de Comunicação</span></a></div>
+      <div class="nav-item"><a href="../capacitacao-funcao/capacitacao-funcao.html">                     <i class="fa-solid fa-id-badge"></i>            <span>Capacitação Função</span></a></div>
+      <div class="nav-item"><a href="../capacitacao-colaborador/capacitacao-colaborador.html">           <i class="fa-solid fa-users"></i>               <span>Capacitação Colaborador</span></a></div>
+      <div class="nav-item"><a href="../indicadores-treinamentos/indicadores-treinamentos.html">         <i class="fa-solid fa-chart-line"></i>          <span>Indicadores Treinamentos</span></a></div>
+      <div class="nav-item"><a href="../analise-individual/analise-individual.html">                     <i class="fa-solid fa-user-check"></i>          <span>Análise Individuasl</span></a></div>
+      <div class="nav-item"><a href="../analise-global/analise-global.html">                             <i class="fa-solid fa-globe"></i>               <span>Análise Global</span></a></div>
+      <div class="nav-item"><a href="https://catalogo-academy.netlify.app/">                      <i class="fa-solid fa-graduation-cap"></i><span>Edesoft Academy</span></a></div>
+      <div class="nav-item"><a href="academy.html">                    <i class="fa-solid fa-graduation-cap"></i>      <span>Edesoft Academy</span></a></div>
+    </nav>
+
+    <div style="min-width: 250px;"></div>
+  </header>
+
+  <main class="dashboard-container">
+    <div class="control-bar">
+      <div class="kpi-wrapper">
+        <div class="kpi-compact" title="Volume Agendado vs Realizado">
+          <i class="fa-solid fa-users-viewfinder blue"></i>
+          <div>
+            <span>Vol:</span>
+            <span id="kpiVolume" class="kpi-value">0/0</span>
+          </div>
+        </div>
+
+        <div class="kpi-compact" title="Aderência Média">
+          <i class="fa-solid fa-chart-pie orange"></i>
+          <div>
+            <span>Aderência:</span>
+            <span id="kpiAderencia" class="kpi-value">0%</span>
+          </div>
+        </div>
+
+        <div class="kpi-compact" title="Turmas com Baixa Aderência">
+          <i class="fa-solid fa-circle-exclamation red"></i>
+          <div>
+            <span>Alertas:</span>
+            <span id="kpiAlertas" class="kpi-value">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="filters-wrapper">
+        <button class="btn-compact">Dia Útil</button>
+
+        <select id="filtroAno" class="select-compact"></select>
+
+        <select id="filtroEtapa" class="select-compact">
+          <option value="">Todas Etapas</option>
+        </select>
+
+        <select id="filtroParticipante" class="select-compact" style="min-width: 150px;">
+          <option value="">Todos Participantes</option>
+        </select>
+
+        <button id="btnLimpar" class="btn-link">Limpar</button>
+      </div>
+    </div>
+
+    <div class="painel-layout">
+      <div class="col-esquerda">
+        <div class="box box-flex">
+          <div class="table-scroll">
+            <table class="grid main-grid">
+              <thead>
+                <tr>
+                  <th class="col-data">Data</th>
+                  <th class="col-dia">Dia da Semana</th>
+                  <th class="col-etapa">Etapa do Processo</th>
+                  <th class="col-agendados text-center">Agend.</th>
+                  <th class="col-realizados text-center">Realiz.</th>
+                  <th class="col-aderencia text-center">Aderência</th>
+                  <th class="col-monitorado text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody id="gridPrincipal"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="box box-fixed-height">
+          <div class="panel-header">Detalhe Monitoramento</div>
+          <div class="table-scroll">
+            <table class="grid dark-header">
+              <thead>
+                <tr>
+                  <th class="col-ev-origem">Origem</th>
+                  <th class="col-ev-data">Data</th>
+                  <th class="col-ev-etapa">Etapa</th>
+                  <th class="col-ev-descricao">Evidência</th>
+                  <th class="col-ev-link text-center">Url</th>
+                </tr>
+              </thead>
+              <tbody id="evidencias"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-direita">
+        <div class="box box-half">
+          <div class="panel-header dark-blue-accent">
+            Aula(s) do dia
+          </div>
+          <div class="content-scroll" id="aulas"></div>
+        </div>
+
+        <div class="box box-half">
+          <div class="panel-header dark-blue-accent">
+            Participante(s)
+          </div>
+          <div class="table-scroll">
+            <div id="participantes" class="participants-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <span>[ App v1.0 ]</span>
+    <span>Última atualização de dados: 19/09/2024 14:04:38</span>
+  </footer>
+
+</div>
+
+<!-- =========================
+     DADOS: BANCO (Supabase)
+     - Layout NÃO muda
+     - data.js foi removido
+     - Carrega dados via db-handler.js
+     - Só carrega app.js DEPOIS de window.dados estar pronto
+========================= -->
+
+<!-- REMOVIDO: <script src="data.js"></script> -->
+
+
+<script type="module" src="../../bd-treinamentos/db-handler.js"></script>
+
+<script type="module">
+  const waitForDBHandler = (timeoutMs = 15000) => new Promise((resolve, reject) => {
+    const start = Date.now();
+    const tick = () => {
+      if (window.DBHandler && typeof window.DBHandler.carregarMonitoramento === "function") return resolve();
+      if (Date.now() - start > timeoutMs) return reject(new Error("DBHandler/carregarMonitoramento não carregou a tempo."));
+      requestAnimationFrame(tick);
+    };
+    tick();
+  });
+
+  try {
+    await waitForDBHandler();
+
+    // Mantemos sem filtros no load inicial.
+    // O app.js seguirá filtrando client-side como já faz hoje.
+    const dados = await window.DBHandler.carregarMonitoramento({
+      ano: null,
+      etapa: null,
+      participante: null,
+    });
+
+    window.dados = Array.isArray(dados) ? dados : (dados ?? []);
+  } catch (err) {
+    console.error("Erro ao carregar dados do banco:", err);
+    window.dados = [];
+    alert("Erro ao carregar dados do banco. Verifique o console.");
+  }
+
+  // ✅ carrega o app.js somente agora (ele assume "dados" existente)
+  const s = document.createElement("script");
+  s.src = "app.js";
+  s.defer = true;
+  document.body.appendChild(s);
+</script>
+
+</body>
+</html>
