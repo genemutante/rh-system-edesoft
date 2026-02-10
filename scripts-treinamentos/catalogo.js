@@ -1,9 +1,20 @@
 /* =============================================================
-   catalogo.JS - Versão Consolidada com Logs de Auditoria
+   catalogo.JS - Versão Corrigida e Consolidada
    ============================================================= */
+
+// 1. IMPORTAÇÃO OBRIGATÓRIA (Sem isso, nada funciona)
 import { DBHandler } from "../bd-treinamentos/db-handler.js";
+
 let cursos = [];
 const YOUTUBE_API_KEY_FIXA = "AIzaSyAJyCenPXn41mbjieW6wTzeaFPYFX5Xrzo";
+
+// --- Variáveis Globais de Elementos DOM (Inicializadas depois) ---
+let modalCurso, formCurso, areaDelete, btnSalvarCurso;
+let modalAulas, listaAulasUl;
+let modalYouTube, btnSyncRapido, selectCursoYT, inputPlaylistId, inputApiKey;
+let videosPendentes = []; 
+let houveAlteracao = false;
+
 // --- Utilitários ---
 function formatarDuracao(minutos) {
   if (!minutos || isNaN(minutos)) return "0 min";
@@ -19,79 +30,65 @@ function normalizarTexto(str) {
 }
 
 // =============================================================
-// CORREÇÃO: Função atualizarResumo com os IDs Corretos
+// FUNÇÕES PRINCIPAIS DE DOM (Carregadas após o DOM estar pronto)
 // =============================================================
-function atualizarResumo(lista) {
-  console.log("📊 [Resumo] Processando lista de cursos:", lista.length, "itens");
 
+function carregarElementosDOM() {
+    // Modal Edição
+    modalCurso = document.getElementById("modal-curso");
+    formCurso = document.getElementById("form-curso");
+    areaDelete = document.getElementById("area-delete");
+    btnSalvarCurso = document.getElementById("btn-salvar-curso");
+    
+    // Modal Aulas
+    modalAulas = document.getElementById("modal-lista-aulas");
+    listaAulasUl = document.getElementById("lista-aulas-container");
+
+    // Modal YouTube
+    modalYouTube = document.getElementById("modal-youtube");
+    btnSyncRapido = document.getElementById("btn-sync-youtube-rapido");
+    selectCursoYT = document.getElementById("yt-curso-selecionado");
+    inputPlaylistId = document.getElementById("yt-playlist-id");
+    inputApiKey = document.getElementById("yt-api-key");
+}
+
+function atualizarResumo(lista) {
   const total = lista.length;
-  // Proteção para Case Sensitivity
   const disponiveis = lista.filter((c) => (c.status || "").toUpperCase() === "DISPONÍVEL").length;
   const emDev = lista.filter((c) => (c.status || "").toUpperCase() === "EM DESENVOLVIMENTO").length;
   const backlog = lista.filter((c) => (c.status || "").toUpperCase() === "BACKLOG").length;
 
-  const totalAulas = lista.reduce((acc, c) => {
-    const q = Number(c.quantidadeAulas);
-    return (isNaN(q) || q <= 0) ? acc : acc + q;
-  }, 0);
+  const totalAulas = lista.reduce((acc, c) => acc + (Number(c.quantidadeAulas) || 0), 0);
+  const totalMinutos = lista.reduce((acc, c) => acc + (Number(c.duracaoMinutos) || 0), 0);
 
-  const totalMinutos = lista.reduce((acc, c) => {
-    const m = Number(c.duracaoMinutos);
-    return (isNaN(m) || m <= 0) ? acc : acc + m;
-  }, 0);
+  const setContent = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
 
-  console.group("📈 Auditoria do Dashboard");
-  console.log("Status:", { total, disponiveis, emDev, backlog });
-  console.log("Cálculos:", { totalAulas, totalMinutos });
-  console.groupEnd();
-
-  // --- ATUALIZAÇÃO DO DOM (IDs Corrigidos) ---
-  
-  // Total de Cursos
-  const elTotal = document.getElementById("resumo-total");
-  if (elTotal) elTotal.textContent = total;
-
-  // Total Disponível
-  const elDisp = document.getElementById("resumo-disponivel");
-  if (elDisp) elDisp.textContent = disponiveis;
-
-  // Total em Desenvolvimento
-  const elDev = document.getElementById("resumo-em-dev");
-  if (elDev) elDev.textContent = emDev;
-
-  // Total Backlog
-  const elBack = document.getElementById("resumo-backlog");
-  if (elBack) elBack.textContent = backlog;
-  
-  // CORREÇÃO 1: ID ajustado de "total-aulas" para "resumo-total-aulas"
-  const elTotalAulas = document.getElementById("resumo-total-aulas");
-  if (elTotalAulas) elTotalAulas.textContent = totalAulas;
-
-  // CORREÇÃO 2: ID ajustado de "resumo-tempo" para "resumo-horas"
-  const elHoras = document.getElementById("resumo-horas");
-  if (elHoras) elHoras.textContent = formatarDuracao(totalMinutos);
+  setContent("resumo-total", total);
+  setContent("resumo-disponivel", disponiveis);
+  setContent("resumo-em-dev", emDev);
+  setContent("resumo-backlog", backlog);
+  setContent("resumo-total-aulas", totalAulas);
+  setContent("resumo-horas", formatarDuracao(totalMinutos));
 }
-
 
 // --- Renderização do Catálogo ---
 function renderCursos(lista) {
   const container = document.getElementById("lista-cursos");
+  if(!container) return;
+  
   container.innerHTML = "";
 
   if (lista.length === 0) {
-    container.innerHTML = `<div class="lista-cursos-vazia">Nenhum curso encontrado com os filtros atuais.</div>`;
+    container.innerHTML = `<div class="lista-cursos-vazia">Nenhum curso encontrado.</div>`;
     return;
   }
 
-  // 1. Ordenação (Trilha > Subtrilha > Ordem > Nome)
+  // Ordenação
   const listaOrdenada = [...lista].sort((a, b) => {
     const t = (a.trilha || "Geral").localeCompare(b.trilha || "Geral");
     if (t !== 0) return t;
     const s = (a.subtrilha || "").localeCompare(b.subtrilha || "");
     if (s !== 0) return s;
-    const ordemA = a.ordem_curso_modulo || 999;
-    const ordemB = b.ordem_curso_modulo || 999;
-    if (ordemA !== ordemB) return ordemA - ordemB;
     return (a.nome || "").localeCompare(b.nome || "");
   });
 
@@ -99,10 +96,8 @@ function renderCursos(lista) {
   let subAtual = null;
 
   listaOrdenada.forEach((curso) => {
-    // --- Cabeçalhos (Agrupamento visual) ---
+    // Cabeçalhos de Trilha
     const trilhaDoCurso = curso.trilha || "Geral";
-    
-    // Header da Trilha Principal
     if (trilhaDoCurso !== trilhaAtual) {
       trilhaAtual = trilhaDoCurso;
       subAtual = null; 
@@ -111,8 +106,6 @@ function renderCursos(lista) {
       h.innerHTML = `<span>${trilhaAtual}</span><small>Trilha principal</small>`;
       container.appendChild(h);
     }
-    
-    // Header da Subtrilha
     if (curso.subtrilha && curso.subtrilha !== subAtual) {
       subAtual = curso.subtrilha;
       const h = document.createElement("div");
@@ -121,118 +114,67 @@ function renderCursos(lista) {
       container.appendChild(h);
     }
 
-    // --- Preparação dos Dados ---
+    // Dados do Card
     const qtdAulas = Number(curso.quantidadeAulas) || 0;
-    const temLink = Boolean(curso.link && curso.link.trim());
-    const podeAcessar = temLink; 
-    
-    const statusClass = (curso.status || "")
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/\s+/g, "-");
-
-    // === NOVO: Verifica se está oculto ===
-    // Se for false, é oculto. Se for null/undefined/true, exibe.
+    const statusClass = (curso.status || "").toLowerCase().replace(/\s+/g, "-");
     const isOculto = curso.exibir_catalogo === false;
 
-    // --- HTML do Card ---
-    const card = document.createElement("article");
-    card.className = "card-curso";
-    
-    // Adiciona classe visual se for oculto (CSS .is-hidden)
-    if (isOculto) card.classList.add("is-hidden");
-
-    card.setAttribute("data-status-text", curso.status || "Indefinido");
-    if(statusClass) card.classList.add(`status-${statusClass}`);
-
-    // Lógica do Botão de Acesso (Ícone Seta ou Texto 'Em breve')
-    let botaoAcessoHtml = "";
-    if (podeAcessar) {
-        botaoAcessoHtml = `
-            <button class="btn-icon-acessar" onclick="window.open('${curso.link}', '_blank')" title="Acessar Curso">
-               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
-            </button>
-        `;
-    } else {
-        botaoAcessoHtml = `
-            <button class="btn-disabled-text" disabled>
-               Em breve
-            </button>
-        `;
+    // Botão Acesso
+    let botaoAcessoHtml = `<button class="btn-disabled-text" disabled>Em breve</button>`;
+    if (curso.link) {
+        botaoAcessoHtml = `<button class="btn-icon-acessar" onclick="window.open('${curso.link}', '_blank')" title="Acessar"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg></button>`;
     }
 
-    // Template do Card
+    const card = document.createElement("article");
+    card.className = "card-curso";
+    if (isOculto) card.classList.add("is-hidden");
+    if(statusClass) card.classList.add(`status-${statusClass}`);
+
     card.innerHTML = `
       <header class="card-header">
         <div class="card-trilhas">
            ${curso.subtrilha ? `<span class="badge-subtrilha">${curso.subtrilha}</span>` : `<span class="badge-trilha">${curso.trilha || 'Geral'}</span>`}
-           
            ${isOculto ? '<span class="badge-oculto">🔒 OCULTO</span>' : ''}
         </div>
         <span class="badge-status ${statusClass}">${curso.status || 'Rascunho'}</span>
       </header>
-
       <h2 class="card-titulo">${curso.nome}</h2>
-      <p class="card-descricao">${curso.descricao || "Sem descrição disponível."}</p>
-
+      <p class="card-descricao">${curso.descricao || "Sem descrição."}</p>
       <footer class="card-footer">
         <div class="pill-duracao">
            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
            <strong>${formatarDuracao(curso.duracaoMinutos)}</strong>
         </div>
-
         <div style="display: flex; gap: 8px;">
-            
-            <button class="btn-icon-grade btn-abrir-grade" data-id="${curso.id}" title="Ver Grade Curricular">
+            <button class="btn-icon-grade btn-abrir-grade" data-id="${curso.id}" title="Ver Grade">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
                 <span class="grade-count">${qtdAulas}</span>
             </button>
-            
-            <button class="btn-icon-editar" data-id="${curso.id}" title="Editar Cadastro">
+            <button class="btn-icon-editar" data-id="${curso.id}" title="Editar">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             </button>
-
             ${botaoAcessoHtml}
         </div>
       </footer>
     `;
-
     container.appendChild(card);
   });
 
-  // --- LISTENERS (Eventos de Clique) ---
-
-  // A) Botão Grade (Modal de Aulas)
+  // Attach Listeners
   document.querySelectorAll('.btn-abrir-grade').forEach(btn => {
       btn.addEventListener('click', (e) => {
           e.stopPropagation(); 
-          const id = e.currentTarget.dataset.id;
-          if(typeof abrirModalAulas === 'function') {
-              abrirModalAulas(id); 
-          }
+          abrirModalAulas(e.currentTarget.dataset.id); 
       });
   });
 
-  // B) Botão Editar (Modal de Manutenção)
   document.querySelectorAll('.btn-icon-editar').forEach(btn => {
       btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const id = e.currentTarget.dataset.id;
-          if(typeof editarCurso === 'function') {
-              editarCurso(id);
-          } else {
-              console.error("Função editarCurso não encontrada.");
-          }
+          editarCurso(e.currentTarget.dataset.id);
       });
   });
 }
-
-
-
-
-
-
-
 
 // --- Filtros ---
 function preencherOpcoesTrilha() {
@@ -264,23 +206,15 @@ function aplicarFiltros() {
   const trilhaSel = document.getElementById("filtro-trilha").value;
   const subSel = document.getElementById("filtro-subtrilha").value;
   const statusSel = document.getElementById("filtro-status").value;
-  
-  // NOVO: Lê o checkbox "Mostrar Ocultos" da toolbar
   const elVerOcultos = document.getElementById("filtro-ver-ocultos");
   const verOcultos = elVerOcultos ? elVerOcultos.checked : false;
 
   const filtrados = cursos.filter((c) => {
-    // --- REGRA DE OURO (Ocultação) ---
-    // Se curso.exibir_catalogo for false E o usuário não marcou "ver ocultos" -> Esconde.
     if (c.exibir_catalogo === false && !verOcultos) return false;
-
-    // Filtros normais
-    const matchBusca = normalizarTexto(c.nome).includes(termo) || 
-                       normalizarTexto(c.descricao).includes(termo);
+    const matchBusca = normalizarTexto(c.nome).includes(termo) || normalizarTexto(c.descricao).includes(termo);
     const matchTrilha = !trilhaSel || c.trilha === trilhaSel;
     const matchSub = !subSel || c.subtrilha === subSel;
     const matchStatus = !statusSel || (c.status || "").toUpperCase() === statusSel;
-
     return matchBusca && matchTrilha && matchSub && matchStatus;
   });
 
@@ -288,309 +222,54 @@ function aplicarFiltros() {
   atualizarResumo(filtrados);
 }
 
-// Listener para o checkbox da Toolbar (cole logo abaixo da função)
-const checkOcultos = document.getElementById("filtro-ver-ocultos");
-if(checkOcultos) {
-    checkOcultos.addEventListener("change", aplicarFiltros);
-}
-
-
-
-
 // --- Inicialização ---
 async function inicializarApp() {
   console.log("🚀 Iniciando App...");
+  
+  // 1. Garante que variáveis globais do DOM estão preenchidas
+  carregarElementosDOM();
+
+  // 2. Setup Listeners Globais
+  setupGlobalListeners();
+
   try {
     const dados = await DBHandler.listarTreinamentos();
-    console.log("📥 Dados brutos do banco:", dados);
     
-    // Mapeamento com CÁLCULO DINÂMICO
     cursos = dados.map(item => {
-      // 1. Verifica se existem aulas, senão é array vazio
       const listaAulas = item.aulas || [];
-
-      // 2. Calcula o total de aulas
-      const qtdCalculada = listaAulas.length;
-
-      // 3. Calcula a duração total somando os minutos de cada aula
-      const duracaoCalculada = listaAulas.reduce((acc, aula) => {
-        return acc + (Number(aula.duracao_minutos) || 0);
-      }, 0);
-
       return {
         ...item,
-        // Agora usamos os valores calculados
-        quantidadeAulas: qtdCalculada, 
-        duracaoMinutos: duracaoCalculada,
-        
-        // Mantém o fallback para trilha
+        quantidadeAulas: listaAulas.length, 
+        duracaoMinutos: listaAulas.reduce((acc, a) => acc + (Number(a.duracao_minutos) || 0), 0),
         trilha: item.trilha || "Geral",
         subtrilha: item.subtrilha || ""
       };
     });
 
     preencherOpcoesTrilha();
-    aplicarFiltros(); // Isso atualiza o resumo e os cards
+    aplicarFiltros();
   } catch (e) {
     console.error("❌ Falha na inicialização:", e);
+    alert("Erro ao conectar com o banco de dados. Verifique o console.");
   }
 }
 
-// Verifica se o DOM já foi carregado para evitar perder o evento
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", inicializarApp);
-} else {
-    // Se o script carregou depois do HTML estar pronto, inicia direto
-    inicializarApp();
-}
-
+// Inicializa quando o DOM estiver pronto
 document.addEventListener("DOMContentLoaded", inicializarApp);
 
-// Listeners
-document.getElementById("filtro-trilha").addEventListener("change", (e) => {
-  preencherOpcoesSubtrilha(e.target.value);
-  aplicarFiltros();
-});
-document.getElementById("filtro-subtrilha").addEventListener("change", aplicarFiltros);
-document.getElementById("filtro-status").addEventListener("change", aplicarFiltros);
-document.getElementById("filtro-busca").addEventListener("input", aplicarFiltros);
-document.getElementById("btn-limpar-filtros").addEventListener("click", () => {
-  document.getElementById("filtro-trilha").value = "";
-  document.getElementById("filtro-status").value = "";
-  document.getElementById("filtro-busca").value = "";
-  preencherOpcoesSubtrilha("");
-  aplicarFiltros();
-});
 
-
-/* =============================================================
-   MÓDULO YOUTUBE SYNC
-   ============================================================= */
-
-const modalYouTube = document.getElementById("modal-youtube");
-const btnAbrirYoutube = document.getElementById("btn-modal-youtube");
-const btnFecharModal = document.querySelector(".btn-close-modal");
-const selectCursoYT = document.getElementById("yt-curso-selecionado");
-const inputApiKey = document.getElementById("yt-api-key");
-const inputPlaylistId = document.getElementById("yt-playlist-id");
-const btnBuscarVideos = document.getElementById("btn-buscar-videos");
-const btnSalvarSync = document.getElementById("btn-salvar-sincronizacao");
-const areaPreview = document.getElementById("yt-preview-area");
-const tbodyPreview = document.getElementById("yt-lista-videos");
-
-let videosEncontrados = []; // Armazena temporariamente os vídeos buscados
-
-// 1. Abrir Modal e Carregar Cursos
-if(btnAbrirYoutube) {
-    btnAbrirYoutube.addEventListener("click", () => {
-        modalYouTube.style.display = "flex";
-        carregarCursosNoSelect();
-        
-        // Tenta recuperar API Key salva anteriormente
-        const savedKey = localStorage.getItem("yt_api_key");
-        if(savedKey) inputApiKey.value = savedKey;
-    });
-}
-
-// 2. Fechar Modal
-if(btnFecharModal) {
-    btnFecharModal.addEventListener("click", () => {
-        modalYouTube.style.display = "none";
-        videosEncontrados = [];
-        areaPreview.style.display = "none";
-    });
-}
-
-// 3. Popular Combo de Cursos
-function carregarCursosNoSelect() {
-    selectCursoYT.innerHTML = '<option value="">Selecione um curso...</option>';
-    // Usa a variável global 'cursos' que já está carregada na memória
-    cursos.forEach(c => {
-        const option = document.createElement("option");
-        option.value = c.id;
-        option.textContent = `${c.trilha} - ${c.nome}`;
-        // Se o curso tiver link, tenta extrair o ID da playlist pra ajudar
-        if(c.link && c.link.includes("list=")) {
-            option.dataset.playlist = c.link.split("list=")[1];
-        }
-        selectCursoYT.appendChild(option);
-    });
-}
-
-// Ao selecionar curso, preenche o ID da playlist se tiver
-selectCursoYT.addEventListener("change", (e) => {
-    const selectedOpt = selectCursoYT.options[selectCursoYT.selectedIndex];
-    if(selectedOpt.dataset.playlist) {
-        inputPlaylistId.value = selectedOpt.dataset.playlist;
-    }
-});
-
-// 4. Buscar Vídeos (Lógica portada do seu HTML)
-btnBuscarVideos.addEventListener("click", async () => {
-    const apiKey = inputApiKey.value.trim();
-    let playlistId = inputPlaylistId.value.trim();
-    const statusMsg = document.getElementById("yt-status-msg");
-
-    if (!apiKey || !playlistId) {
-        alert("Por favor, preencha a API Key e o ID da Playlist.");
-        return;
-    }
-
-    // Limpa URL se o usuário colou o link inteiro
-    if(playlistId.includes("list=")) {
-        playlistId = playlistId.split("list=")[1].split("&")[0];
-    }
-
-    // Salva API Key para facilitar próxima vez
-    localStorage.setItem("yt_api_key", apiKey);
-
-    statusMsg.textContent = "⏳ Buscando dados no YouTube...";
-    statusMsg.style.color = "blue";
-    btnBuscarVideos.disabled = true;
-    tbodyPreview.innerHTML = "";
-    
-    try {
-        let videos = [];
-        let nextPageToken = "";
-        
-        // Loop para pegar paginação (caso tenha mais de 50 vídeos)
-        do {
-            const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${playlistId}&key=${apiKey}&pageToken=${nextPageToken}`;
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (data.error) throw new Error(data.error.message);
-
-            // Coleta IDs dos vídeos para buscar duração
-            const videoIds = data.items.map(item => item.contentDetails.videoId).join(",");
-            
-            // Busca detalhes (Duração)
-            const urlDetails = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${videoIds}&key=${apiKey}`;
-            const respDetails = await fetch(urlDetails);
-            const dataDetails = await respDetails.json();
-
-            // Mescla informações
-            const pageVideos = dataDetails.items.map(item => ({
-                titulo: item.snippet.title,
-                link_video: `https://www.youtube.com/watch?v=${item.id}`,
-                descricao: item.snippet.description ? item.snippet.description.substring(0, 200) + "..." : "",
-                duracao_minutos: parseIsoDuration(item.contentDetails.duration),
-                ordem: 0 // Será ajustado no loop final
-            }));
-
-            videos = [...videos, ...pageVideos];
-            nextPageToken = data.nextPageToken;
-
-        } while (nextPageToken);
-
-        videosEncontrados = videos; // Guarda na variável global
-        renderPreview(videos);
-        
-        statusMsg.textContent = `✅ ${videos.length} vídeos encontrados!`;
-        statusMsg.style.color = "green";
-        btnSalvarSync.disabled = false;
-        areaPreview.style.display = "block";
-
-    } catch (error) {
-        console.error(error);
-        statusMsg.textContent = "❌ Erro: " + error.message;
-        statusMsg.style.color = "red";
-    } finally {
-        btnBuscarVideos.disabled = false;
-    }
-});
-
-// 5. Renderizar Preview
-function renderPreview(lista) {
-    document.getElementById("yt-total-videos").textContent = lista.length;
-    let html = "";
-    lista.forEach((v, index) => {
-        html += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${v.titulo}</td>
-                <td>${v.duracao_minutos} min</td>
-                <td><a href="${v.link_video}" target="_blank">Link</a></td>
-            </tr>
-        `;
-    });
-    tbodyPreview.innerHTML = html;
-}
-
-// 6. Converter ISO 8601 (PT1H2M) para Minutos Inteiros
-function parseIsoDuration(iso) {
-    const match = iso.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-    const hours = (parseInt(match[1]) || 0);
-    const minutes = (parseInt(match[2]) || 0);
-    // Segundos ignorados para cálculo de aulas, mas arredondamos se > 30s se quiser
-    return (hours * 60) + minutes;
-}
-
-// 7. Salvar no Banco
-btnSalvarSync.addEventListener("click", async () => {
-    const cursoId = selectCursoYT.value;
-    if(!cursoId) return;
-
-    const statusMsg = document.getElementById("yt-status-msg");
-    statusMsg.textContent = "💾 Salvando no banco...";
-    btnSalvarSync.disabled = true;
-
-    try {
-        // Prepara o array final com o ID do curso e Ordem sequencial
-        const payload = videosEncontrados.map((v, index) => ({
-            treinamento_id: cursoId,
-            titulo: v.titulo,
-            descricao: v.descricao,
-            link_video: v.link_video,
-            duracao_minutos: v.duracao_minutos,
-            ordem: index + 1
-        }));
-
-        await DBHandler.sincronizarAulasPorPlaylist(cursoId, payload);
-
-        alert("Sucesso! Aulas atualizadas.");
-        modalYouTube.style.display = "none";
-        
-        // Recarrega a aplicação para atualizar os cards e totais
-        inicializarApp(); 
-
-    } catch (error) {
-        console.error(error);
-        statusMsg.textContent = "Erro ao salvar: " + error.message;
-        alert("Erro ao salvar no banco. Veja o console.");
-    } finally {
-        btnSalvarSync.disabled = false;
-    }
-});
-
-
-/* =============================================================
-   MODAL DE VISUALIZAÇÃO DE AULAS (GRADE)
-   ============================================================= */
-const modalAulas = document.getElementById("modal-lista-aulas");
-const listaAulasUl = document.getElementById("lista-aulas-container");
-
-// Fechar modal
-document.querySelectorAll(".btn-close-modal-aulas").forEach(btn => {
-    btn.addEventListener("click", () => {
-        modalAulas.style.display = "none";
-    });
-});
-
+// =============================================================
+// MODAL DE GRADE CURRICULAR
+// =============================================================
 function abrirModalAulas(id) {
-    // 1. Acha o curso na memória
     const curso = cursos.find(c => c.id == id);
     if (!curso) return;
 
-    // 2. Preenche Header
     document.getElementById("modal-titulo-curso").textContent = curso.nome;
     document.getElementById("modal-qtd-aulas").textContent = `${curso.quantidadeAulas} aulas`;
     document.getElementById("modal-tempo-total").textContent = formatarDuracao(curso.duracaoMinutos);
-
-    // 3. Renderiza Lista
     listaAulasUl.innerHTML = "";
     
-    // Ordena por ordem
     const aulasOrdenadas = (curso.aulas || []).sort((a, b) => a.ordem - b.ordem);
 
     if (aulasOrdenadas.length === 0) {
@@ -603,96 +282,72 @@ function abrirModalAulas(id) {
                 <div class="aula-ordem">${index + 1}</div>
                 <div class="aula-info">
                     <span class="aula-titulo">${aula.titulo}</span>
-                    <span class="aula-tempo">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        ${aula.duracao_minutos} min
-                    </span>
+                    <span class="aula-tempo">${aula.duracao_minutos} min</span>
                 </div>
-                ${aula.link_video ? `
-                <a href="${aula.link_video}" target="_blank" class="btn-ver-video" title="Assistir Aula">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </a>` : ''}
+                ${aula.link_video ? `<a href="${aula.link_video}" target="_blank" class="btn-ver-video" title="Assistir">📺</a>` : ''}
             `;
             listaAulasUl.appendChild(li);
         });
     }
-
-    // 4. Mostra Modal
     modalAulas.style.display = "flex";
 }
 
-/* =============================================================
-   MÓDULO DE MANUTENÇÃO (CRUD CURSOS + SYNC COM RASCUNHO)
-   ============================================================= */
 
-// Variáveis de Estado Local (Rascunho)
-let videosPendentes = []; // Armazena a lista do YouTube antes de salvar
-let houveAlteracao = false; // Controla se o botão salvar deve acender
+// =============================================================
+// MÓDULO DE MANUTENÇÃO (CRUD)
+// =============================================================
 
-const modalCurso = document.getElementById("modal-curso");
-const formCurso = document.getElementById("form-curso");
-const btnNovoCurso = document.getElementById("btn-novo-curso");
-const btnSalvarCurso = document.getElementById("btn-salvar-curso");
-const btnExcluirCurso = document.getElementById("btn-excluir-curso");
-const areaDelete = document.getElementById("area-delete");
-
-// --- Monitoramento de Alterações (Para acender o botão Salvar) ---
 function marcarAlteracao() {
     houveAlteracao = true;
-    btnSalvarCurso.disabled = false;
-    btnSalvarCurso.style.opacity = "1";
-    btnSalvarCurso.style.cursor = "pointer";
-    btnSalvarCurso.textContent = "Salvar Alterações";
+    if(btnSalvarCurso) {
+        btnSalvarCurso.disabled = false;
+        btnSalvarCurso.innerText = "Salvar Alterações";
+    }
 }
 
-// Adiciona listener em todos os campos para detectar digitação
-formCurso.querySelectorAll("input, select, textarea").forEach(el => {
-    el.addEventListener("input", marcarAlteracao);
-    el.addEventListener("change", marcarAlteracao);
-});
-
-// --- Reset Completo do Modal ---
 function resetarModalManutencao() {
     formCurso.reset();
     videosPendentes = []; 
     houveAlteracao = false;
+    if(btnSalvarCurso) btnSalvarCurso.disabled = true;
     
     // Reseta UI
-    btnSalvarCurso.disabled = true; // Começa apagado
-    document.getElementById("badge-pendente").style.display = "none";
-    document.getElementById("meta-qtd-aulas").textContent = "-";
-    document.getElementById("meta-tempo-total").textContent = "-";
-    document.getElementById("meta-data-sync").textContent = "-";
+    const elBadge = document.getElementById("badge-pendente");
+    if(elBadge) elBadge.style.display = "none";
     
-    // Reseta cor da data
-    document.getElementById("meta-data-sync").style.color = "";
-    document.getElementById("meta-data-sync").style.fontWeight = "";
+    document.getElementById("meta-qtd-aulas").textContent = "0";
+    document.getElementById("meta-tempo-total").textContent = "0 min";
     
-    areaDelete.style.display = "none";
+    const elData = document.getElementById("meta-data-sync");
+    if(elData) {
+        elData.textContent = "-";
+        elData.style.color = "";
+        elData.style.fontWeight = "";
+    }
+    
+    if(areaDelete) areaDelete.style.display = "none";
+    
+    // Limpa lista manual visual
+    const listaManual = document.getElementById("lista-manual-preview");
+    if(listaManual) listaManual.innerHTML = "";
+    const btnLimpar = document.getElementById("btn-limpar-aulas");
+    if(btnLimpar) btnLimpar.style.display = "none";
+
+    // Reseta abas para Youtube por padrão
+    const btnYT = document.querySelector('.tab-btn[data-target="tab-youtube"]');
+    if(btnYT && window.alternarAba) window.alternarAba(btnYT);
 }
 
-// 1. Abrir Modal para NOVO curso
-if(btnNovoCurso) {
-    btnNovoCurso.addEventListener("click", () => {
-        resetarModalManutencao();
-        document.getElementById("curso-id").value = ""; 
-        document.getElementById("modal-curso-titulo").textContent = "Novo Curso";
-        
-        // PADRÃO: Novo curso já nasce Exibido e Trilha Select populado
-        document.getElementById("curso-exibir").checked = true;
-        popularSelectTrilhas("");
-
-        modalCurso.style.display = "flex";
-    });
-}
-
-// 2. Abrir Modal para EDITAR curso
+// --- FUNÇÃO DE EDIÇÃO (CHAMADA PELO BOTÃO DO CARD) ---
+// Agora é global no escopo do módulo para ser chamada pelo listener
 function editarCurso(id) {
-    resetarModalManutencao(); // Limpa lixo anterior
+    if(!modalCurso) { console.error("Modal não carregado"); return; }
+    
+    resetarModalManutencao();
     const curso = cursos.find(c => c.id == id);
     if (!curso) return;
 
-    // Preenche Campos Básicos
+    // Preenche Campos
     document.getElementById("curso-id").value = curso.id;
     document.getElementById("curso-nome").value = curso.nome;
     document.getElementById("curso-status").value = (curso.status || "DISPONÍVEL").toUpperCase();
@@ -701,227 +356,39 @@ function editarCurso(id) {
     document.getElementById("curso-descricao").value = curso.descricao || "";
     document.getElementById("curso-exibir").checked = (curso.exibir_catalogo !== false);
 
-    // Preenche Metadados (Aulas e Data)
+    // Preenche Metadados
     document.getElementById("meta-qtd-aulas").textContent = curso.quantidadeAulas || 0;
     document.getElementById("meta-tempo-total").textContent = formatarDuracao(curso.duracaoMinutos);
     
+    const elData = document.getElementById("meta-data-sync");
     if(curso.ultima_sincronizacao) {
-        const data = new Date(curso.ultima_sincronizacao);
-        document.getElementById("meta-data-sync").textContent = data.toLocaleString('pt-BR');
+        elData.textContent = new Date(curso.ultima_sincronizacao).toLocaleString('pt-BR');
     } else {
-        document.getElementById("meta-data-sync").textContent = "Nunca";
+        elData.textContent = "Nunca";
     }
 
     document.getElementById("modal-curso-titulo").textContent = "Editar Curso";
-    areaDelete.style.display = "block";
+    if(areaDelete) areaDelete.style.display = "block";
     
     popularSelectTrilhas(curso.trilha);
     modalCurso.style.display = "flex";
 }
 
-// 3. Botão SYNC YOUTUBE e Listener de Limpeza (Modo Rascunho)
 
-// --- LISTENER: Limpar metadados ao apagar o link ---
-const inputLink = document.getElementById("curso-link");
-if (inputLink) {
-    inputLink.addEventListener("input", (e) => {
-        // Se o campo ficar vazio ou apenas com espaços
-        if (e.target.value.trim() === "") {
-            console.log("🧹 Link limpo: resetando metadados e pendências.");
-            
-            // 1. Zera a lista global
-            videosPendentes = []; 
-            
-            // 2. Atualiza a UI usando as funções centrais
-            renderizarListaManual();      // Limpa a lista visual
-            atualizarMetadadosGlobais();  // Zera contadores e ajusta badge
-            
-            // 3. Ajuste específico de texto para este contexto
-            const elData = document.getElementById("meta-data-sync");
-            elData.textContent = "Remoção Pendente";
-            elData.style.color = "#ef4444"; // Vermelho alerta
-            
-            // 4. Força o botão de salvar a ficar habilitado
-            marcarAlteracao();
-        }
-    });
-}
-
-// --- LISTENER: Botão Sincronizar ---
-const btnSyncRapido = document.getElementById("btn-sync-youtube-rapido");
-if(btnSyncRapido) {
-    btnSyncRapido.addEventListener("click", async () => {
-        const linkUrl = document.getElementById("curso-link").value.trim();
-        
-        // 1. Extração de ID
-        let playlistId = "";
-        try {
-            if (linkUrl.includes("http")) {
-                const urlObj = new URL(linkUrl);
-                playlistId = urlObj.searchParams.get("list");
-            } else if (linkUrl.includes("list=")) {
-                playlistId = linkUrl.split("list=")[1].split("&")[0];
-            } else {
-                playlistId = linkUrl;
-            }
-        } catch (e) { console.warn("Erro parsing URL"); }
-
-        if (!playlistId) {
-            alert("⚠️ Link inválido. Certifique-se que contém '?list=...'");
-            return;
-        }
-
-        // 2. Busca (Sem salvar no banco)
-        const textoOriginal = btnSyncRapido.innerHTML;
-        btnSyncRapido.innerHTML = `⏳ ...`;
-        btnSyncRapido.disabled = true;
-
-        try {
-            let videos = [];
-            let nextPageToken = "";
-            
-            do {
-                const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY_FIXA}&pageToken=${nextPageToken}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.error) throw new Error(data.error.message);
-
-                const videoIds = data.items.map(item => item.contentDetails.videoId).join(",");
-                if(!videoIds) { nextPageToken = data.nextPageToken || ""; continue; }
-
-                const urlDetails = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${videoIds}&key=${YOUTUBE_API_KEY_FIXA}`;
-                const respDetails = await fetch(urlDetails);
-                const dataDetails = await respDetails.json();
-
-                const pageVideos = dataDetails.items.map(item => ({
-                    titulo: item.snippet.title,
-                    link_video: `https://www.youtube.com/watch?v=${item.id}`,
-                    descricao: item.snippet.description || "",
-                    duracao_minutos: parseIsoDuration(item.contentDetails.duration),
-                    ordem: 0
-                }));
-                videos = [...videos, ...pageVideos];
-                nextPageToken = data.nextPageToken || "";
-            } while (nextPageToken);
-
-            if(videos.length === 0) throw new Error("Playlist vazia.");
-
-            // 3. Sucesso: Atualiza Estado Global
-            videosPendentes = videos; 
-            
-            // 4. Atualiza TODA a Interface (Metadados + Lista Visual)
-            // Isso garante que se o usuário mudar para a aba "Manual", os vídeos do YouTube estarão lá listados
-            renderizarListaManual();      
-            atualizarMetadadosGlobais();  
-            
-            // 5. Ajustes visuais específicos de sucesso
-            const agora = new Date();
-            const elData = document.getElementById("meta-data-sync");
-            elData.textContent = agora.toLocaleString('pt-BR');
-            elData.style.color = "#16a34a"; // Volta para Verde
-            elData.style.fontWeight = "bold";
-
-            // Habilita Botão Salvar
-            marcarAlteracao();
-
-            alert(`✅ Sincronização em rascunho!\n\n${videos.length} aulas encontradas.\nClique em SALVAR para confirmar.`);
-
-        } catch (error) {
-            console.error(error);
-            alert("❌ Erro ao buscar: " + error.message);
-        } finally {
-            btnSyncRapido.innerHTML = textoOriginal;
-            btnSyncRapido.disabled = false;
-        }
-    });
-}
-
-// 4. Botão SALVAR (Create/Update + Efetivação do Sync)
-btnSalvarCurso.addEventListener("click", async () => {
-    const id = document.getElementById("curso-id").value;
-    const nome = document.getElementById("curso-nome").value;
-
-    // Trilha Híbrida
-    let trilhaValor = "";
-    const isInputMode = document.getElementById("curso-trilha-input").dataset.mode === "active";
-    if (isInputMode) {
-        trilhaValor = document.getElementById("curso-trilha-input").value.trim();
-        if(!trilhaValor) { alert("Digite o nome da nova trilha."); return; }
-    } else {
-        trilhaValor = document.getElementById("curso-trilha-select").value || "Geral";
-    }
-
-    if(!nome) { alert("O nome do curso é obrigatório."); return; }
-
-    // Prepara Payload
-    const payload = {
-        categoria: trilhaValor, 
-        nome: nome,
-        status: document.getElementById("curso-status").value,
-        trilha: trilhaValor, 
-        subtrilha: document.getElementById("curso-subtrilha").value,
-        link: document.getElementById("curso-link").value,
-        descricao: document.getElementById("curso-descricao").value,
-        exibir_catalogo: document.getElementById("curso-exibir").checked
-    };
-
-    if(id) payload.id = id; 
-
-    // Se houve sync (videosPendentes preenchido), atualiza a data de sincronização
-    if (videosPendentes) {
-        payload.ultima_sincronizacao = new Date().toISOString();
-    }
-
-    btnSalvarCurso.innerText = "Salvando...";
-    btnSalvarCurso.disabled = true;
-
-    try {
-        // Chama método robusto que salva Curso E Aulas (se houver)
-        await DBHandler.salvarCursoCompleto(payload, videosPendentes);
-        
-        modalCurso.style.display = "none";
-        inicializarApp(); 
-        
-        alert("Curso salvo com sucesso!");
-    } catch (e) {
-        console.error(e);
-        alert("Erro ao salvar: " + e.message);
-        btnSalvarCurso.disabled = false;
-        btnSalvarCurso.innerText = "Salvar Alterações";
-    }
-});
-
-// 5. Excluir
-btnExcluirCurso.addEventListener("click", async () => {
-    const id = document.getElementById("curso-id").value;
-    if(!id) return;
-
-    if(confirm("Tem certeza? Isso apagará o curso e TODO o histórico de aulas vinculado a ele.")) {
-        try {
-            await DBHandler.excluirCurso(id);
-            modalCurso.style.display = "none";
-            inicializarApp();
-        } catch (e) {
-            alert("Erro ao excluir: " + e.message);
-        }
-    }
-});
-
-// Outros Listeners e Funções Auxiliares
-document.querySelectorAll(".btn-close-modal-curso").forEach(btn => {
-    btn.addEventListener("click", () => modalCurso.style.display = "none");
-});
+// =============================================================
+// FUNÇÕES AUXILIARES E LISTENERS GLOBAIS
+// =============================================================
 
 function popularSelectTrilhas(valorSelecionado = "") {
     const select = document.getElementById("curso-trilha-select");
+    if(!select) return;
+    
     select.innerHTML = "";
     const trilhasUnicas = [...new Set(cursos.map(c => c.trilha || "Geral"))].sort();
     
     trilhasUnicas.forEach(t => {
         const opt = document.createElement("option");
-        opt.value = t;
-        opt.textContent = t;
+        opt.value = t; opt.textContent = t;
         select.appendChild(opt);
     });
 
@@ -940,6 +407,8 @@ function alternarModoTrilha(modo) {
     const boxSelect = document.getElementById("box-select-trilha");
     const inputTexto = document.getElementById("curso-trilha-input");
     const btnIcon = document.getElementById("btn-toggle-trilha");
+    
+    if(!boxSelect || !inputTexto) return;
 
     if (modo === "input") {
         boxSelect.style.display = "none";
@@ -957,89 +426,36 @@ function alternarModoTrilha(modo) {
     }
 }
 
-document.getElementById("btn-toggle-trilha").addEventListener("click", () => {
-    const inputTexto = document.getElementById("curso-trilha-input");
-    const isInputMode = inputTexto.style.display === "block";
-    alternarModoTrilha(isInputMode ? "select" : "input");
-});
-
-
-// --- LÓGICA DE ABAS ---
+// -------------------------------------------------------------
+// LÓGICA DE ABAS (Global Window para onclick HTML funcionar)
+// -------------------------------------------------------------
 window.alternarAba = function(btn) {
-    // 1. Visual dos Botões
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
-    // 2. Visual do Conteúdo
     const targetId = btn.dataset.target;
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     document.getElementById(targetId).style.display = 'block';
-    
-    // 3. Limpeza Opcional (se quiser limpar ao trocar de aba, descomente abaixo)
-    // Se trocar para manual, talvez queira manter o que veio do Youtube? 
-    // Por enquanto, vamos manter os dados compartilhados na mesma variável 'videosPendentes'.
 }
 
-
-// --- LÓGICA DE ADIÇÃO MANUAL ---
-const btnAddManual = document.getElementById("btn-add-manual");
-const inputManualTitulo = document.getElementById("manual-titulo");
-const inputManualLink = document.getElementById("manual-link");
-const inputManualMinutos = document.getElementById("manual-minutos");
-const listaManualUl = document.getElementById("lista-manual-preview");
-const btnLimparAulas = document.getElementById("btn-limpar-aulas");
-
-if(btnAddManual) {
-    btnAddManual.addEventListener("click", () => {
-        const titulo = inputManualTitulo.value.trim();
-        const link = inputManualLink.value.trim(); // Pode ser vazio
-        const minutos = parseInt(inputManualMinutos.value) || 0;
-
-        if(!titulo) {
-            alert("O título da aula é obrigatório.");
-            return;
-        }
-
-        // 1. Inicializa array se necessário
-        if(!videosPendentes) videosPendentes = [];
-
-        // 2. Adiciona ao Array Global
-        videosPendentes.push({
-            titulo: titulo,
-            link_video: link,
-            duracao_minutos: minutos,
-            ordem: videosPendentes.length + 1,
-            descricao: "Cadastrado manualmente"
-        });
-
-        // 3. Atualiza a UI
-        renderizarListaManual();
-        atualizarMetadadosGlobais();
-        marcarAlteracao();
-
-        // 4. Limpa inputs
-        inputManualTitulo.value = "";
-        inputManualLink.value = "";
-        inputManualMinutos.value = "";
-        inputManualTitulo.focus();
-    });
+window.removerItemManual = function(index) {
+    videosPendentes.splice(index, 1);
+    videosPendentes.forEach((v, i) => v.ordem = i + 1);
+    renderizarListaManual();
+    atualizarMetadadosGlobais();
+    marcarAlteracao();
 }
 
-if(btnLimparAulas) {
-    btnLimparAulas.addEventListener("click", () => {
-        if(confirm("Remover todas as aulas pendentes?")) {
-            videosPendentes = [];
-            renderizarListaManual();
-            atualizarMetadadosGlobais();
-            marcarAlteracao();
-        }
-    });
-}
-
-// Função auxiliar para desenhar a lista manual
+// Funções de Renderização Manual
 function renderizarListaManual() {
-    listaManualUl.innerHTML = "";
-    if(!videosPendentes || videosPendentes.length === 0) return;
+    const ul = document.getElementById("lista-manual-preview");
+    const btnLimpar = document.getElementById("btn-limpar-aulas");
+    if(!ul) return;
+    
+    ul.innerHTML = "";
+    if(!videosPendentes || videosPendentes.length === 0) {
+        if(btnLimpar) btnLimpar.style.display = "none";
+        return;
+    }
 
     videosPendentes.forEach((video, index) => {
         const li = document.createElement("li");
@@ -1049,29 +465,13 @@ function renderizarListaManual() {
                 <strong style="color:#334155;">${index + 1}. ${video.titulo}</strong>
                 <span style="color:#94a3b8; font-size:0.7rem;">${video.link_video || 'Sem link'} • ${video.duracao_minutos} min</span>
             </div>
-            <button type="button" class="btn-remove-item" onclick="removerItemManual(${index})">
-                &times;
-            </button>
+            <button type="button" class="btn-remove-item" onclick="removerItemManual(${index})">&times;</button>
         `;
-        listaManualUl.appendChild(li);
+        ul.appendChild(li);
     });
-    
-    // Mostra botão de limpar se tiver itens
-    btnLimparAulas.style.display = "block";
+    if(btnLimpar) btnLimpar.style.display = "block";
 }
 
-// Tornar global para o onclick do HTML funcionar
-window.removerItemManual = function(index) {
-    videosPendentes.splice(index, 1);
-    // Reajusta a ordem
-    videosPendentes.forEach((v, i) => v.ordem = i + 1);
-    
-    renderizarListaManual();
-    atualizarMetadadosGlobais();
-    marcarAlteracao();
-}
-
-// Função Unificada de Metadados (Youtube + Manual usam essa agora)
 function atualizarMetadadosGlobais() {
     const totalAulas = videosPendentes ? videosPendentes.length : 0;
     const totalMinutos = videosPendentes ? videosPendentes.reduce((acc, v) => acc + (v.duracao_minutos || 0), 0) : 0;
@@ -1080,21 +480,267 @@ function atualizarMetadadosGlobais() {
     document.getElementById("meta-tempo-total").textContent = formatarDuracao(totalMinutos);
 
     const badge = document.getElementById("badge-pendente");
-    if(totalAulas > 0 || houveAlteracao) {
-        badge.style.display = "block";
-        badge.textContent = "Pendentes de Salvar";
-        badge.style.backgroundColor = "#fef3c7";
-        badge.style.color = "#d97706";
-    } else {
-        badge.style.display = "none";
-        btnLimparAulas.style.display = "none";
+    if(badge) {
+        if(totalAulas > 0 || houveAlteracao) {
+            badge.style.display = "block";
+            badge.textContent = "Pendentes de Salvar";
+            badge.style.backgroundColor = "#fef3c7";
+            badge.style.color = "#d97706";
+        } else {
+            badge.style.display = "none";
+        }
     }
 }
 
+// -------------------------------------------------------------
+// SETUP DOS LISTENERS (EXECUTADO NO INICIO)
+// -------------------------------------------------------------
+function setupGlobalListeners() {
+    
+    // Filtros
+    const addEvt = (id, evt, fn) => { const el = document.getElementById(id); if(el) el.addEventListener(evt, fn); };
+    
+    addEvt("filtro-trilha", "change", (e) => { preencherOpcoesSubtrilha(e.target.value); aplicarFiltros(); });
+    addEvt("filtro-subtrilha", "change", aplicarFiltros);
+    addEvt("filtro-status", "change", aplicarFiltros);
+    addEvt("filtro-busca", "input", aplicarFiltros);
+    addEvt("filtro-ver-ocultos", "change", aplicarFiltros);
+    
+    addEvt("btn-limpar-filtros", "click", () => {
+        document.getElementById("filtro-trilha").value = "";
+        document.getElementById("filtro-status").value = "";
+        document.getElementById("filtro-busca").value = "";
+        preencherOpcoesSubtrilha("");
+        aplicarFiltros();
+    });
 
+    // Modais - Fechar
+    document.querySelectorAll(".btn-close-modal").forEach(btn => btn.addEventListener("click", () => {
+        if(modalYouTube) modalYouTube.style.display = "none";
+        if(modalCurso) modalCurso.style.display = "none";
+    }));
+    document.querySelectorAll(".btn-close-modal-curso").forEach(btn => btn.addEventListener("click", () => modalCurso.style.display = "none"));
+    document.querySelectorAll(".btn-close-modal-aulas").forEach(btn => btn.addEventListener("click", () => modalAulas.style.display = "none"));
 
+    // Novo Curso
+    addEvt("btn-novo-curso", "click", () => {
+        resetarModalManutencao();
+        document.getElementById("curso-id").value = ""; 
+        document.getElementById("modal-curso-titulo").textContent = "Novo Curso";
+        document.getElementById("curso-exibir").checked = true;
+        popularSelectTrilhas("");
+        if(modalCurso) modalCurso.style.display = "flex";
+    });
 
+    // Excluir Curso
+    addEvt("btn-excluir-curso", "click", async () => {
+        const id = document.getElementById("curso-id").value;
+        if(!id) return;
+        if(confirm("Tem certeza? Isso apagará o curso e TODO o histórico de aulas.")) {
+            try {
+                await DBHandler.excluirCurso(id);
+                modalCurso.style.display = "none";
+                inicializarApp();
+            } catch (e) { alert("Erro ao excluir: " + e.message); }
+        }
+    });
 
+    // Toggle Trilha
+    addEvt("btn-toggle-trilha", "click", () => {
+        const inputTexto = document.getElementById("curso-trilha-input");
+        const isInputMode = inputTexto.style.display === "block";
+        alternarModoTrilha(isInputMode ? "select" : "input");
+    });
 
+    // Salvar Curso
+    if(btnSalvarCurso) btnSalvarCurso.addEventListener("click", async () => {
+        const id = document.getElementById("curso-id").value;
+        const nome = document.getElementById("curso-nome").value;
+        
+        let trilhaValor = "";
+        const inputTrilha = document.getElementById("curso-trilha-input");
+        if (inputTrilha.dataset.mode === "active") {
+            trilhaValor = inputTrilha.value.trim();
+            if(!trilhaValor) { alert("Digite o nome da nova trilha."); return; }
+        } else {
+            trilhaValor = document.getElementById("curso-trilha-select").value || "Geral";
+        }
 
+        if(!nome) { alert("O nome do curso é obrigatório."); return; }
 
+        const payload = {
+            categoria: trilhaValor, 
+            nome: nome,
+            status: document.getElementById("curso-status").value,
+            trilha: trilhaValor, 
+            subtrilha: document.getElementById("curso-subtrilha").value,
+            link: document.getElementById("curso-link").value,
+            descricao: document.getElementById("curso-descricao").value,
+            exibir_catalogo: document.getElementById("curso-exibir").checked
+        };
+
+        if(id) payload.id = id; 
+        if (videosPendentes.length > 0) {
+            payload.ultima_sincronizacao = new Date().toISOString();
+        }
+
+        btnSalvarCurso.innerText = "Salvando...";
+        btnSalvarCurso.disabled = true;
+
+        try {
+            await DBHandler.salvarCursoCompleto(payload, videosPendentes);
+            modalCurso.style.display = "none";
+            inicializarApp(); 
+            alert("Curso salvo com sucesso!");
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao salvar: " + e.message);
+            btnSalvarCurso.disabled = false;
+            btnSalvarCurso.innerText = "Salvar Alterações";
+        }
+    });
+
+    // Monitorar inputs para habilitar salvar
+    if(formCurso) {
+        formCurso.querySelectorAll("input, select, textarea").forEach(el => {
+            el.addEventListener("input", marcarAlteracao);
+            el.addEventListener("change", marcarAlteracao);
+        });
+    }
+
+    // LISTENER MANUAL ADD
+    addEvt("btn-add-manual", "click", () => {
+        const titulo = document.getElementById("manual-titulo").value.trim();
+        const link = document.getElementById("manual-link").value.trim();
+        const minutos = parseInt(document.getElementById("manual-minutos").value) || 0;
+
+        if(!titulo) { alert("O título da aula é obrigatório."); return; }
+        if(!videosPendentes) videosPendentes = [];
+
+        videosPendentes.push({
+            titulo: titulo,
+            link_video: link,
+            duracao_minutos: minutos,
+            ordem: videosPendentes.length + 1,
+            descricao: "Cadastrado manualmente"
+        });
+
+        renderizarListaManual();
+        atualizarMetadadosGlobais();
+        marcarAlteracao();
+
+        document.getElementById("manual-titulo").value = "";
+        document.getElementById("manual-link").value = "";
+        document.getElementById("manual-minutos").value = "";
+        document.getElementById("manual-titulo").focus();
+    });
+
+    addEvt("btn-limpar-aulas", "click", () => {
+        if(confirm("Remover todas as aulas pendentes?")) {
+            videosPendentes = [];
+            renderizarListaManual();
+            atualizarMetadadosGlobais();
+            marcarAlteracao();
+        }
+    });
+
+    // LISTENER LIMPEZA LINK
+    const inputLink = document.getElementById("curso-link");
+    if (inputLink) {
+        inputLink.addEventListener("input", (e) => {
+            if (e.target.value.trim() === "") {
+                videosPendentes = []; 
+                renderizarListaManual();      
+                atualizarMetadadosGlobais();  
+                const elData = document.getElementById("meta-data-sync");
+                if(elData) {
+                    elData.textContent = "Remoção Pendente";
+                    elData.style.color = "#ef4444";
+                }
+                marcarAlteracao();
+            }
+        });
+    }
+
+    // LISTENER SYNC YOUTUBE
+    if(btnSyncRapido) {
+        btnSyncRapido.addEventListener("click", async () => {
+            const linkUrl = document.getElementById("curso-link").value.trim();
+            let playlistId = "";
+            
+            if (linkUrl.includes("list=")) {
+                playlistId = linkUrl.split("list=")[1].split("&")[0];
+            } else {
+                playlistId = linkUrl;
+            }
+
+            if (!playlistId || playlistId.length < 5) {
+                alert("⚠️ Link inválido. Certifique-se que contém '?list=...'");
+                return;
+            }
+
+            const textoOriginal = btnSyncRapido.innerHTML;
+            btnSyncRapido.innerHTML = `⏳ ...`;
+            btnSyncRapido.disabled = true;
+
+            try {
+                let videos = [];
+                let nextPageToken = "";
+                
+                do {
+                    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY_FIXA}&pageToken=${nextPageToken}`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (data.error) throw new Error(data.error.message);
+
+                    const videoIds = data.items.map(item => item.contentDetails.videoId).join(",");
+                    if(!videoIds) { nextPageToken = data.nextPageToken || ""; continue; }
+
+                    const urlDetails = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${videoIds}&key=${YOUTUBE_API_KEY_FIXA}`;
+                    const respDetails = await fetch(urlDetails);
+                    const dataDetails = await respDetails.json();
+
+                    const pageVideos = dataDetails.items.map(item => {
+                        // Parse ISO Duration
+                        const match = item.contentDetails.duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+                        const hours = (parseInt(match[1]) || 0);
+                        const mins = (parseInt(match[2]) || 0);
+                        const totalMins = (hours * 60) + mins;
+                        
+                        return {
+                            titulo: item.snippet.title,
+                            link_video: `https://www.youtube.com/watch?v=${item.id}`,
+                            descricao: item.snippet.description || "",
+                            duracao_minutos: totalMins,
+                            ordem: 0
+                        };
+                    });
+                    videos = [...videos, ...pageVideos];
+                    nextPageToken = data.nextPageToken || "";
+                } while (nextPageToken);
+
+                if(videos.length === 0) throw new Error("Playlist vazia.");
+
+                videosPendentes = videos; 
+                renderizarListaManual();      
+                atualizarMetadadosGlobais();  
+                
+                const elData = document.getElementById("meta-data-sync");
+                elData.textContent = new Date().toLocaleString('pt-BR');
+                elData.style.color = "#16a34a";
+                elData.style.fontWeight = "bold";
+
+                marcarAlteracao();
+                alert(`✅ Sincronização em rascunho!\n\n${videos.length} aulas encontradas.\nClique em SALVAR para confirmar.`);
+
+            } catch (error) {
+                console.error(error);
+                alert("❌ Erro ao buscar: " + error.message);
+            } finally {
+                btnSyncRapido.innerHTML = textoOriginal;
+                btnSyncRapido.disabled = false;
+            }
+        });
+    }
+}
