@@ -274,45 +274,82 @@
             }
         };
 
-        function renderizarLinhas(lista, container) {
+    
+
+function renderizarLinhas(lista, container) {
             const agora = new Date();
+            
+            // Ordena: Data mais recente primeiro
             lista.sort((a,b) => new Date(b.data_hora) - new Date(a.data_hora));
 
             lista.forEach(item => {
                 const dataItem = new Date(item.data_hora);
-                const dataFmt = dataItem.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                const dataFmt = dataItem.toLocaleString('pt-BR', { 
+                    day: '2-digit', month: '2-digit', 
+                    hour: '2-digit', minute: '2-digit' 
+                });
+
                 const nomeAula = item.aula ? `${item.aula.ordem}. ${item.aula.titulo}` : 'Curso Completo';
                 
+                // --- LÓGICA DE STATUS ---
                 let labelStatus = item.status;
                 let statusClass = 'st-agendado';
                 let corTexto = '#2563eb'; 
 
-                if (item.status === 'PARTICIPOU') { statusClass = 'st-participou'; corTexto = '#15803d'; }
-                else if (item.status === 'FALTOU') { statusClass = 'st-faltou'; corTexto = '#b91c1c'; }
-                else if (item.status === 'AGENDADO') {
+                // Verifica se é futuro
+                const isFuturo = (item.status === 'AGENDADO' && dataItem > agora);
+
+                if (item.status === 'PARTICIPOU') { 
+                    statusClass = 'st-participou'; corTexto = '#15803d'; 
+                } else if (item.status === 'FALTOU') { 
+                    statusClass = 'st-faltou'; corTexto = '#b91c1c'; 
+                } else if (item.status === 'AGENDADO') {
                     if (dataItem < agora) {
-                        labelStatus = 'AGUARDANDO BAIXA'; statusClass = 'st-pendente'; corTexto = '#c2410c';
+                        labelStatus = 'AGUARDANDO BAIXA'; 
+                        statusClass = 'st-pendente'; 
+                        corTexto = '#c2410c'; // Laranja
                     }
                 }
 
+                // --- LÓGICA DE BOTÕES (CORREÇÃO AQUI) ---
                 let botoesHtml = '';
-                if (item.status !== 'PARTICIPOU') botoesHtml += `<button class="btn-mini btn-check" title="Participou" onclick="mudarStatus(${item.id}, 'PARTICIPOU')">✅</button>`;
-                if (item.status !== 'FALTOU') botoesHtml += `<button class="btn-mini btn-miss" title="Faltou" onclick="mudarStatus(${item.id}, 'FALTOU')">❌</button>`;
+                
+                // Só mostra botões de chamada se NÃO for futuro
+                // (Ou seja: Se já passou a hora OU se já foi marcado presença/falta anteriormente)
+                if (!isFuturo) {
+                    if (item.status !== 'PARTICIPOU') {
+                        botoesHtml += `<button class="btn-mini btn-check" title="Participou" onclick="mudarStatus(${item.id}, 'PARTICIPOU')">✅</button>`;
+                    }
+                    if (item.status !== 'FALTOU') {
+                        botoesHtml += `<button class="btn-mini btn-miss" title="Faltou" onclick="mudarStatus(${item.id}, 'FALTOU')">❌</button>`;
+                    }
+                }
+
+                // Botão Excluir sempre aparece
                 botoesHtml += `<button class="btn-mini btn-trash" title="Excluir" onclick="excluirAgendamento(${item.id})">🗑️</button>`;
 
                 const tr = document.createElement('tr');
                 if (labelStatus === 'AGUARDANDO BAIXA') tr.style.backgroundColor = '#fff7ed';
+
                 tr.innerHTML = `
                     <td style="font-weight:600; color:${dataItem < agora ? '#64748b' : '#1e293b'}">${dataFmt}</td>
                     <td>${item.colaborador?.nome || '-'}</td>
                     <td style="color:#64748b;">${item.treinamento?.nome || '-'}</td>
                     <td>${nomeAula}</td>
-                    <td style="text-align:center;"><span class="tag-status ${statusClass}" style="color:${corTexto}; border-color:${corTexto}40; background-color:${corTexto}10;">${labelStatus}</span></td>
+                    <td style="text-align:center;">
+                        <span class="tag-status ${statusClass}" style="color:${corTexto}; border-color:${corTexto}40; background-color:${corTexto}10;">
+                            ${labelStatus}
+                        </span>
+                    </td>
                     <td class="actions-cell">${botoesHtml}</td>
                 `;
                 container.appendChild(tr);
             });
         }
+
+
+
+        
 
         window.mudarStatus = async function(id, novoStatus) {
             const item = agendaCache.find(i => i.id === id);
@@ -417,4 +454,5 @@
     </script>
 </body>
 </html>
+
 
