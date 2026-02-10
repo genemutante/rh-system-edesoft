@@ -719,8 +719,9 @@ function editarCurso(id) {
     modalCurso.style.display = "flex";
 }
 
-// 3. Botão SYNC YOUTUBE (Modo Rascunho)
-// --- NOVO: Listener para limpar metadados ao apagar o link ---
+// 3. Botão SYNC YOUTUBE e Listener de Limpeza (Modo Rascunho)
+
+// --- LISTENER: Limpar metadados ao apagar o link ---
 const inputLink = document.getElementById("curso-link");
 if (inputLink) {
     inputLink.addEventListener("input", (e) => {
@@ -728,33 +729,25 @@ if (inputLink) {
         if (e.target.value.trim() === "") {
             console.log("🧹 Link limpo: resetando metadados e pendências.");
             
-            // 1. Zera a lista de pendência (Isso avisa o DBHandler para apagar tudo)
+            // 1. Zera a lista global
             videosPendentes = []; 
             
-            // 2. Atualiza a UI visualmente para Zero
-            document.getElementById("meta-qtd-aulas").textContent = "0";
-            document.getElementById("meta-tempo-total").textContent = "0 min";
+            // 2. Atualiza a UI usando as funções centrais
+            renderizarListaManual();      // Limpa a lista visual
+            atualizarMetadadosGlobais();  // Zera contadores e ajusta badge
             
-            // 3. Atualiza status da sincrozinação para avisar que vai mudar
+            // 3. Ajuste específico de texto para este contexto
             const elData = document.getElementById("meta-data-sync");
             elData.textContent = "Remoção Pendente";
             elData.style.color = "#ef4444"; // Vermelho alerta
             
-            // 4. Mostra o badge de pendência
-            const badge = document.getElementById("badge-pendente");
-            if(badge) {
-                badge.style.display = "block";
-                badge.textContent = "Limpeza Pendente";
-            }
-
-            // 5. Força o botão de salvar a ficar habilitado
+            // 4. Força o botão de salvar a ficar habilitado
             marcarAlteracao();
         }
     });
 }
 
-
-
+// --- LISTENER: Botão Sincronizar ---
 const btnSyncRapido = document.getElementById("btn-sync-youtube-rapido");
 if(btnSyncRapido) {
     btnSyncRapido.addEventListener("click", async () => {
@@ -814,36 +807,25 @@ if(btnSyncRapido) {
 
             if(videos.length === 0) throw new Error("Playlist vazia.");
 
-            // 3. Sucesso: Atualiza Estado Local (Rascunho)
+            // 3. Sucesso: Atualiza Estado Global
             videosPendentes = videos; 
             
-            // 4. Atualiza UI dos Metadados (Preview)
-            const totalAulas = videos.length;
-            const totalMinutos = videos.reduce((acc, v) => acc + v.duracao_minutos, 0);
+            // 4. Atualiza TODA a Interface (Metadados + Lista Visual)
+            // Isso garante que se o usuário mudar para a aba "Manual", os vídeos do YouTube estarão lá listados
+            renderizarListaManual();      
+            atualizarMetadadosGlobais();  
             
-            document.getElementById("meta-qtd-aulas").textContent = totalAulas;
-            document.getElementById("meta-tempo-total").textContent = formatarDuracao(totalMinutos);
-            
-            // Simula a nova data e FORÇA a cor verde (para tirar o vermelho de erro/limpeza se houver)
+            // 5. Ajustes visuais específicos de sucesso
             const agora = new Date();
             const elData = document.getElementById("meta-data-sync");
             elData.textContent = agora.toLocaleString('pt-BR');
             elData.style.color = "#16a34a"; // Volta para Verde
             elData.style.fontWeight = "bold";
 
-            // Mostra badge e FORÇA o texto/cor de "Pendente" (para tirar o "Limpeza" se houver)
-            const badge = document.getElementById("badge-pendente");
-            if(badge) {
-                badge.style.display = "block";
-                badge.textContent = "Pendentes de Salvar"; // Texto correto
-                badge.style.backgroundColor = "#fef3c7";   // Fundo Amarelo
-                badge.style.color = "#d97706";             // Texto Laranja
-            }
-
             // Habilita Botão Salvar
             marcarAlteracao();
 
-            alert(`✅ Sincronização em rascunho!\n\n${totalAulas} aulas encontradas.\nClique em SALVAR para confirmar.`);
+            alert(`✅ Sincronização em rascunho!\n\n${videos.length} aulas encontradas.\nClique em SALVAR para confirmar.`);
 
         } catch (error) {
             console.error(error);
@@ -1108,6 +1090,7 @@ function atualizarMetadadosGlobais() {
         btnLimparAulas.style.display = "none";
     }
 }
+
 
 
 
