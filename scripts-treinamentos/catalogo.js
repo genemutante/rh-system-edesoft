@@ -259,22 +259,30 @@ function setupListenersUnicos() {
 
     // --- SALVAR CURSO ---
     if(btnSalvarCurso) btnSalvarCurso.onclick = async () => {
-        const id = document.getElementById("curso-id").value;
-        const nome = document.getElementById("curso-nome").value;
-        const inputTrilha = document.getElementById("curso-trilha-input");
-        const trilha = inputTrilha.dataset.mode === "active" ? inputTrilha.value.trim() : document.getElementById("curso-trilha-select").value;
-        
-        if(!nome || !trilha) return alert("Preencha Nome e Trilha.");
+       const id = document.getElementById("curso-id").value;
+    const nome = document.getElementById("curso-nome").value;
+    const inputTrilha = document.getElementById("curso-trilha-input");
+    const trilha = inputTrilha.dataset.mode === "active" ? inputTrilha.value.trim() : document.getElementById("curso-trilha-select").value;
+    
+    if(!nome || !trilha) return alert("Preencha Nome e Trilha.");
 
-        const payload = {
-            id: id || undefined, nome, trilha,
-            categoria: trilha,
-            subtrilha: document.getElementById("curso-subtrilha").value,
-            link: document.getElementById("curso-link").value,
-            status: document.getElementById("curso-status").value,
-            descricao: document.getElementById("curso-descricao").value,
-            exibir_catalogo: document.getElementById("curso-exibir").checked
-        };
+    // 1. Cria o objeto SEM o ID inicialmente
+    const payload = {
+        nome, 
+        trilha,
+        categoria: trilha,
+        subtrilha: document.getElementById("curso-subtrilha").value,
+        link: document.getElementById("curso-link").value,
+        status: document.getElementById("curso-status").value,
+        descricao: document.getElementById("curso-descricao").value,
+        exibir_catalogo: document.getElementById("curso-exibir").checked
+    };
+
+    // 2. Só injeta a propriedade ID se ela realmente existir (Edição)
+    // Se for string vazia "" (Novo Curso), a chave 'id' nem entra no objeto via JSON.
+    if (id && id.trim() !== "") {
+        payload.id = id;
+    }
 
         if(houveAlteracao && videosPendentes.length > 0) payload.ultima_sincronizacao = new Date().toISOString();
         
@@ -673,6 +681,7 @@ window.alternarFonte = function(v) {
     document.getElementById("panel-youtube").style.display = v==='youtube'?'block':'none';
     document.getElementById("panel-manual").style.display = v==='manual'?'block':'none';
 }
+
 
 
 
