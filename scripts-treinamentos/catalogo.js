@@ -533,7 +533,12 @@ function abrirModalAulas(id) {
 
 function resetarModalManutencao() {
     if(formCurso) formCurso.reset();
-    
+   
+    // 🔥 CORREÇÃO CRÍTICA AQUI:
+    // Força a limpeza do ID para garantir que o Supabase crie um registro novo (Insert)
+    // ao invés de atualizar o anterior (Update).
+    document.getElementById("curso-id").value = "";
+   
     videosPendentes = []; 
     houveAlteracao = false;
     
@@ -668,6 +673,7 @@ window.alternarFonte = function(v) {
     document.getElementById("panel-youtube").style.display = v==='youtube'?'block':'none';
     document.getElementById("panel-manual").style.display = v==='manual'?'block':'none';
 }
+
 
 
 
