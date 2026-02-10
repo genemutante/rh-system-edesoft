@@ -1492,3 +1492,55 @@ input:checked + .slider:before {
     opacity: 0.7;
 }
 
+/* ==========================================================================
+   CORREÇÃO TIPOGRÁFICA DE FORMULÁRIOS (PREMIUM FIX)
+   ========================================================================== */
+
+/* 1. Força a fonte Inter em TODOS os elementos de formulário */
+button, input, optgroup, select, textarea {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 2. Estilo dos Rótulos (Labels) - Mais profissionais e discretos */
+.form-group label {
+  font-size: 0.8rem !important;      /* Tamanho menor (aprox 13px) */
+  font-weight: 600 !important;       /* Semi-bold para leitura clara */
+  color: #334155 !important;         /* Slate 700 (Cinza escuro, não preto) */
+  letter-spacing: 0.01em;            /* Leve respiro entre letras */
+  margin-bottom: 6px !important;     /* Espaço entre o label e o input */
+  display: block;
+}
+
+/* 3. Ajuste de Contraste nos Inputs */
+.input-premium {
+  font-size: 0.9rem !important;      /* Tamanho confortável para digitar */
+  color: #0f172a !important;         /* Texto digitado bem escuro (Slate 900) */
+  font-weight: 500 !important;       /* Peso médio */
+  background-color: #f8fafc;         /* Fundo levemente cinza (Gelo) */
+  border: 1px solid #cbd5e1;         /* Borda cinza suave */
+  transition: all 0.2s ease-in-out;
+}
+
+/* Foco no input (Efeito Glow Azul) */
+.input-premium:focus {
+  background-color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+/* 4. Placeholders (Texto de ajuda) */
+.input-premium::placeholder {
+  color: #94a3b8 !important; /* Cinza claro para não confundir com texto real */
+  font-weight: 400;
+}
+
+/* 5. Títulos do Modal */
+.modal-header h2 {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em; /* Tracking negativo moderno */
+  color: #0f172a;
+}
