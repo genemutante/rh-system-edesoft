@@ -902,3 +902,84 @@ input:checked + .slider:before{ transform: translateX(18px) !important; }
 #modal-curso .modal-footer{
   padding: 10px 18px !important;
 }
+
+/* ====== APLICAR DIRETO NO MODAL EXISTENTE (SEM MEXER NO HTML) ====== */
+
+/* 1) Modal maior (largura e altura) */
+#modal-curso .modal-content{
+  width: min(1280px, 96vw) !important;
+  max-width: none !important;
+  max-height: 92vh !important;
+}
+
+/* 2) Header/Body mais compactos */
+#modal-curso .modal-header{
+  padding: 10px 18px !important;
+}
+#modal-curso .modal-body{
+  padding: 14px 18px !important;
+  gap: 10px !important;
+}
+
+/* 3) PRIMEIRA LINHA (Nome / Status / Descrição / Exibir) em GRID */
+#modal-curso .modal-body .form-row:first-of-type{
+  display: grid !important;
+  grid-template-columns: 2.2fr 1.1fr 2.2fr auto !important;
+  gap: 10px 12px !important;
+  align-items: end !important;
+  margin-bottom: 10px !important;
+}
+
+/* 4) SEGUNDA LINHA (Trilha / Subtrilha) mais “curta” */
+#modal-curso .modal-body .form-row:nth-of-type(2){
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+  align-items: end !important;
+  margin-bottom: 8px !important;
+}
+
+/* 5) Descrição mais enxuta (não engolir altura) */
+#modal-curso #curso-descricao{
+  resize: none !important;
+  max-height: 58px !important;  /* ~2 linhas confortáveis */
+  overflow: auto !important;
+}
+
+/* 6) Origem das aulas (abas) com menos altura */
+#modal-curso .source-selector{
+  padding: 3px !important;
+  gap: 8px !important;
+  border-radius: 10px !important;
+}
+#modal-curso .radio-option label{
+  padding: 7px 10px !important;
+  font-size: .82rem !important;
+}
+
+/* 7) Área YouTube mais compacta */
+#modal-curso .youtube-wrapper{
+  padding: 10px 12px !important;
+  gap: 6px !important;
+  border-radius: 12px !important;
+}
+#modal-curso .btn-youtube-sync{
+  height: 34px !important;
+}
+
+/* 8) Metadata (Aulas/Tempo/Sync) mais fina */
+#modal-curso .sync-metadata{
+  padding: 4px 10px !important;
+  font-size: .74rem !important;
+}
+
+/* 9) Preview manual (scroll só ali) */
+#modal-curso #lista-manual-preview{
+  max-height: 120px !important;
+  overflow-y: auto !important;
+}
+
+/* 10) Rodapé mais fino */
+#modal-curso .modal-footer{
+  padding: 10px 18px !important;
+}
