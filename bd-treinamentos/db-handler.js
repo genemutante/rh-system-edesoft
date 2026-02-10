@@ -539,12 +539,53 @@ async salvarCursoCompleto(dadosCurso, aulasPendentes = null) {
 
     return cursoSalvo;
 },
+
+
+
+// --- Adicione estas funções dentro do objeto DBHandler no arquivo db-handler.js ---
+
+    // Lista os agendamentos futuros, trazendo os nomes dos treinos e colaboradores
+    async listarAgendamentosFuturos() {
+        const hoje = new Date().toISOString();
+        
+        // O 'select' faz o JOIN automático graças às Foreign Keys que criamos no SQL
+        const { data, error } = await supabaseClient
+            .from('agendamentos')
+            .select(`
+                id,
+                data_hora,
+                status,
+                treinamento:treinamentos (nome),
+                colaborador:colaboradores (nome)
+            `)
+            .gte('data_hora', hoje) // Apenas datas maiores ou iguais a hoje
+            .order('data_hora', { ascending: true });
+
+        if (error) throw error;
+        return data;
+    },
+
+    // Cria um novo agendamento
+    async criarAgendamento(payload) {
+        // payload deve ser: { treinamento_id, colaborador_id, data_hora, observacoes }
+        const { data, error } = await supabaseClient
+            .from('agendamentos')
+            .insert([payload]);
+            
+        if (error) throw error;
+        return data;
+    },
+
+// -----------------------------------------------------------------------------------
+
+    
     
 };
 
 
 // No final do ficheiro db-handler.js
 window.DBHandler = DBHandler;
+
 
 
 
