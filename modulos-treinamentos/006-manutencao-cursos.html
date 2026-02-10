@@ -16,14 +16,11 @@
   <div class="page">
 
     <section class="app-header">
-      
       <div class="header-top">
-        <p class="header-desc">
-          </p>
+        <p class="header-desc"></p>
       </div>
 
       <div class="toolbar">
-
         <div class="toolbar-filters">
           <div class="select-wrapper">
             <label>Trilha</label>
@@ -72,7 +69,6 @@
                 Novo Curso
             </button>
         </div>
-
       </div>
     </section>
 
@@ -275,45 +271,73 @@
         </div>
 
         <div class="form-group">
-            <div class="youtube-wrapper">
+            <label>Origem das Aulas</label>
+            
+            <div class="tabs-origin">
+                <button type="button" class="tab-btn active" data-target="tab-youtube" onclick="alternarAba(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="currentColor"/></svg>
+                    Playlist YouTube
+                </button>
+                <button type="button" class="tab-btn" data-target="tab-manual" onclick="alternarAba(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    Manual / Individual
+                </button>
+            </div>
+
+            <div id="tab-youtube" class="tab-content active">
+                <div class="youtube-wrapper">
+                    <div style="display: flex; gap: 8px;">
+                        <input type="url" id="curso-link" class="input-premium" placeholder="Cole a URL da playlist aqui..." style="flex: 1;">
+                        <button type="button" id="btn-sync-youtube-rapido" class="btn-youtube-sync" title="Buscar dados">
+                            <span style="font-size: 0.85rem; font-weight: 600;">Sincronizar</span>
+                        </button>
+                    </div>
+                    <small class="youtube-help-text">
+                        O sistema buscará título, duração e link de todos os vídeos da playlist automaticamente.
+                    </small>
+                </div>
+            </div>
+
+            <div id="tab-manual" class="tab-content" style="display: none;">
+                <div class="manual-wrapper">
+                    <div class="manual-input-row">
+                        <input type="text" id="manual-titulo" class="input-premium" placeholder="Título da Aula" style="flex: 3;">
+                        <input type="number" id="manual-minutos" class="input-premium" placeholder="Min" style="width: 70px;">
+                    </div>
+                    <div class="manual-input-row" style="margin-top: 8px;">
+                        <input type="url" id="manual-link" class="input-premium" placeholder="Link do Vídeo (Opcional)" style="flex: 1;">
+                        <button type="button" id="btn-add-manual" class="btn-add-manual">
+                            + Adicionar
+                        </button>
+                    </div>
+                    
+                    <ul id="lista-manual-preview" class="lista-manual-preview"></ul>
+                </div>
+            </div>
+
+            <div class="sync-metadata" id="box-metadata-sync" style="margin-top: 8px;">
+                <div class="meta-item">
+                    <span class="meta-label">Aulas:</span>
+                    <span class="meta-value" id="meta-qtd-aulas">0</span>
+                </div>
+                <div style="width: 1px; height: 12px; background: #cbd5e1;"></div>
+                <div class="meta-item">
+                    <span class="meta-label">Tempo:</span>
+                    <span class="meta-value" id="meta-tempo-total">0 min</span>
+                </div>
+                <div style="width: 1px; height: 12px; background: #cbd5e1;"></div>
+                <div class="meta-item" style="flex: 1;">
+                    <span class="meta-label">Sync:</span>
+                    <span class="meta-value" id="meta-data-sync">Nunca</span>
+                </div>
                 
-                <label class="youtube-label">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="currentColor"/></svg>
-                    Integração com YouTube
-                </label>
-
-                <div style="display: flex; gap: 8px;">
-                    <input type="url" id="curso-link" class="input-premium" placeholder="Cole a URL da playlist aqui..." style="flex: 1;">
-                    
-                    <button type="button" id="btn-sync-youtube-rapido" class="btn-youtube-sync" title="Buscar dados da Playlist">
-                        <span style="font-size: 0.85rem; font-weight: 600;">Sincronizar</span>
-                    </button>
+                <div class="meta-badge-pendente" id="badge-pendente" style="display: none;">
+                    Pendentes
                 </div>
-
-                <div class="sync-metadata" id="box-metadata-sync">
-                    <div class="meta-item">
-                        <span class="meta-label">Aulas:</span>
-                        <span class="meta-value" id="meta-qtd-aulas">0</span>
-                    </div>
-                    <div style="width: 1px; height: 12px; background: #cbd5e1;"></div>
-                    <div class="meta-item">
-                        <span class="meta-label">Tempo:</span>
-                        <span class="meta-value" id="meta-tempo-total">0 min</span>
-                    </div>
-                    <div style="width: 1px; height: 12px; background: #cbd5e1;"></div>
-                    <div class="meta-item" style="flex: 1;">
-                        <span class="meta-label">Sync:</span>
-                        <span class="meta-value" id="meta-data-sync">Nunca</span>
-                    </div>
-                    
-                    <div class="meta-badge-pendente" id="badge-pendente" style="display: none;">
-                        Pendentes
-                    </div>
-                </div>
-
-                <small class="youtube-help-text">
-                    Cole o link da playlist e clique em sincronizar. As aulas serão importadas automaticamente.
-                </small>
+                
+                <button type="button" id="btn-limpar-aulas" style="margin-left: auto; font-size: 0.7rem; color: #ef4444; background: none; border: none; cursor: pointer; display: none; font-weight: 600;">
+                    Limpar Tudo
+                </button>
             </div>
         </div>
 
