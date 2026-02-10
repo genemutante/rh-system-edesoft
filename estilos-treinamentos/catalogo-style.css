@@ -275,6 +275,71 @@ input:checked + .slider:before{transform:translateX(20px)}
 .btn-close-modal{background:none;border:none;font-size:1.5rem;cursor:pointer;color:#64748b}
 
 
+/* =======================
+   BOTÕES DE AÇÃO (ícones) — pacote premium
+   ======================= */
+.btn-icon-editar,
+.btn-icon-acessar,
+.btn-icon-grade{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  height:36px;
+  min-width:36px;
+  padding:0 10px;
+  border-radius:999px;
+  border:1px solid #e2e8f0;
+  background:#fff;
+  color:#475569;
+  cursor:pointer;
+  transition:all .2s;
+}
+
+/* tamanhos dos SVGs */
+.btn-icon-editar svg,
+.btn-icon-acessar svg,
+.btn-icon-grade svg{
+  width:18px;
+  height:18px;
+  display:block;
+}
+
+/* variações */
+.btn-icon-editar:hover{
+  border-color:#f59e0b;
+  color:#b45309;
+  background:#fffbeb;
+}
+
+.btn-icon-acessar{
+  background:var(--accent);
+  border-color:transparent;
+  color:#fff;
+  box-shadow:0 4px 10px rgba(37,99,235,.25);
+}
+.btn-icon-acessar:hover{
+  background:var(--accent-hover);
+  transform:translateY(-1px);
+  box-shadow:0 10px 18px rgba(37,99,235,.35);
+}
+
+.btn-icon-grade{
+  background:#f1f5f9;
+  border-color:#e2e8f0;
+  color:#334155;
+}
+.btn-icon-grade:hover{
+  background:#e2e8f0;
+  border-color:#cbd5e1;
+}
+
+/* se quiser mostrar texto junto do ícone em desktop */
+.btn-icon-grade span{
+  font-size:.8rem;
+  font-weight:700;
+}
+
 
 
 
