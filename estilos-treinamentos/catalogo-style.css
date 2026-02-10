@@ -158,6 +158,14 @@ textarea.input-premium{resize:vertical;min-height:80px;font-family:inherit}
 .btn-disabled-text{background:#e2e8f0;color:#94a3b8;font-size:.75rem;font-weight:600;padding:0 12px;height:36px;border-radius:999px;border:none;cursor:default;white-space:nowrap}
 .btn-icon-editar{background:#fff;color:#64748b;border:1px solid #e2e8f0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
 .btn-icon-editar:hover{border-color:#f59e0b;color:#f59e0b;background:#fffbeb}
+.btn-icon-editar svg,
+.btn-icon-acessar svg{
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+
 .switch{position:relative;display:inline-block;width:50px;height:26px}
 .switch input{opacity:0;width:0;height:0}
 .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#cbd5e1;transition:.4s}
@@ -265,6 +273,7 @@ input:checked + .slider:before{transform:translateX(20px)}
 .modal-header{padding:20px 24px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
 .modal-header h2{font-size:1.25rem;color:#1e293b;font-weight:700}
 .btn-close-modal{background:none;border:none;font-size:1.5rem;cursor:pointer;color:#64748b}
+
 
 
 
