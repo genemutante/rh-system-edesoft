@@ -626,7 +626,7 @@ function abrirModalAulas(id) {
    ============================================================= */
 
 // Variáveis de Estado Local (Rascunho)
-let videosPendentes = null; // Armazena a lista do YouTube antes de salvar
+let videosPendentes = []; // Armazena a lista do YouTube antes de salvar
 let houveAlteracao = false; // Controla se o botão salvar deve acender
 
 const modalCurso = document.getElementById("modal-curso");
@@ -654,7 +654,7 @@ formCurso.querySelectorAll("input, select, textarea").forEach(el => {
 // --- Reset Completo do Modal ---
 function resetarModalManutencao() {
     formCurso.reset();
-    videosPendentes = null; 
+    videosPendentes = []; 
     houveAlteracao = false;
     
     // Reseta UI
@@ -1108,6 +1108,7 @@ function atualizarMetadadosGlobais() {
         btnLimparAulas.style.display = "none";
     }
 }
+
 
 
 
