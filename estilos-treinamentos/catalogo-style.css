@@ -907,7 +907,7 @@ input:checked + .slider:before{ transform: translateX(18px) !important; }
 
 /* 1) Modal maior (largura e altura) */
 #modal-curso .modal-content{
-  width: min(1280px, 90vw) !important;
+  width: min(900px, 90vw) !important;
   max-width: none !important;
   max-height: 95vh !important;
 }
@@ -983,4 +983,5 @@ input:checked + .slider:before{ transform: translateX(18px) !important; }
 #modal-curso .modal-footer{
   padding: 10px 18px !important;
 }
+
 
