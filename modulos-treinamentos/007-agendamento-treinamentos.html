@@ -432,45 +432,45 @@ function renderizarLinhas(lista, container) {
                 // --- LÓGICA DE STATUS ---
                 let labelStatus = item.status;
                 let statusClass = 'st-agendado';
-                let corTexto = '#2563eb'; 
+                let corTexto = '#2563eb'; // Azul (Padrão Agendado)
 
-                // Definições visuais
                 if (item.status === 'REALIZADO') {
-                    statusClass = 'st-realizado'; corTexto = '#15803d';
+                    statusClass = 'st-realizado'; 
+                    corTexto = '#15803d'; // Verde
                 } else if (item.status === 'FALTA') {
-                    statusClass = 'st-falta'; corTexto = '#b91c1c';
+                    statusClass = 'st-falta'; 
+                    corTexto = '#b91c1c'; // Vermelho
                 } else if (item.status === 'AGENDADO') {
                     if (dataItem < agora) {
-                        labelStatus = 'FALTA (N.C.)'; // Passado não confirmado
-                        statusClass = 'st-falta'; 
-                        corTexto = '#ea580c'; // Laranja
+                        // Passado: Requer ação do instrutor
+                        labelStatus = 'AGUARDANDO BAIXA'; 
+                        statusClass = 'st-falta'; // Usa a base do alerta
+                        corTexto = '#ea580c'; // Laranja (Atenção)
                     }
                 }
 
-                // --- LÓGICA DE BOTÕES (PERMITE CORREÇÃO) ---
+                // --- LÓGICA DE BOTÕES ---
                 let botoesHtml = '';
                 
-                // 1. Botão PRESENÇA (✅)
-                // Aparece se for: Agendado, Falta ou Falta N.C. (Para corrigir falha)
+                // Botão PRESENÇA (✅)
                 if (item.status !== 'REALIZADO') {
                     botoesHtml += `
-                        <button class="btn-mini btn-check" title="Marcar Presença" onclick="mudarStatus(${item.id}, 'REALIZADO')">
+                        <button class="btn-mini btn-check" title="Confirmar Presença" onclick="mudarStatus(${item.id}, 'REALIZADO')">
                             ✅
                         </button>
                     `;
                 }
                 
-                // 2. Botão FALTA (❌)
-                // Aparece se for: Agendado (Passado/Futuro) ou REALIZADO (Para corrigir se marcou presença errado)
+                // Botão FALTA (❌)
                 if (item.status !== 'FALTA') {
                      botoesHtml += `
-                        <button class="btn-mini btn-miss" title="Marcar Falta" onclick="mudarStatus(${item.id}, 'FALTA')">
+                        <button class="btn-mini btn-miss" title="Confirmar Falta" onclick="mudarStatus(${item.id}, 'FALTA')">
                             ❌
                         </button>
                     `;
                 }
 
-                // 3. Botão EXCLUIR (Sempre)
+                // Botão EXCLUIR
                 botoesHtml += `
                     <button class="btn-mini btn-trash" title="Excluir Agendamento" onclick="excluirAgendamento(${item.id})">
                         🗑️
@@ -478,8 +478,11 @@ function renderizarLinhas(lista, container) {
                 `;
 
                 const tr = document.createElement('tr');
-                // Destaca linhas pendentes passadas
-                if (labelStatus.includes('FALTA (N.C.)')) tr.style.backgroundColor = '#fff7ed'; 
+                
+                // Destaca linhas que precisam de ação (Laranja claro no fundo)
+                if (labelStatus === 'AGUARDANDO BAIXA') {
+                    tr.style.backgroundColor = '#fff7ed'; 
+                }
 
                 tr.innerHTML = `
                     <td style="font-weight:600; color:${dataItem < agora ? '#64748b' : '#1e293b'}">${dataFmt}</td>
@@ -669,5 +672,6 @@ function renderizarLinhas(lista, container) {
     </script>
 </body>
 </html>
+
 
 
