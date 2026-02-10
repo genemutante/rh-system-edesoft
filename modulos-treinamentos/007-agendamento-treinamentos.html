@@ -3,318 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Colaboradores | Enterprise</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../estilos-treinamentos/cadastro-style.css">
-    <script src="../scripts-treinamentos/module-guard.js"></script>
+    <title>Agendamento de Treinamentos</title>
+    <link rel="stylesheet" href="catalogo-style.css"> 
     <style>
-        /* =========================================================
-           SEGURANÇA & VISUAL PROFISSIONAL
-           ========================================================= */
-        
-        /* 1. Controle de Admin */
-        .admin-only { display: none !important; }
-        body.is-admin .admin-only { display: inline-flex !important; }
-        body.is-admin button.btn-primary-glow.admin-only { display: flex !important; }
-        
-        /* 2. Novo Estilo do Aviso (No Header) */
-        .viewer-badge {
-            display: none; /* Controlado via JS */
-            align-items: center; gap: 6px;
-            background-color: #fff7ed; 
-            color: #c2410c; 
-            border: 1px solid #ffedd5;
-            font-size: 11px; font-weight: 600; 
-            padding: 4px 12px; border-radius: 100px;
-            margin-left: 16px;
-            animation: fadeIn 0.3s ease-out;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-
-        /* 3. Tabela: Remover botões extras para não-admin */
-        body:not(.is-admin) #colabTable tbody td:last-child > *:not(:first-child) {
-            display: none !important;
+        /* Estilos específicos para esta tela de agendamento */
+        .layout-agendamento {
+            display: grid;
+            grid-template-columns: 1fr 2fr; /* Coluna do form menor, agenda maior */
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        /* 4. Inputs Desabilitados */
-        input:disabled, select:disabled {
-            background-color: #f8fafc !important;
-            color: #64748b !important;
-            cursor: not-allowed;
-            border-color: #e2e8f0 !important;
+        .panel {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* 5. ÍCONES PROFISSIONAIS (Correção dos Botões) */
-        .btn-icon-action {
-            width: 32px; height: 32px; 
-            padding: 6px;
-            border-radius: 6px;
+        .panel h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            color: #1e293b;
+        }
+
+        /* Formulário */
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px;
+        }
+        .btn-primary-full { width: 100%; padding: 1rem; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn-primary-full:hover { background-color: #1d4ed8; }
+
+        /* Agenda Visual */
+        .agenda-list { list-style: none; padding: 0; margin: 0; }
+        .agenda-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
             border: 1px solid #e2e8f0;
-            background: #fff;
-            color: #64748b; /* Cinza sóbrio padrão */
-            transition: all 0.2s;
-            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border-left: 5px solid #2563eb; /* Cor padrão Agendado */
         }
+        .agenda-date {
+            flex-basis: 80px;
+            text-align: center;
+            font-weight: bold;
+            color: #334155;
+            line-height: 1.2;
+        }
+        .agenda-date span { display: block; font-size: 0.8rem; color: #64748b; font-weight: normal; }
+        .agenda-details { flex: 1; margin-left: 1.5rem; }
+        .agenda-details h4 { margin: 0; color: #1e293b; }
+        .agenda-details p { margin: 0.25rem 0 0; color: #64748b; font-size: 0.9rem; }
+        .agenda-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-agendado { background: #dbeafe; color: #1e40af; }
+        .status-realizado { background: #dcfce7; color: #166534; border-color: #22c55e; }
+        .status-cancelado { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
         
-        .btn-icon-action svg { width: 16px; height: 16px; stroke-width: 2; }
+        .loading-spinner { text-align: center; padding: 2rem; color: #64748b; }
 
-        /* Cores ao passar o mouse (Hover) */
-        .btn-icon-action:hover { border-color: #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        
-        /* Cores específicas por ação (baseado no ícone injetado) */
-        .btn-icon-action.action-view:hover { color: #3b82f6; border-color: #bfdbfe; background: #eff6ff; }
-        .btn-icon-action.action-edit:hover { color: #f59e0b; border-color: #fde68a; background: #fffbeb; }
-        .btn-icon-action.action-restore:hover { color: #10b981; border-color: #a7f3d0; background: #ecfdf5; }
-        .btn-icon-action.action-delete:hover { color: #ef4444; border-color: #fecaca; background: #fef2f2; }
-
+        @media (max-width: 768px) {
+            .layout-agendamento { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
-<body>
+<body style="background-color: #f8fafc;">
 
-<header class="top-bar" style="
-    flex-shrink: 0;
-    height: 56px !important;
-    min-height: 56px !important;
-    background-color: #ffffff !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-    padding: 0 1.5rem !important;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-    z-index: 100;
-">
-    <div style="display: flex; align-items: center; margin: 0; padding: 0;">
-        <div class="header-brand" style="
-            font-size: 13px !important;
-            font-weight: 700 !important;
-            color: #4f46e5 !important;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            margin: 0;
-            padding: 0;
-            line-height: 1;
-            font-family: 'Inter', sans-serif;
-        ">Gestão de Colaboradores</div>
+    <header style="background: white; padding: 1rem 2rem; border-bottom: 1px solid #e2e8f0;">
+        <h1 style="margin: 0; font-size: 1.5rem; color: #0f172a;">🗓️ Agendamento de Treinamentos</h1>
+    </header>
+
+    <main class="layout-agendamento">
         
-        <div id="viewerWarning" class="viewer-badge" style="
-            display: none; 
-            align-items: center; 
-            gap: 6px;
-            background-color: #f8fafc; 
-            color: #64748b; 
-            border: 1px solid #e2e8f0;
-            font-size: 10px; 
-            font-weight: 600; 
-            padding: 2px 10px; 
-            border-radius: 100px;
-            margin-left: 16px;
-        ">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width: 12px; height: 12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <span>Modo Leitura</span>
-        </div>
-    </div>
-</header>
-
-    <main class="container">
-        
-        <section id="viewList" class="content-view">
-            
-            <div class="actions-container" style="
-    margin-top: 0 !important;
-    background-color: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 12px 1.5rem !important;
-    display: flex;
-    align-items: center;
-">
-    </div>
-
-                <div class="toolbar-right">
-                    <div class="filters-group">
-                        <div class="select-wrapper">
-                            <select id="filtroStatus" onchange="renderizarTabela()">
-                                <option value="todos">Status: Todos</option>
-                                <option value="ativos">Apenas Ativos</option>
-                                <option value="desligados">Desligados</option>
-                            </select>
-                        </div>
-                        <div class="select-wrapper">
-                            <select id="filtroDepto" onchange="renderizarTabela()"></select>
-                        </div>
-                        <div class="select-wrapper">
-                            <select id="filtroCargo" onchange="renderizarTabela()"></select>
-                        </div>
-                    </div>
-                    
-                    <button class="btn-icon-soft" title="Limpar Filtros" onclick="limparFiltros()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3L2 3 10 12.46 10 19 14 21 14 12.46 22 3"></path></svg>
-                    </button>
-
-                    <div class="vertical-divider"></div>
-                    
-                    <button class="btn-primary-glow admin-only" onclick="novoColaborador()">+ Novo</button>
+        <section class="panel">
+            <h2>Novo Agendamento</h2>
+            <form id="form-agendamento">
+                <div class="form-group">
+                    <label class="form-label">O quê? (Treinamento)</label>
+                    <select id="select-treinamento" class="form-select" required>
+                        <option value="">Carregando...</option>
+                    </select>
                 </div>
-            </div>
 
-            <div class="table-container">
-                <div class="table-scroll-area">
-                    <table id="colabTable">
-                        <thead>
-                            <tr>
-                                <th class="sortable" onclick="ordenar('nome')">NOME <span id="sort-nome"></span></th>
-                                <th class="sortable" onclick="ordenar('cargo')">CARGO <span id="sort-cargo"></span></th>
-                                <th>DEPTO</th>
-                                <th>ADMISSÃO</th>
-                                <th class="sortable" onclick="ordenar('status')">STATUS <span id="sort-status"></span></th>
-                                <th style="text-align: right;">AÇÕES</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                <div class="form-group">
+                    <label class="form-label">Quem? (Colaborador)</label>
+                    <select id="select-colaborador" class="form-select" required>
+                        <option value="">Carregando...</option>
+                    </select>
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <label class="form-label">Quando? (Data e Hora)</label>
+                    <input type="datetime-local" id="input-datahora" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Observações (Opcional)</label>
+                    <textarea id="input-obs" class="form-textarea" rows="3"></textarea>
+                </div>
+
+                <button type="submit" id="btn-agendar" class="btn-primary-full">Confirmar Agendamento</button>
+            </form>
         </section>
 
-        <section id="viewForm" class="content-view" style="display: none;">
-            <div class="form-header">
-                <h2 id="formTitle">Novo Colaborador</h2>
-                <div style="flex:1"></div>
-                <div class="form-status-badge" style="display:none;" id="formStatusBadge">ATIVO</div>
-            </div>
-
-            <div class="form-tabs">
-                <button class="tab-link active" onclick="openTab('tabDados', this)">Dados Pessoais</button>
-                <button class="tab-link" onclick="openTab('tabContrato', this)">Contrato e Cargo</button>
-                <button class="tab-link" onclick="openTab('tabDocs', this)">Documentação</button>
-                <button class="tab-link" onclick="openTab('tabEndereco', this)">Endereço e Contato</button>
-                <button class="tab-link" onclick="openTab('tabBancarios', this)">Dados Bancários</button>
-            </div>
-
-            <form id="mainForm" onsubmit="event.preventDefault();">
-                <input type="hidden" id="colabId">
-                <div id="tabDados" class="tab-content active">
-                    <div class="grid-4">
-                        <div class="field span-2"> <label>Nome Completo <span style="color:red">*</span></label> <input type="text" id="nome" required> </div>
-                        <div class="field"> <label>CPF <span style="color:red">*</span></label> <input type="text" id="cpf" placeholder="000.000.000-00" required> </div>
-                        <div class="field"> <label>Data Nascimento</label> <input type="date" id="dataNascimento"> </div>
-                        <div class="field"> <label>Gênero</label> <select id="genero"><option value="">Selecione...</option><option>Masculino</option><option>Feminino</option><option>Outro</option></select> </div>
-                        <div class="field"> <label>Estado Civil</label> <select id="estadoCivil"><option value="">Selecione...</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option></select> </div>
-                        <div class="field"> <label>Nacionalidade</label> <input type="text" id="nacionalidade" value="Brasileira"> </div>
-                        <div class="field"> <label>Naturalidade</label> <input type="text" id="naturalidade"> </div>
-                    </div>
-                </div>
-                <div id="tabContrato" class="tab-content"><div class="grid-4"><div class="field"> <label>Data Admissão <span style="color:red">*</span></label> <input type="date" id="dataAdmissao" required> </div><div class="field"> <label>Cargo <span style="color:red">*</span></label> <select id="cargoAtualId" required></select> </div><div class="field"> <label>Departamento</label> <input type="text" id="departamento"> </div></div></div>
-                <div id="tabDocs" class="tab-content"></div>
-                <div id="tabEndereco" class="tab-content"></div>
-                <div id="tabBancarios" class="tab-content"></div>
-            </form>
-
-            <div class="form-actions">
-                <button type="button" class="btn-danger-text admin-only" id="btnExcluir" style="display:none;">Excluir</button>
-                <div style="flex:1"></div>
-                <button type="button" class="btn-secondary" id="btnCancelarVoltar" onclick="acaoVoltar()">Voltar</button>
-                <button type="button" class="btn-primary admin-only" id="btnSalvar" onclick="salvarColaborador()">Salvar Dados</button>
-                <button type="button" class="btn-primary admin-only" id="btnIrParaEdicao" style="display:none;" onclick="ativarModoEdicao()">Editar Registro</button>
-            </div>
+        <section class="panel">
+            <h2>Próximos Treinamentos</h2>
+            <div id="loading-agenda" class="loading-spinner">Carregando agenda...</div>
+            <ul id="lista-agenda" class="agenda-list" style="display: none;">
+                </ul>
         </section>
 
     </main>
 
-    <div id="modalDesligamento" class="modal-overlay" style="display: none;">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>Confirmar Desligamento</h3>
-            </div>
-            <div class="modal-body">
-                <p>Você está prestes a desligar este colaborador.</p>
-                <div class="field"><label>Data</label><input type="date" id="modalDataDemissao"></div>
-                <div class="field"><label>Motivo</label><input type="text" id="modalMotivo"></div>
-            </div>
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="fecharModalDesligamento()">Cancelar</button>
-                <button class="btn-danger-solid" onclick="confirmarDesligamento()">Confirmar</button>
-            </div>
-        </div>
-    </div>  
+    <script type="module">
+        import "./module-guard.js"; // Mantém sua segurança
+        import { DBHandler } from "./db-handler.js";
 
-    <script src="../bd-treinamentos/data.js"></script>
-    <script src="../bd-treinamentos/db-handler.js"></script>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sessionRaw = localStorage.getItem('rh_session');
-            if (!sessionRaw) { window.top.location.href = '../login.html'; return; }
-            const session = JSON.parse(sessionRaw);
+        // --- Elementos do DOM ---
+        const formAgendamento = document.getElementById('form-agendamento');
+        const selectTreino = document.getElementById('select-treinamento');
+        const selectColab = document.getElementById('select-colaborador');
+        const btnAgendar = document.getElementById('btn-agendar');
+        const listaAgenda = document.getElementById('lista-agenda');
+        const loadingAgenda = document.getElementById('loading-agenda');
 
-            if (session.role === 'ADMIN') {
-                document.body.classList.add('is-admin');
-            } else {
-                // Ativa a badge no header
-                document.getElementById('viewerWarning').style.display = 'flex';
+        // --- Funções Utilitárias ---
+        function formatarDataHoraVisual(isoString) {
+            const data = new Date(isoString);
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const hora = String(data.getHours()).padStart(2, '0');
+            const min = String(data.getMinutes()).padStart(2, '0');
+            
+            return {
+                diaMes: `${dia}/${mes}`,
+                ano: data.getFullYear(),
+                hora: `${hora}:${min}`
+            };
+        }
+
+        // --- Inicialização ---
+        async function inicializarTela() {
+            try {
+                // 1. Carrega os selects em paralelo (Promise.all para ser mais rápido)
+                const [treinos, colaboradores] = await Promise.all([
+                    DBHandler.listarTreinamentos(),
+                    DBHandler.listarColaboradores()
+                ]);
+
+                popularSelect(selectTreino, treinos, 'Selecione o Treinamento');
+                popularSelect(selectColab, colaboradores, 'Selecione o Colaborador');
+
+                // 2. Carrega a agenda
+                await carregarAgenda();
+
+            } catch (error) {
+                console.error("Erro ao inicializar:", error);
+                alert("Erro ao carregar dados. Verifique o console.");
+            }
+        }
+
+        // Popula um <select> genérico
+        function popularSelect(elementoSelect, dados, placeholder) {
+            elementoSelect.innerHTML = `<option value="">${placeholder}</option>`;
+            dados.forEach(item => {
+                // Assume que item tem 'id' e 'nome' (padrão das suas tabelas)
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.nome;
+                elementoSelect.appendChild(option);
+            });
+        }
+
+        // Carrega e Renderiza a Agenda
+        async function carregarAgenda() {
+            loadingAgenda.style.display = 'block';
+            listaAgenda.style.display = 'none';
+            listaAgenda.innerHTML = '';
+
+            try {
+                const agendamentos = await DBHandler.listarAgendamentosFuturos();
+
+                if (agendamentos.length === 0) {
+                    listaAgenda.innerHTML = '<li style="text-align:center; padding: 2rem; color: #64748b;">Nenhum agendamento futuro.</li>';
+                } else {
+                    agendamentos.forEach(item => {
+                        const dataF = formatarDataHoraVisual(item.data_hora);
+                        const statusClass = `status-${item.status.toLowerCase()}`;
+                        
+                        const li = document.createElement('li');
+                        li.className = `agenda-item ${statusClass}`;
+                        li.innerHTML = `
+                            <div class="agenda-date">
+                                ${dataF.diaMes}
+                                <span>${dataF.hora}</span>
+                            </div>
+                            <div class="agenda-details">
+                                <h4>${item.treinamento.nome}</h4>
+                                <p>👤 ${item.colaborador.nome}</p>
+                            </div>
+                            <span class="agenda-status ${statusClass}">${item.status}</span>
+                        `;
+                        listaAgenda.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error("Erro ao carregar agenda:", error);
+                listaAgenda.innerHTML = '<li style="color: red;">Erro ao carregar agenda.</li>';
+            } finally {
+                loadingAgenda.style.display = 'none';
+                listaAgenda.style.display = 'block';
+            }
+        }
+
+        // --- Evento de Salvar ---
+        formAgendamento.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Validação HTML5 já cuida dos campos 'required'
+            
+            const payload = {
+                treinamento_id: selectTreino.value,
+                colaborador_id: selectColab.value,
+                data_hora: new Date(document.getElementById('input-datahora').value).toISOString(),
+                observacoes: document.getElementById('input-obs').value || null,
+                status: 'AGENDADO'
+            };
+
+            const btnTextoOriginal = btnAgendar.innerText;
+            btnAgendar.innerText = 'Agendando...';
+            btnAgendar.disabled = true;
+
+            try {
+                await DBHandler.criarAgendamento(payload);
                 
-                // Trava formulário
-                const observer = new MutationObserver(() => {
-                    const form = document.getElementById('viewForm');
-                    if (form.style.display !== 'none') {
-                        form.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
-                    }
-                });
-                observer.observe(document.getElementById('viewForm'), { attributes: true });
+                // Sucesso
+                formAgendamento.reset();
+                await carregarAgenda(); // Recarrega a lista para mostrar o novo item
+                alert("✅ Agendamento realizado com sucesso!");
+
+            } catch (error) {
+                console.error("Erro ao agendar:", error);
+                alert("Erro ao salvar agendamento:\n" + (error.message || error));
+            } finally {
+                btnAgendar.innerText = btnTextoOriginal;
+                btnAgendar.disabled = false;
             }
         });
-    </script>
 
-    <script src="../scripts-treinamentos/cadastro-script.js"></script> 
+        // Roda ao carregar a página
+        document.addEventListener('DOMContentLoaded', inicializarTela);
 
-    <script>
-        // Ícones SVG (Feather Icons)
-        const icons = {
-            view: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
-            edit: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
-            restore: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>',
-            trash: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>'
-        };
-
-        // Monitora a tabela para trocar emojis por SVGs assim que forem criados
-        const tableBody = document.querySelector('#colabTable tbody');
-        if (tableBody) {
-            const patcher = new MutationObserver(() => {
-                const buttons = tableBody.querySelectorAll('.btn-icon-action');
-                buttons.forEach(btn => {
-                    const html = btn.innerHTML;
-                    
-                    // Substitui Emoji de Olho
-                    if (html.includes('👁️')) {
-                        btn.innerHTML = icons.view;
-                        btn.classList.add('action-view');
-                        btn.title = "Visualizar Ficha";
-                    }
-                    // Substitui Emoji de Lápis
-                    else if (html.includes('✏️')) {
-                        btn.innerHTML = icons.edit;
-                        btn.classList.add('action-edit');
-                        btn.title = "Editar Dados";
-                    }
-                    // Substitui Emoji de Reciclagem (Reativar)
-                    else if (html.includes('♻️')) {
-                        btn.innerHTML = icons.restore;
-                        btn.classList.add('action-restore');
-                        btn.title = "Reativar Colaborador";
-                    }
-                    // Substitui Emoji de Lixo (Se houver)
-                    else if (html.includes('🗑️')) {
-                        btn.innerHTML = icons.trash;
-                        btn.classList.add('action-delete');
-                    }
-                });
-            });
-            patcher.observe(tableBody, { childList: true, subtree: true });
-        }
     </script>
 </body>
-
 </html>
-
-
