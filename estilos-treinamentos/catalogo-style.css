@@ -340,6 +340,39 @@ input:checked + .slider:before{transform:translateX(20px)}
   font-weight:700;
 }
 
+/* badges mini-ícones (fonte + visibilidade) */
+.card-badges-icons{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-left: 8px; /* cola ao lado da trilha/subtrilha */
+}
+
+.badge-icon{
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#f1f5f9;
+  border:1px solid #e2e8f0;
+  color:#334155;
+}
+
+.badge-icon svg{
+  width:16px;
+  height:16px;
+  display:block;
+}
+
+/* quando oculto, deixa mais “alerta” */
+.badge-icon--off{
+  background:#fff1f2;
+  border-color:#fecdd3;
+  color:#be123c;
+}
+
 
 
 
