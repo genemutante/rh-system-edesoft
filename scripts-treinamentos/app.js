@@ -240,18 +240,24 @@ function alternarSelecao(trClicada, dadosDia, etapaKey, todosDadosVisiveis) {
   if (jaEstavaSelecionada) {
     // DESELECT
     carregarVisaoGeral(todosDadosVisiveis);
+
+    // ✅ quando desmarca, limpa/volta o detalhe
+    preencherEvidencias([]);
   } else {
     // SELECT
     trClicada.classList.add('selected');
     carregarDetalhesFocados(dadosDia, etapaKey);
+
+    // ✅ NOVO: busca evidências do banco pelo dia clicado
+    carregarEvidenciasDoDia(dadosDia);
   }
 }
+
 
 // ================= ESTADOS DE EXIBIÇÃO =================
 
 // ESTADO 1: FOCADO (Linha selecionada)
 function carregarDetalhesFocados(d, etapaFocada) {
-  // Filtra as aulas se houver participante selecionado
   let aulasParaExibir = (d.aulas || []);
 
   if (filtroParticipante.value !== "") {
@@ -263,29 +269,7 @@ function carregarDetalhesFocados(d, etapaFocada) {
   const aulasComData = aulasParaExibir.map(a => ({ ...a, data: d.data }));
   preencherListaAulas(aulasComData);
 
-  // Evidências
-  let evidencias = (d.evidencias || []);
-
-  // Se houver filtro de etapa (ou etapa focada), filtra evidências por essa etapa
-  const etapaSel = filtroEtapa.value;
-  const etapaParaFiltrar = etapaFocada || (etapaSel !== "" ? etapaSel : null);
-
-  if (etapaParaFiltrar) {
-    const nomeEtapa = etapasMap[etapaParaFiltrar];
-    evidencias = evidencias.filter(e => {
-      if (e.etapaKey) return e.etapaKey === etapaParaFiltrar;
-      if (e.etapa) return e.etapa === nomeEtapa;
-      return false;
-    });
-  }
-
-  const evidenciasComData = evidencias.map(e => ({
-    ...e,
-    data: d.data,
-    etapaKey: e.etapaKey || inferEtapaKeyFromNome(e.etapa) || etapaParaFiltrar || ""
-  }));
-
-  preencherGridEvidencias(evidenciasComData);
+  // ✅ Evidências agora vêm do banco (RPC) no clique.
 }
 
 
@@ -462,6 +446,42 @@ function preencherEvidencias(lista) {
 }
 
 
+async function carregarEvidenciasDoDia(dadosDia) {
+  try {
+    // d.data vem como "DD/MM/YYYY"
+    const [dd, mm, yyyy] = String(dadosDia.data).split("/");
+    const dataISO = `${yyyy}-${mm}-${dd}`;
+
+    // placeholder enquanto carrega
+    const tbody = document.getElementById("evidencias");
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center" style="padding:16px; color:#6b7280;">
+            Carregando evidências...
+          </td>
+        </tr>
+      `;
+    }
+
+    const lista = await window.DBHandler.carregarDetalheMonitoramento(dataISO);
+
+    // ✅ usa a função correta (RPC)
+    preencherEvidencias(lista);
+  } catch (err) {
+    console.error("Erro ao carregar evidências do dia:", err);
+    const tbody = document.getElementById("evidencias");
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center" style="padding:16px; color:#dc2626;">
+            Erro ao carregar evidências. Verifique o console.
+          </td>
+        </tr>
+      `;
+    }
+  }
+}
 
 
 // ================= EVENTOS =================
@@ -479,6 +499,7 @@ filtroParticipante.onchange = renderGrid;
 
 // Inicializa
 renderGrid();
+
 
 
 
