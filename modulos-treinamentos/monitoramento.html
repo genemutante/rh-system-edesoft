@@ -259,5 +259,74 @@
   document.body.appendChild(s);
 </script>
 
+
+<!-- =========================
+     MODAL: Evidência de Monitoramento (IA)
+     - Overlay + conteúdo com padrão "relatório"
+     - Sem alterar layout existente
+========================= -->
+<div id="evidenciaModalOverlay" class="evidencia-overlay" aria-hidden="true">
+  <div class="evidencia-modal" role="dialog" aria-modal="true" aria-labelledby="evidenciaModalTitle">
+    <div class="evidencia-header">
+      <div class="evidencia-titlewrap">
+        <div class="evidencia-badge">EVIDÊNCIA OFICIAL</div>
+        <h2 id="evidenciaModalTitle" class="evidencia-title">Registro de Monitoramento Automatizado (IA)</h2>
+        <div id="evidenciaSubTitle" class="evidencia-subtitle"></div>
+      </div>
+
+      <div class="evidencia-actions">
+        <button id="btnEvidenciaImprimir" class="evidencia-btn evidencia-btn-primary" type="button">
+          <i class="fa-solid fa-print"></i>&nbsp;Imprimir / PDF
+        </button>
+        <button id="btnEvidenciaFechar" class="evidencia-btn evidencia-btn-ghost" type="button" aria-label="Fechar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="evidencia-body">
+      <div class="evidencia-grid">
+        <div class="evidencia-card">
+          <div class="evidencia-card-title">Identificação</div>
+          <div class="evidencia-kv">
+            <div class="kv"><span>Data</span><strong id="ev_data"></strong></div>
+            <div class="kv"><span>Dia da Semana</span><strong id="ev_dia"></strong></div>
+            <div class="kv"><span>Tipo do Dia</span><strong id="ev_tipo"></strong></div>
+            <div class="kv"><span>Etapa do Processo</span><strong id="ev_etapa"></strong></div>
+          </div>
+        </div>
+
+        <div class="evidencia-card">
+          <div class="evidencia-card-title">Resultado da Monitoria (IA)</div>
+          <div class="evidencia-result">
+            <div class="evidencia-result-label">Avaliação</div>
+            <div id="ev_avaliacao" class="evidencia-result-value"></div>
+          </div>
+
+          <div class="evidencia-seal">
+            <i class="fa-solid fa-shield-halved"></i>
+            <div>
+              <div class="seal-title">Validação Automatizada</div>
+              <div class="seal-desc">Registro gerado automaticamente por rotina server-side. Sem intervenção humana.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="evidencia-card evidencia-card-full">
+        <div class="evidencia-card-title">Log de Autenticação Automática</div>
+        <pre id="ev_log" class="evidencia-log"></pre>
+      </div>
+
+      <div class="evidencia-footer-note">
+        <strong>Observação:</strong> Este documento é uma evidência operacional do monitoramento automatizado.
+        Para auditoria, utilize “Imprimir / PDF” e arquive o arquivo gerado.
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
+
