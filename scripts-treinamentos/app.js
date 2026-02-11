@@ -17,8 +17,7 @@ const etapasMap = {
   monitorar: "Monitorar"
 };
 
-
-// Mapeamento reverso: Nome Legível -> Chave (para evidências vindas do banco)
+// Mapeamento reverso: Nome Legível -> Chave (para evidências vindas do banco, caso precise)
 const etapasReverseMap = Object.fromEntries(
   Object.entries(etapasMap).map(([k, v]) => [v, k])
 );
@@ -34,26 +33,28 @@ const anosUnicos = [...new Set(dados.map(d => d.ano))].sort();
 anosUnicos.forEach(ano => {
   filtroAno.appendChild(new Option(ano, ano));
 });
-filtroAno.value = anosUnicos[anosUnicos.length - 1]; // Seleciona último ano
+
+// (mantive como estava: último ano)
+// se quiser ano atual como padrão, me avise que ajusto
+filtroAno.value = anosUnicos[anosUnicos.length - 1];
 
 // 2. Popula Filtro ETAPA
 Object.keys(etapasMap).forEach(key => {
   filtroEtapa.appendChild(new Option(etapasMap[key], key));
 });
 
-// 3. Popula Filtro PARTICIPANTES (Novo)
+// 3. Popula Filtro PARTICIPANTES
 const participantesSet = new Set();
 dados.forEach(d => {
-    if (d.aulas && d.aulas.length > 0) {
-        d.aulas.forEach(aula => {
-            aula.participantes.forEach(p => participantesSet.add(p.nome));
-        });
-    }
+  if (d.aulas && d.aulas.length > 0) {
+    d.aulas.forEach(aula => {
+      (aula.participantes || []).forEach(p => participantesSet.add(p.nome));
+    });
+  }
 });
 [...participantesSet].sort().forEach(nome => {
-    filtroParticipante.appendChild(new Option(nome, nome));
+  filtroParticipante.appendChild(new Option(nome, nome));
 });
-
 
 // ================= RENDERIZAÇÃO =================
 
@@ -76,7 +77,7 @@ function renderGrid() {
       const etapasArr = Array.isArray(d.etapas) ? d.etapas : [];
 
       // --- FILTRO POR ETAPA ---
-      // Agora a grid é 1 linha por dia. Se houver filtro de etapa, o dia precisa conter essa etapa.
+      // Grid = 1 linha por dia. Se houver filtro de etapa, o dia precisa conter essa etapa.
       if (etapaSel !== "") {
         if (!etapasArr.includes(etapaSel)) mostrarLinha = false;
       }
@@ -104,19 +105,17 @@ function renderGrid() {
         tr.onclick = () => alternarSelecao(tr, d, null, dadosVisiveis);
 
         // ===== MARCAÇÕES VISUAIS =====
-// Linha de dia NÃO ÚTIL (FERIADO/RECESSO/OFF etc.) -> tom avermelhado
-if (d.diaUtil === false) tr.classList.add("row-nao-util");
+        // Linha de dia NÃO ÚTIL (FERIADO/RECESSO/OFF etc.) -> tom avermelhado
+        if (d.diaUtil === false) tr.classList.add("row-nao-util");
 
-// Sábado/Domingo -> marcador escuro na coluna de etapa
-// (funciona tanto com "SÁB/DOM" quanto "sábado/domingo" ou "sab/dom")
-const diaTxt = String(d.dia || "").toLowerCase();
-if (
-  diaTxt.includes("sáb") || diaTxt.includes("sab") || diaTxt.includes("sábado") ||
-  diaTxt.includes("dom") || diaTxt.includes("domingo")
-) {
-  tr.classList.add("row-fds");
-}
-
+        // Sábado/Domingo -> marcador escuro na coluna de etapa
+        const diaTxt = String(d.dia || "").toLowerCase();
+        if (
+          diaTxt.includes("sáb") || diaTxt.includes("sab") || diaTxt.includes("sábado") ||
+          diaTxt.includes("dom") || diaTxt.includes("domingo")
+        ) {
+          tr.classList.add("row-fds");
+        }
 
         // Etapa exibida: exatamente como vem do calendário (melhor cenário)
         const etapaTextoRaw =
@@ -128,15 +127,16 @@ if (
         const etapaTexto = etapaTextoRaw !== "" ? etapaTextoRaw : "—";
 
         // Classe visual (mantém CSS existente): usa a primeira etapa normalizada, se existir
-        // Se não houver, coloca uma classe fallback para não ficar "sem classe"
+        // Se não houver, coloca uma classe fallback
         const etapaCssKey = (etapasArr.length > 0) ? etapasArr[0] : "nao_mapeado";
 
         // ✅ CLASSES para não ficar "branco" quando não há etapa mapeada/texto vazio
         if (etapasArr.length === 0) tr.classList.add("row-nao-mapeado");
         if (etapaTexto === "—") tr.classList.add("row-sem-etapa");
 
-        // Evidência (se houver). Quando não há etapa focada, basta indicar se existe evidência no dia
-        const temEvidencia = Array.isArray(d.evidencias) && d.evidencias.length > 0;
+        // ✅ Status: agora depende de flag do banco (recomendado) OU fica vazio
+        // (d.evidencias não é mais usado no calendário)
+        const temEvidencia = !!d.temEvidencia;
 
         // Aderência
         let aderenciaHtml = "—";
@@ -165,68 +165,43 @@ if (
   carregarVisaoGeral(dadosVisiveis);
 }
 
-
-
-
-// ================= FUNÇÃO DE CÁLCULO DE KPI (NOVA) =================
+// ================= FUNÇÃO DE CÁLCULO DE KPI =================
 function atualizarKPIs(lista) {
-    // 1. Volume (Agendados vs Realizados)
-    // Somamos apenas das linhas visíveis. 
-    // Nota: Se um dia tem 2 etapas, os "agendados" do dia contam 2x? 
-    // Na lógica atual do data.js, agendados é por dia/registro. 
-    // Para evitar duplicidade se mostrarmos várias etapas do mesmo dia, 
-    // o ideal seria somar agendados apenas uma vez por 'd' único, 
-    // mas como o grid mostra linhas de processo, somar o total de "esforço" (linhas) faz sentido.
-    
-    let totalAgendados = 0;
-    let totalRealizados = 0;
-    let somaPercentuais = 0;
-    let contagemComPercentual = 0;
-    let totalAlertas = 0;
+  let totalAgendados = 0;
+  let totalRealizados = 0;
+  let somaPercentuais = 0;
+  let contagemComPercentual = 0;
+  let totalAlertas = 0;
 
-    lista.forEach(item => {
-        const { d, isAlerta } = item;
-        
-        // Só somamos se houver agendamento > 0 (ignora etapas puramente burocráticas sem pessoas)
-        if (d.agendados > 0) {
-            totalAgendados += d.agendados;
-            totalRealizados += d.realizados;
-            
-            // Para média de aderência
-            const pct = (d.realizados / d.agendados) * 100;
-            somaPercentuais += pct;
-            contagemComPercentual++;
-        }
+  lista.forEach(item => {
+    const { d, isAlerta } = item;
 
-        if (isAlerta) {
-            totalAlertas++;
-        }
-    });
+    if (d.agendados > 0) {
+      totalAgendados += d.agendados;
+      totalRealizados += d.realizados;
 
-    // 2. Aderência Média
-    // Evita divisão por zero
-    const mediaAderencia = contagemComPercentual > 0 
-        ? Math.round(somaPercentuais / contagemComPercentual) 
-        : 0;
+      const pct = (d.realizados / d.agendados) * 100;
+      somaPercentuais += pct;
+      contagemComPercentual++;
+    }
 
-    // --- ATUALIZAÇÃO DO DOM ---
-    
-    // Card 1: Volume
-    document.getElementById("kpiVolume").textContent = `${totalRealizados} / ${totalAgendados}`;
-    
-    // Card 2: Aderência (Muda cor se for muito baixa)
-    const elAderencia = document.getElementById("kpiAderencia");
-    elAderencia.textContent = `${mediaAderencia}%`;
-    elAderencia.style.color = mediaAderencia < 80 ? "#dc2626" : "#111"; // Vermelho se média ruim
+    if (isAlerta) totalAlertas++;
+  });
 
-    // Card 3: Alertas
-    const elAlertas = document.getElementById("kpiAlertas");
-    elAlertas.textContent = totalAlertas;
-    // Se tiver alertas, destaca o número em vermelho
-    elAlertas.style.color = totalAlertas > 0 ? "#dc2626" : "#111";
+  const mediaAderencia = contagemComPercentual > 0
+    ? Math.round(somaPercentuais / contagemComPercentual)
+    : 0;
+
+  document.getElementById("kpiVolume").textContent = `${totalRealizados} / ${totalAgendados}`;
+
+  const elAderencia = document.getElementById("kpiAderencia");
+  elAderencia.textContent = `${mediaAderencia}%`;
+  elAderencia.style.color = mediaAderencia < 80 ? "#dc2626" : "#111";
+
+  const elAlertas = document.getElementById("kpiAlertas");
+  elAlertas.textContent = totalAlertas;
+  elAlertas.style.color = totalAlertas > 0 ? "#dc2626" : "#111";
 }
-
-
 
 // ================= LÓGICA DE SELEÇÃO (TOGGLE) =================
 
@@ -241,18 +216,17 @@ function alternarSelecao(trClicada, dadosDia, etapaKey, todosDadosVisiveis) {
     // DESELECT
     carregarVisaoGeral(todosDadosVisiveis);
 
-    // ✅ quando desmarca, limpa/volta o detalhe
+    // limpa/volta detalhe
     preencherEvidencias([]);
   } else {
     // SELECT
     trClicada.classList.add('selected');
     carregarDetalhesFocados(dadosDia, etapaKey);
 
-    // ✅ NOVO: busca evidências do banco pelo dia clicado
+    // ✅ busca evidências do banco pelo dia clicado
     carregarEvidenciasDoDia(dadosDia);
   }
 }
-
 
 // ================= ESTADOS DE EXIBIÇÃO =================
 
@@ -269,59 +243,49 @@ function carregarDetalhesFocados(d, etapaFocada) {
   const aulasComData = aulasParaExibir.map(a => ({ ...a, data: d.data }));
   preencherListaAulas(aulasComData);
 
-  // ✅ Evidências agora vêm do banco (RPC) no clique.
+  // ✅ Evidências agora vêm do banco (RPC) no clique (carregarEvidenciasDoDia)
 }
-
-
 
 // ESTADO 2: VISÃO GERAL (Nenhuma linha selecionada)
 function carregarVisaoGeral(listaDadosVisiveis) {
   participantesDiv.innerHTML = "<div style='padding:12px; color:#9ca3af; text-align:center; font-style:italic;'>Selecione um curso acima para ver participantes</div>";
 
   let todasAulas = [];
-  let todasEvidencias = [];
   const partSel = filtroParticipante.value;
 
   listaDadosVisiveis.forEach(item => {
-    const { d, etapaKey } = item;
-    
+    const { d } = item;
+
     // Acumula Aulas
     if (d.aulas && d.aulas.length > 0) {
       d.aulas.forEach(aula => {
-         // SE tiver filtro de participante, só adiciona as aulas desse participante
-         if (partSel !== "") {
-             const hasP = aula.participantes.some(p => p.nome === partSel);
-             if (!hasP) return; // Pula esta aula
-         }
-
-         todasAulas.push({ ...aula, data: d.data });
+        if (partSel !== "") {
+          const hasP = (aula.participantes || []).some(p => p.nome === partSel);
+          if (!hasP) return;
+        }
+        todasAulas.push({ ...aula, data: d.data });
       });
     }
-
-    // Acumula Evidências
-    const nomeEtapa = etapasMap[etapaKey];
-    const evsDoDia = d.evidencias.filter(e => e.etapa === nomeEtapa);
-    evsDoDia.forEach(e => {
-        todasEvidencias.push({ ...e, data: d.data, etapaKey: etapaKey });
-    });
   });
 
   // Ordena
   todasAulas.sort((a, b) => {
-      const dataA = a.data.split('/').reverse().join('');
-      const dataB = b.data.split('/').reverse().join('');
-      return dataA.localeCompare(dataB);
+    const dataA = a.data.split('/').reverse().join('');
+    const dataB = b.data.split('/').reverse().join('');
+    return dataA.localeCompare(dataB);
   });
 
   preencherListaAulas(todasAulas);
-  preencherGridEvidencias(todasEvidencias);
+
+  // ✅ detalhe de evidências na visão geral fica vazio (carrega sob demanda no clique)
+  preencherEvidencias([]);
 }
 
 // ================= FUNÇÕES AUXILIARES DE HTML =================
 
 function preencherListaAulas(listaAulas) {
   aulasDiv.innerHTML = "";
-  
+
   if (listaAulas.length === 0) {
     aulasDiv.innerHTML = "<div style='padding:10px; color:#999;'>Nenhum curso encontrado.</div>";
     return;
@@ -329,13 +293,13 @@ function preencherListaAulas(listaAulas) {
 
   const nomesVistos = new Set();
   const aulasUnicas = [];
-  
+
   listaAulas.forEach(aula => {
-      const uniqueKey = `${aula.data}-${aula.nome}`;
-      if (!nomesVistos.has(uniqueKey)) {
-          nomesVistos.add(uniqueKey);
-          aulasUnicas.push(aula);
-      }
+    const uniqueKey = `${aula.data}-${aula.nome}`;
+    if (!nomesVistos.has(uniqueKey)) {
+      nomesVistos.add(uniqueKey);
+      aulasUnicas.push(aula);
+    }
   });
 
   aulasUnicas.forEach(a => {
@@ -343,43 +307,23 @@ function preencherListaAulas(listaAulas) {
     div.dataset.id = `${a.data}-${a.nome}`;
 
     div.innerHTML = `
-        <span class="aula-data">${a.data}</span>
-        <span class="aula-nome">${a.nome}</span>
+      <span class="aula-data">${a.data}</span>
+      <span class="aula-nome">${a.nome}</span>
     `;
-    
+
     div.onclick = () => {
-        Array.from(aulasDiv.children).forEach(child => child.classList.remove('selected'));
-        div.classList.add('selected');
-        selecionarAula(a);
+      Array.from(aulasDiv.children).forEach(child => child.classList.remove('selected'));
+      div.classList.add('selected');
+      selecionarAula(a);
     };
-    
+
     aulasDiv.appendChild(div);
-  });
-}
-
-function preencherGridEvidencias(listaEvidencias) {
-  evidenciasDiv.innerHTML = "";
-
-  if (listaEvidencias.length === 0) {
-     evidenciasDiv.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999; padding: 12px;">Nenhuma evidência encontrada.</td></tr>`;
-     return;
-  }
-
-  listaEvidencias.slice(0, 100).forEach(e => {
-    evidenciasDiv.innerHTML += `
-        <tr>
-            <td>${e.origem}</td>
-            <td>${e.data}</td>
-            <td><span class="etapa ${e.etapaKey}" style="font-size:10px;">${e.etapa}</span></td>
-            <td>${e.descricao}</td>
-            <td class="text-center"><i class="fa-solid fa-link" style="color:#2563eb; cursor:pointer;"></i></td>
-        </tr>`;
   });
 }
 
 function selecionarAula(aula) {
   participantesDiv.innerHTML = "";
-  
+
   const header = document.createElement("div");
   header.style.padding = "10px 12px";
   header.style.fontWeight = "bold";
@@ -389,34 +333,26 @@ function selecionarAula(aula) {
   header.innerHTML = `${aula.nome} <span style="font-weight:400; font-size:11px; color:#666; margin-left:8px;">(${aula.data})</span>`;
   participantesDiv.appendChild(header);
 
-  // === ALTERAÇÃO AQUI: Ordenação Alfabética ===
-  // Criamos uma cópia ([...]) para não alterar o original e ordenamos pelo nome
-  const participantesOrdenados = [...aula.participantes].sort((a, b) => {
-      return a.nome.localeCompare(b.nome);
-  });
+  const participantesOrdenados = [...(aula.participantes || [])].sort((a, b) => a.nome.localeCompare(b.nome));
 
   participantesOrdenados.forEach(p => {
-    
-    // Lógica de destaque do filtro (mantida do código anterior)
     const isFilteredPerson = filtroParticipante.value === p.nome;
     const highlightStyle = isFilteredPerson ? "background: #fef9c3; font-weight:bold;" : "";
 
     const div = document.createElement("div");
-    // Aplicamos o estilo highlightStyle se necessário
     div.style.cssText = `display:flex; justify-content:space-between; align-items:center; padding: 8px 12px; border-bottom: 1px solid #f3f4f6; ${highlightStyle}`;
-    
+
     div.innerHTML = `
-        <span style="color:${isFilteredPerson ? '#000' : '#374151'}; font-size: 12px;">${p.nome}</span>
-        ${p.participou 
-            ? '<i class="fa-solid fa-check" style="color:#16a34a;"></i>' 
-            : '<i class="fa-solid fa-xmark" style="color:#dc2626;"></i>'}
+      <span style="color:${isFilteredPerson ? '#000' : '#374151'}; font-size: 12px;">${p.nome}</span>
+      ${p.participou
+        ? '<i class="fa-solid fa-check" style="color:#16a34a;"></i>'
+        : '<i class="fa-solid fa-xmark" style="color:#dc2626;"></i>'}
     `;
     participantesDiv.appendChild(div);
   });
 }
 
-
-
+// ✅ Preenche tabela de evidências (retorno do RPC monitoramento_detalhe)
 function preencherEvidencias(lista) {
   const tbody = document.getElementById("evidencias");
   if (!tbody) return;
@@ -445,14 +381,11 @@ function preencherEvidencias(lista) {
   `).join("");
 }
 
-
 async function carregarEvidenciasDoDia(dadosDia) {
   try {
-    // d.data vem como "DD/MM/YYYY"
     const [dd, mm, yyyy] = String(dadosDia.data).split("/");
     const dataISO = `${yyyy}-${mm}-${dd}`;
 
-    // placeholder enquanto carrega
     const tbody = document.getElementById("evidencias");
     if (tbody) {
       tbody.innerHTML = `
@@ -465,8 +398,6 @@ async function carregarEvidenciasDoDia(dadosDia) {
     }
 
     const lista = await window.DBHandler.carregarDetalheMonitoramento(dataISO);
-
-    // ✅ usa a função correta (RPC)
     preencherEvidencias(lista);
   } catch (err) {
     console.error("Erro ao carregar evidências do dia:", err);
@@ -483,7 +414,6 @@ async function carregarEvidenciasDoDia(dadosDia) {
   }
 }
 
-
 // ================= EVENTOS =================
 
 document.getElementById("btnLimpar").onclick = () => {
@@ -499,7 +429,3 @@ filtroParticipante.onchange = renderGrid;
 
 // Inicializa
 renderGrid();
-
-
-
-
