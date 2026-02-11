@@ -8,11 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
- 
   <link rel="stylesheet" href="../estilos-treinamentos/monitoramento.css">
 </head>
 
@@ -166,51 +165,99 @@
      - data.js foi removido
      - Carrega dados via db-handler.js
      - Só carrega app.js DEPOIS de window.dados estar pronto
+     - Logs para confirmar se encontrou/baixou/rodou arquivos
 ========================= -->
 
-<!-- REMOVIDO: <script src="data.js"></script> -->
+<script>
+  // Logger simples e padronizado
+  (function () {
+    const t0 = performance.now();
+    window.__log = (...args) => console.log(`[MONITORAMENTO +${(performance.now() - t0).toFixed(0)}ms]`, ...args);
+    window.__err = (...args) => console.error(`[MONITORAMENTO +${(performance.now() - t0).toFixed(0)}ms]`, ...args);
+  })();
 
-
-<script type="module" src="../bd-treinamentos/db-handler.js"></script>
+  async function probe(url) {
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      const ct = res.headers.get("content-type");
+      window.__log(`[PROBE] ${url} -> ${res.status} ${res.statusText} | content-type: ${ct}`);
+      return { ok: res.ok, status: res.status, contentType: ct };
+    } catch (e) {
+      window.__err(`[PROBE ERRO] ${url} ->`, e);
+      return { ok: false, status: 0, contentType: null, error: e };
+    }
+  }
+</script>
 
 <script type="module">
-  const waitForDBHandler = (timeoutMs = 15000) => new Promise((resolve, reject) => {
-    const start = Date.now();
-    const tick = () => {
-      if (window.DBHandler && typeof window.DBHandler.carregarMonitoramento === "function") return resolve();
-      if (Date.now() - start > timeoutMs) return reject(new Error("DBHandler/carregarMonitoramento não carregou a tempo."));
-      requestAnimationFrame(tick);
-    };
-    tick();
-  });
+  const DB_URL = "../bd-treinamentos/db-handler.js";
+  const APP_URL = "../scripts-treinamentos/app.js";
 
-  try {
-    await waitForDBHandler();
+  window.__log("Iniciando bootstrap. Página:", location.href);
+  window.__log("Testando caminhos:", { DB_URL, APP_URL });
 
-    // Mantemos sem filtros no load inicial.
-    // O app.js seguirá filtrando client-side como já faz hoje.
-    const dados = await window.DBHandler.carregarMonitoramento({
-      ano: null,
-      etapa: null,
-      participante: null,
-    });
+  // 1) Probe dos arquivos (confirma se encontrou e status HTTP)
+  const dbProbe = await probe(DB_URL);
+  const appProbe = await probe(APP_URL);
 
-    window.dados = Array.isArray(dados) ? dados : (dados ?? []);
-  } catch (err) {
-    console.error("Erro ao carregar dados do banco:", err);
-    window.dados = [];
-    alert("Erro ao carregar dados do banco. Verifique o console.");
+  if (!dbProbe.ok) {
+    alert(`db-handler.js não está acessível (${dbProbe.status}). Veja console [PROBE].`);
+  }
+  if (!appProbe.ok) {
+    alert(`app.js não está acessível (${appProbe.status}). Veja console [PROBE].`);
   }
 
-  // ✅ carrega o app.js somente agora (ele assume "dados" existente)
+  // 2) Import dinâmico do db-handler (garante execução do módulo)
+  try {
+    window.__log("[LOAD] Importando módulo:", DB_URL);
+    await import(DB_URL);
+    window.__log("[OK] import(db-handler.js) concluído.");
+  } catch (e) {
+    window.__err("[ERRO] Falha ao importar db-handler.js:", e);
+    alert("Falha ao importar db-handler.js. Veja o console.");
+  }
+
+  // 3) Verifica se DBHandler existe e tem o método esperado
+  if (!window.DBHandler) {
+    window.__err("DBHandler NÃO existe em window após import().");
+    alert("DBHandler não foi definido. Veja o console.");
+    window.dados = [];
+  } else {
+    window.__log("DBHandler existe:", !!window.DBHandler, "carregarMonitoramento:", typeof window.DBHandler.carregarMonitoramento);
+
+    if (typeof window.DBHandler.carregarMonitoramento !== "function") {
+      window.__err("DBHandler.carregarMonitoramento NÃO é função. Verifique db-handler.js.");
+      alert("DBHandler.carregarMonitoramento não existe. Veja o console.");
+      window.dados = [];
+    } else {
+      // 4) Carrega dados
+      try {
+        window.__log("[LOAD] Chamando DBHandler.carregarMonitoramento...");
+        const dados = await window.DBHandler.carregarMonitoramento({
+          ano: null,
+          etapa: null,
+          participante: null,
+        });
+
+        window.dados = Array.isArray(dados) ? dados : (dados ?? []);
+        window.__log("[OK] Dados carregados. Registros:", Array.isArray(window.dados) ? window.dados.length : 0);
+      } catch (err) {
+        window.__err("Erro ao carregar dados do banco:", err);
+        window.dados = [];
+        alert("Erro ao carregar dados do banco. Verifique o console.");
+      }
+    }
+  }
+
+  // 5) Carrega o app.js só agora
+  window.__log("[LOAD] Injetando app.js:", APP_URL);
   const s = document.createElement("script");
-  s.src = "../scripts-treinamentos/app.js";
+  s.src = APP_URL;
   s.defer = true;
+  s.onload = () => window.__log("[OK] app.js carregado e executado.");
+  s.onerror = () => window.__err("[ERRO] Falha ao carregar app.js:", APP_URL);
   document.body.appendChild(s);
 </script>
 
 </body>
 </html>
-
-
-
