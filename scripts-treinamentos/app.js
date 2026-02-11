@@ -17,6 +17,16 @@ const etapasMap = {
   monitorar: "Monitorar"
 };
 
+
+// Mapeamento reverso: Nome Legível -> Chave (para evidências vindas do banco)
+const etapasReverseMap = Object.fromEntries(
+  Object.entries(etapasMap).map(([k, v]) => [v, k])
+);
+
+function inferEtapaKeyFromNome(nomeEtapa) {
+  return etapasReverseMap[nomeEtapa] || null;
+}
+
 // ================= INICIALIZAÇÃO =================
 
 // 1. Popula Filtro ANO
@@ -51,82 +61,91 @@ dados.forEach(d => {
 
 function renderGrid() {
   grid.innerHTML = "";
-  
+
   // Captura valor dos filtros
   const anoSel = filtroAno.value;
-  const etapaSel = filtroEtapa.value;
-  const partSel = filtroParticipante.value;
+  const etapaSel = filtroEtapa.value;          // chave: levantar/plano/preparar/prover/obter/monitorar
+  const partSel = filtroParticipante.value;    // nome do participante
 
-  // Array para acumular os dados visíveis e gerar a visão geral/KPIs
+  // Array para acumular os dados visíveis e gerar KPIs/visão geral
   let dadosVisiveis = [];
 
   dados
     .filter(d => d.ano == anoSel)
     .forEach(d => {
-      d.etapas.forEach(etapaKey => {
-        
-        let mostrarLinha = true;
+      let mostrarLinha = true;
 
-        // --- FILTROS (Lógica existente) ---
-        if (etapaSel !== "" && etapaSel !== etapaKey) mostrarLinha = false;
+      // --- FILTRO POR ETAPA ---
+      // Agora a grid é 1 linha por dia. Se houver filtro de etapa, o dia precisa conter essa etapa.
+      if (etapaSel !== "") {
+        const etapas = Array.isArray(d.etapas) ? d.etapas : [];
+        if (!etapas.includes(etapaSel)) mostrarLinha = false;
+      }
 
-        if (partSel !== "") {
-            if (etapaKey !== 'prover') {
-                mostrarLinha = false;
-            } else {
-                const estaNasAulas = d.aulas && d.aulas.some(a => 
-                    a.participantes.some(p => p.nome === partSel)
-                );
-                if (!estaNasAulas) mostrarLinha = false;
-            }
+      // --- FILTRO POR PARTICIPANTE ---
+      // Só faz sentido quando o dia tem etapa "prover" e o participante está em alguma aula do dia.
+      if (partSel !== "") {
+        const etapas = Array.isArray(d.etapas) ? d.etapas : [];
+        if (!etapas.includes("prover")) {
+          mostrarLinha = false;
+        } else {
+          const estaNasAulas = d.aulas && d.aulas.some(a =>
+            a.participantes && a.participantes.some(p => p.nome === partSel)
+          );
+          if (!estaNasAulas) mostrarLinha = false;
+        }
+      }
+
+      if (mostrarLinha) {
+        dadosVisiveis.push({
+          d,
+          isAlerta: (d.agendados > 0 && (d.realizados / d.agendados) < 0.8)
+        });
+
+        const tr = document.createElement("tr");
+        tr.onclick = () => alternarSelecao(tr, d, null, dadosVisiveis);
+
+        // Etapa exibida: exatamente como vem do calendário (melhor cenário)
+        const etapaTexto =
+          (typeof d.etapaTexto === "string" && d.etapaTexto.trim() !== "") ? d.etapaTexto :
+          (typeof d.etapa_processo === "string" && d.etapa_processo.trim() !== "") ? d.etapa_processo :
+          (Array.isArray(d.etapas) && d.etapas.length > 0) ? d.etapas.map(k => etapasMap[k] || k).join(" / ") :
+          "—";
+
+        // Classe visual (mantém CSS existente): usa a primeira etapa normalizada, se existir
+        const etapaCssKey = (Array.isArray(d.etapas) && d.etapas.length > 0) ? d.etapas[0] : "";
+
+        // Evidência (se houver). Quando não há etapa focada, basta indicar se existe evidência no dia
+        const temEvidencia = Array.isArray(d.evidencias) && d.evidencias.length > 0;
+
+        // Aderência
+        let aderenciaHtml = "—";
+        if (d.agendados > 0) {
+          const pct = Math.round((d.realizados / d.agendados) * 100);
+          if (pct >= 100) aderenciaHtml = `<span style="color:#16a34a; font-weight:700;">${pct}%</span>`;
+          else if (pct >= 80) aderenciaHtml = `<span style="color:#d97706; font-weight:700;">${pct}%</span>`;
+          else aderenciaHtml = `<span style="color:#dc2626; font-weight:700;">${pct}%</span>`;
         }
 
-        if (mostrarLinha) {
-            // Adiciona objeto com metadados extras para o cálculo de KPI
-            dadosVisiveis.push({ 
-                d, 
-                etapaKey,
-                // Pré-calculamos se é uma linha de alerta (Aderência < 80% e tem agendamento)
-                isAlerta: (d.agendados > 0 && (d.realizados / d.agendados) < 0.8)
-            });
+        tr.innerHTML = `
+          <td>${d.data}</td>
+          <td>${d.dia}</td>
+          <td><span class="etapa ${etapaCssKey}">${etapaTexto}</span></td>
+          <td class="text-center">${d.agendados ? d.agendados : "—"}</td>
+          <td class="text-center">${d.realizados ? d.realizados : "—"}</td>
+          <td class="text-center">${aderenciaHtml}</td>
+          <td class="text-center">${temEvidencia ? '<i class="fa-solid fa-check" style="color:green"></i>' : ''}</td>
+        `;
 
-            // ... (Aqui vem o código de criação do TR igual ao anterior) ...
-            const tr = document.createElement("tr");
-            tr.onclick = () => alternarSelecao(tr, d, etapaKey, dadosVisiveis);
-            // ... (Preenchimento do HTML da linha) ...
-            
-            // Recriando o trecho do cálculo visual da linha (apenas para referência, mantenha o seu):
-            const nomeEtapa = etapasMap[etapaKey];
-            const temEvidencia = d.evidencias.some(ev => ev.etapa === nomeEtapa);
-            let aderenciaHtml = "—";
-            if (d.agendados > 0) {
-                const pct = Math.round((d.realizados / d.agendados) * 100);
-                if (pct >= 100) aderenciaHtml = `<span style="color:#16a34a; font-weight:700;">${pct}%</span>`;
-                else if (pct >= 80) aderenciaHtml = `<span style="color:#d97706; font-weight:700;">${pct}%</span>`;
-                else aderenciaHtml = `<span style="color:#dc2626; font-weight:700;">${pct}%</span>`;
-            }
-
-            tr.innerHTML = `
-              <td>${d.data}</td>
-              <td>${d.dia}</td>
-              <td><span class="etapa ${etapaKey}">${nomeEtapa}</span></td>
-              <td class="text-center">${d.agendados ? d.agendados : "—"}</td>
-              <td class="text-center">${d.realizados ? d.realizados : "—"}</td>
-              <td class="text-center">${aderenciaHtml}</td>
-              <td class="text-center">${temEvidencia ? '<i class="fa-solid fa-check" style="color:green"></i>' : ''}</td>
-            `;
-
-            grid.appendChild(tr);
-        }
-      });
+        grid.appendChild(tr);
+      }
     });
 
-  // NOVO: Atualiza os Cards de KPI com base no que foi filtrado
   atualizarKPIs(dadosVisiveis);
-
-  // Carrega a visão geral
   carregarVisaoGeral(dadosVisiveis);
 }
+
+
 
 // ================= FUNÇÃO DE CÁLCULO DE KPI (NOVA) =================
 function atualizarKPIs(lista) {
@@ -213,22 +232,42 @@ function alternarSelecao(trClicada, dadosDia, etapaKey, todosDadosVisiveis) {
 function carregarDetalhesFocados(d, etapaFocada) {
   // Filtra as aulas se houver participante selecionado
   let aulasParaExibir = (d.aulas || []);
-  
+
   if (filtroParticipante.value !== "") {
-      aulasParaExibir = aulasParaExibir.filter(a => 
-          a.participantes.some(p => p.nome === filtroParticipante.value)
-      );
+    aulasParaExibir = aulasParaExibir.filter(a =>
+      a.participantes && a.participantes.some(p => p.nome === filtroParticipante.value)
+    );
   }
 
-  const aulasComData = aulasParaExibir.map(a => ({...a, data: d.data}));
+  const aulasComData = aulasParaExibir.map(a => ({ ...a, data: d.data }));
   preencherListaAulas(aulasComData);
 
   // Evidências
-  const nomeEtapa = etapasMap[etapaFocada];
-  const evidencias = d.evidencias.filter(e => e.etapa === nomeEtapa);
-  const evidenciasComData = evidencias.map(e => ({...e, data: d.data, etapaKey: etapaFocada}));
+  let evidencias = (d.evidencias || []);
+
+  // Se houver filtro de etapa (ou etapa focada), filtra evidências por essa etapa
+  const etapaSel = filtroEtapa.value;
+  const etapaParaFiltrar = etapaFocada || (etapaSel !== "" ? etapaSel : null);
+
+  if (etapaParaFiltrar) {
+    const nomeEtapa = etapasMap[etapaParaFiltrar];
+    evidencias = evidencias.filter(e => {
+      if (e.etapaKey) return e.etapaKey === etapaParaFiltrar;
+      if (e.etapa) return e.etapa === nomeEtapa;
+      return false;
+    });
+  }
+
+  const evidenciasComData = evidencias.map(e => ({
+    ...e,
+    data: d.data,
+    etapaKey: e.etapaKey || inferEtapaKeyFromNome(e.etapa) || etapaParaFiltrar || ""
+  }));
+
   preencherGridEvidencias(evidenciasComData);
 }
+
+
 
 // ESTADO 2: VISÃO GERAL (Nenhuma linha selecionada)
 function carregarVisaoGeral(listaDadosVisiveis) {
