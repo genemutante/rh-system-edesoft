@@ -599,6 +599,18 @@ async carregarMonitoramento({ ano = null, etapa = null, participante = null } = 
   return Array.isArray(data) ? data : (data ?? []);
 },
 
+// =========================
+// DETALHE MONITORAMENTO (RPC)
+// =========================
+async carregarDetalheMonitoramento(dataISO) {
+  // dataISO: "YYYY-MM-DD"
+  const { data, error } = await supabaseClient.rpc("monitoramento_detalhe", {
+    p_data: dataISO,
+  });
+
+  if (error) throw new Error(normalizeError(error));
+  return Array.isArray(data) ? data : (data ?? []);
+},
 	
     
     
@@ -608,6 +620,7 @@ async carregarMonitoramento({ ano = null, etapa = null, participante = null } = 
 
 // No final do ficheiro db-handler.js
 window.DBHandler = DBHandler;
+
 
 
 
