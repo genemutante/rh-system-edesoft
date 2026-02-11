@@ -430,6 +430,40 @@ function selecionarAula(aula) {
     participantesDiv.appendChild(div);
   });
 }
+
+
+
+function preencherEvidencias(lista) {
+  const tbody = document.getElementById("evidencias");
+  if (!tbody) return;
+
+  if (!Array.isArray(lista) || lista.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center" style="padding:16px; color:#6b7280;">
+          Nenhuma evidência encontrada.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = lista.map(ev => `
+    <tr>
+      <td>${ev.origem ?? ""}</td>
+      <td>${ev.data ?? ""}</td>
+      <td>${ev.etapa ?? ""}</td>
+      <td>${ev.evidencia ?? ""}</td>
+      <td class="text-center">
+        ${ev.url ? `<a href="${ev.url}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-link"></i></a>` : ""}
+      </td>
+    </tr>
+  `).join("");
+}
+
+
+
+
 // ================= EVENTOS =================
 
 document.getElementById("btnLimpar").onclick = () => {
@@ -445,5 +479,6 @@ filtroParticipante.onchange = renderGrid;
 
 // Inicializa
 renderGrid();
+
 
 
