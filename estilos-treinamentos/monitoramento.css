@@ -890,3 +890,69 @@ body {
   background: #4b5563;
 }
 
+/* =========================================================
+   AJUSTE DE LARGURA DAS COLUNAS (GRID PRINCIPAL)
+   - reduz colunas numéricas
+   - dá mais espaço para "Etapa do Processo"
+   - evita corte quebrando linha
+   ========================================================= */
+
+/* 1) garante cálculo de largura previsível */
+table.main-grid {
+  width: 100%;
+  table-layout: fixed; /* essencial para as larguras funcionarem */
+}
+
+/* 2) define larguras fixas para colunas que não precisam ser largas */
+table.main-grid th.col-data,
+table.main-grid td.col-data {
+  width: 110px;
+}
+
+table.main-grid th.col-dia,
+table.main-grid td.col-dia {
+  width: 120px;
+}
+
+table.main-grid th.col-agendados,
+table.main-grid td.col-agendados {
+  width: 80px;
+}
+
+table.main-grid th.col-realizados,
+table.main-grid td.col-realizados {
+  width: 80px;
+}
+
+table.main-grid th.col-aderencia,
+table.main-grid td.col-aderencia {
+  width: 95px;
+}
+
+table.main-grid th.col-monitorado,
+table.main-grid td.col-monitorado {
+  width: 80px;
+}
+
+/* 3) Etapa ocupa o RESTANTE do espaço (não define width aqui) */
+table.main-grid th.col-etapa,
+table.main-grid td.col-etapa {
+  width: auto;                 /* ocupa o resto */
+  white-space: normal !important;
+  word-break: break-word;
+}
+
+/* 4) garante que o "badge" da etapa também quebre linha, sem cortar */
+table.main-grid td.col-etapa .etapa {
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal !important;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+/* 5) opcional: dá um pouco mais de respiro na célula da etapa */
+table.main-grid td.col-etapa {
+  padding-right: 10px;
+}
+
