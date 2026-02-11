@@ -103,6 +103,21 @@ function renderGrid() {
         const tr = document.createElement("tr");
         tr.onclick = () => alternarSelecao(tr, d, null, dadosVisiveis);
 
+        // ===== MARCAÇÕES VISUAIS =====
+// Linha de dia NÃO ÚTIL (FERIADO/RECESSO/OFF etc.) -> tom avermelhado
+if (d.diaUtil === false) tr.classList.add("row-nao-util");
+
+// Sábado/Domingo -> marcador escuro na coluna de etapa
+// (funciona tanto com "SÁB/DOM" quanto "sábado/domingo" ou "sab/dom")
+const diaTxt = String(d.dia || "").toLowerCase();
+if (
+  diaTxt.includes("sáb") || diaTxt.includes("sab") || diaTxt.includes("sábado") ||
+  diaTxt.includes("dom") || diaTxt.includes("domingo")
+) {
+  tr.classList.add("row-fds");
+}
+
+
         // Etapa exibida: exatamente como vem do calendário (melhor cenário)
         const etapaTextoRaw =
           (typeof d.etapaTexto === "string" && d.etapaTexto.trim() !== "") ? d.etapaTexto.trim() :
@@ -430,4 +445,5 @@ filtroParticipante.onchange = renderGrid;
 
 // Inicializa
 renderGrid();
+
 
