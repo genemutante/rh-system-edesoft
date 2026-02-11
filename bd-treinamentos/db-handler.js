@@ -611,8 +611,21 @@ async carregarDetalheMonitoramento(dataISO) {
   if (error) throw new Error(normalizeError(error));
   return Array.isArray(data) ? data : (data ?? []);
 },
+
+// =========================
+// EVIDÊNCIA MONITORAMENTO (RPC)
+// =========================
 	
-    
+async carregarEvidenciaCompleta(dataISO) {
+  const { data, error } = await supabaseClient.rpc("monitoramento_evidencia_completa", {
+    p_data: dataISO,
+  });
+  if (error) throw new Error(normalizeError(error));
+  return Array.isArray(data) ? data[0] : null;
+},
+
+
+	
     
     
 };
@@ -620,6 +633,7 @@ async carregarDetalheMonitoramento(dataISO) {
 
 // No final do ficheiro db-handler.js
 window.DBHandler = DBHandler;
+
 
 
 
