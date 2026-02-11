@@ -352,7 +352,12 @@ function selecionarAula(aula) {
   });
 }
 
+
 // ✅ Preenche tabela de evidências (retorno do RPC monitoramento_detalhe)
+// ✅ Agora: ícone abre MODAL de evidência completa (RPC monitoramento_evidencia_completa)
+// Requisitos:
+// - window.DBHandler.carregarEvidenciaCompleta(dataISO) -> retorna 1 objeto completo (ou null)
+// - openEvidenciaModal(payload) -> abre o modal e preenche os campos
 function preencherEvidencias(lista) {
   const tbody = document.getElementById("evidencias");
   if (!tbody) return;
@@ -368,18 +373,73 @@ function preencherEvidencias(lista) {
     return;
   }
 
-  tbody.innerHTML = lista.map(ev => `
+  // Monta linhas e adiciona um botão para abrir o modal da evidência completa
+  tbody.innerHTML = lista.map((ev, idx) => `
     <tr>
       <td>${ev.origem ?? ""}</td>
       <td>${ev.data ?? ""}</td>
       <td>${ev.etapa ?? ""}</td>
       <td>${ev.evidencia ?? ""}</td>
       <td class="text-center">
-        ${ev.url ? `<a href="${ev.url}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-link"></i></a>` : ""}
+        <button
+          type="button"
+          class="btn-link"
+          title="Abrir evidência"
+          data-ev-date="${ev.data ?? ""}"
+          data-ev-url="${ev.url ?? ""}"
+          data-ev-idx="${idx}"
+          style="border:0; background:transparent; cursor:pointer;"
+        >
+          <i class="fa-solid fa-file-lines" style="color:#2563eb;"></i>
+        </button>
       </td>
     </tr>
   `).join("");
+
+  // Bind dos cliques (abre modal)
+  tbody.querySelectorAll("button[data-ev-date]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      try {
+        const dataBR = btn.getAttribute("data-ev-date") || "";
+        if (!dataBR || !dataBR.includes("/")) return;
+
+        const [dd, mm, yyyy] = dataBR.split("/");
+        const dataISO = `${yyyy}-${mm}-${dd}`;
+
+        // Se não existir a função no DBHandler, cai no link como fallback
+        if (!window.DBHandler || typeof window.DBHandler.carregarEvidenciaCompleta !== "function") {
+          const url = btn.getAttribute("data-ev-url");
+          if (url) window.open(url, "_blank", "noopener,noreferrer");
+          return;
+        }
+
+        // Busca evidência completa (campos: data_calendario, dia_semana, tipo_dia, etapa_processo,
+        // avaliacao_monitoria, log_autenticacao_automatica)
+        const payload = await window.DBHandler.carregarEvidenciaCompleta(dataISO);
+
+        if (!payload) {
+          alert("Não foi possível carregar a evidência completa para esta data.");
+          return;
+        }
+
+        // Abre modal (deve existir no app)
+        if (typeof openEvidenciaModal === "function") {
+          openEvidenciaModal(payload);
+        } else {
+          // fallback se o modal não estiver disponível ainda
+          console.warn("openEvidenciaModal() não encontrado. Payload:", payload);
+          alert("Modal de evidência não está disponível. Verifique o console.");
+        }
+      } catch (err) {
+        console.error("Erro ao abrir evidência completa:", err);
+        alert("Erro ao carregar evidência completa. Verifique o console.");
+      }
+    });
+  });
 }
+
+
+
 
 async function carregarEvidenciasDoDia(dadosDia) {
   try {
@@ -497,4 +557,5 @@ filtroParticipante.onchange = renderGrid;
 
 // Inicializa
 renderGrid();
+
 
