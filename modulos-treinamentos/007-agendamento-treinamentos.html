@@ -285,43 +285,34 @@
       }
     }
 
-    // ✅ Popula o select de Conteúdo com base na agenda carregada
-// ✅ Popula o select de Conteúdo com base na agenda carregada
-// ✅ Popula o select com CURSOS (treinamentos) únicos da agenda
 function atualizarFiltroConteudo() {
-  const sel = document.getElementById('grid-filter-aula'); // mantém o id pra não mexer no HTML
+  const sel = document.getElementById('grid-filter-aula');
   if (!sel) return;
 
   const valorAtual = sel.value;
-
   const map = new Map(); // treinamentoId -> nomeTreinamento
 
   (agendaCache || []).forEach(item => {
-    const tid = item.treinamento?.id;
-    const tnome = (item.treinamento?.nome || '').trim();
+    // ✅ fallback: se não vier item.treinamento.id, usa item.treinamento_id
+    const tid = item?.treinamento?.id ?? item?.treinamento_id ?? item?.treinamentoId ?? null;
+    const tnome = (item?.treinamento?.nome || '').trim();
+
     if (!tid || !tnome) return;
 
-    // 1 curso aparece muitas vezes na agenda, mas no Map entra só 1 vez
     map.set(String(tid), tnome);
   });
 
   sel.innerHTML = `<option value="">Todos Cursos</option>`;
 
-  // ✅ ordena por nome do curso
   [...map.entries()]
     .sort((a, b) => a[1].localeCompare(b[1], 'pt-BR', { sensitivity: 'base' }))
     .forEach(([treinamentoId, nome]) => {
       sel.innerHTML += `<option value="${treinamentoId}">${nome}</option>`;
     });
 
-  // mantém seleção anterior se ainda existir
-  if ([...sel.options].some(o => o.value === valorAtual)) {
-    sel.value = valorAtual;
-  } else {
-    sel.value = '';
-  }
+  if ([...sel.options].some(o => o.value === valorAtual)) sel.value = valorAtual;
+  else sel.value = '';
 }
-
 
 
 window.carregarAgenda = async function() {
@@ -386,7 +377,9 @@ window.carregarAgenda = async function() {
 // 3) Filtro por CURSO (treinamento)
 let matchCurso = true;
 if (aulaFilter) {
-  matchCurso = String(item.treinamento?.id || '') === aulaFilter;
+const tid = item?.treinamento?.id ?? item?.treinamento_id ?? item?.treinamentoId ?? '';
+matchCurso = String(tid) === aulaFilter;
+
 }
 
 
@@ -720,6 +713,7 @@ if (aulaFilter) {
   </script>
 </body>
 </html>
+
 
 
 
