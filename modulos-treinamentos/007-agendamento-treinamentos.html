@@ -118,7 +118,7 @@
                 <table id="tabela-agenda">
                     <thead>
                         <tr>
-                            <th style="width: 140px;">Data</th>
+                            <th style="width: 180px;">Data</th>
                             <th>Colaborador</th>
                             <th>Treinamento</th>
                             <th>Conteúdo</th>
@@ -356,7 +356,8 @@ lista.forEach(item => {
                 if (labelStatus === 'AGUARDANDO BAIXA') tr.style.backgroundColor = '#fff7ed';
 
                 tr.innerHTML = `
-                    <td style="font-weight:600; color:${dataItem < agora ? '#64748b' : '#1e293b'}">${dataFmt}</td>
+                    <td style="font-weight:600; white-space:nowrap; color:${dataItem < agora ? '#64748b' : '#1e293b'}">${dataFmt}</td>
+
                     <td>${item.colaborador?.nome || '-'}</td>
                     <td style="color:#64748b;">${item.treinamento?.nome || '-'}</td>
                     <td>${nomeAula}</td>
@@ -478,6 +479,7 @@ lista.forEach(item => {
     </script>
 </body>
 </html>
+
 
 
 
