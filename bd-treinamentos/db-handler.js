@@ -556,7 +556,8 @@ async salvarCursoCompleto(dadosCurso, aulasPendentes = null) {
                 observacoes,
                 treinamento:treinamentos (nome),
                 colaborador:colaboradores (nome),
-                aula:aulas_treinamentos (titulo, ordem)
+                aula:aulas_treinamentos (id, titulo, ordem)
+
             `)
             .order('data_hora', { ascending: false }); // Do mais novo para o mais antigo
 
@@ -633,6 +634,7 @@ async carregarEvidenciaCompleta(dataISO) {
 
 // No final do ficheiro db-handler.js
 window.DBHandler = DBHandler;
+
 
 
 
