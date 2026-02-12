@@ -289,7 +289,8 @@ function renderizarLinhas(lista, container) {
                     hour: '2-digit', minute: '2-digit' 
                 });
 
-                const nomeAula = item.aula ? `${item.aula.ordem}. ${item.aula.titulo}` : 'Curso Completo';
+                const nomeAula = item.aula ? (item.aula.titulo || '') : 'Curso Completo';
+
                 
                 // --- LÓGICA DE STATUS ---
                 let labelStatus = item.status;
@@ -454,5 +455,6 @@ function renderizarLinhas(lista, container) {
     </script>
 </body>
 </html>
+
 
 
