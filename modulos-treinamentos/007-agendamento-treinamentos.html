@@ -286,71 +286,77 @@
     }
 
     // ✅ Popula o select de Conteúdo com base na agenda carregada
-    function atualizarFiltroConteudo() {
-      const sel = document.getElementById('grid-filter-aula');
-      if (!sel) return;
+function atualizarFiltroConteudo() {
+  const sel = document.getElementById('grid-filter-aula');
+  if (!sel) return;
 
-      const valorAtual = sel.value;
+  const valorAtual = sel.value;
 
-      const map = new Map(); // aulaId -> label
-      let temCursoInteiro = false;
+  // vamos montar uma lista com "tema" (título limpo) para ordenar por assunto
+  const itens = []; // [{ id, tema, label }]
+  let temCursoInteiro = false;
 
-      (agendaCache || []).forEach(item => {
-        if (!item.aula) {
-          temCursoInteiro = true;
-          return;
-        }
-
-       const id = String(item.aula.id);
-const ordem = item.aula.ordem ?? '';
-
-let titulo = (item.aula.titulo || '').trim();
-
-// remove prefixos duplicados comuns
-titulo = titulo
-  .replace(/^Aula\s*\d+\s*[:\-]\s*/i, '')   // "Aula 10: " ou "Aula 10 - "
-  .replace(/^\d+\s*[.\-:]\s*/, '');        // "10. " ou "10 - " ou "10: "
-
-const label = (ordem !== '' && ordem !== null && ordem !== undefined)
-  ? `Aula ${ordem}: ${titulo}`
-  : (titulo || `Aula ${id}`);
-
-map.set(id, label);
-      });
-
-      sel.innerHTML = `<option value="">Todos Conteúdos</option>`;
-      if (temCursoInteiro) sel.innerHTML += `<option value="__CURSO_INTEIRO__">(Curso Inteiro)</option>`;
-
-      [...map.entries()]
-        .sort((a, b) => a[1].localeCompare(b[1], 'pt-BR', { sensitivity: 'base' }))
-        .forEach(([id, label]) => {
-          sel.innerHTML += `<option value="${id}">${label}</option>`;
-        });
-
-      if ([...sel.options].some(o => o.value === valorAtual)) {
-        sel.value = valorAtual;
-      }
+  (agendaCache || []).forEach(item => {
+    if (!item.aula) {
+      temCursoInteiro = true;
+      return;
     }
 
-    window.carregarAgenda = async function() {
-      document.getElementById('loading-grid').style.display = 'block';
-      document.getElementById('tbody-agenda').innerHTML = '';
-      try {
-        if (DBHandler.listarAgendamentos) {
-          agendaCache = await DBHandler.listarAgendamentos();
-        } else {
-          agendaCache = await DBHandler.listarAgendamentosFuturos();
-        }
+    const id = String(item.aula.id);
+    const ordem = item.aula.ordem ?? '';
 
-        atualizarFiltroConteudo();
-        renderizarGrid();
-      } catch (e) {
-        console.error(e);
-        alert("Erro ao carregar agenda: " + e.message);
-      } finally {
-        document.getElementById('loading-grid').style.display = 'none';
-      }
-    };
+    let tema = (item.aula.titulo || '').trim();
+
+    // remove prefixos duplicados comuns
+    tema = tema
+      .replace(/^Aula\s*\d+\s*[:\-]\s*/i, '') // "Aula 10: " ou "Aula 10 - "
+      .replace(/^\d+\s*[.\-:]\s*/, '')       // "10. " ou "10 - " ou "10: "
+      .trim();
+
+    const label = (ordem !== '' && ordem !== null && ordem !== undefined)
+      ? `Aula ${ordem}: ${tema}`
+      : (tema || `Aula ${id}`);
+
+    // evita duplicar a mesma aula (por id)
+    if (!itens.some(x => x.id === id)) itens.push({ id, tema, label });
+  });
+
+  sel.innerHTML = `<option value="">Todos Conteúdos</option>`;
+  if (temCursoInteiro) sel.innerHTML += `<option value="__CURSO_INTEIRO__">(Curso Inteiro)</option>`;
+
+  // ✅ ordena pelo TEMA (assunto), ignorando "Aula X:"
+  itens
+    .sort((a, b) => a.tema.localeCompare(b.tema, 'pt-BR', { sensitivity: 'base' }))
+    .forEach(({ id, label }) => {
+      sel.innerHTML += `<option value="${id}">${label}</option>`;
+    });
+
+  // mantém seleção anterior se ainda existir
+  if ([...sel.options].some(o => o.value === valorAtual)) {
+    sel.value = valorAtual;
+  }
+}
+
+window.carregarAgenda = async function() {
+  document.getElementById('loading-grid').style.display = 'block';
+  document.getElementById('tbody-agenda').innerHTML = '';
+  try {
+    if (DBHandler.listarAgendamentos) {
+      agendaCache = await DBHandler.listarAgendamentos();
+    } else {
+      agendaCache = await DBHandler.listarAgendamentosFuturos();
+    }
+
+    atualizarFiltroConteudo();
+    renderizarGrid();
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao carregar agenda: " + e.message);
+  } finally {
+    document.getElementById('loading-grid').style.display = 'none';
+  }
+};
+
 
     window.renderizarGrid = function() {
       const tbody = document.getElementById('tbody-agenda');
@@ -727,4 +733,5 @@ map.set(id, label);
   </script>
 </body>
 </html>
+
 
