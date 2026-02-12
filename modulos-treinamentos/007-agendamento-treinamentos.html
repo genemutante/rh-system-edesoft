@@ -200,6 +200,52 @@
             finally { document.getElementById('loading-grid').style.display = 'none'; }
         };
 
+function atualizarFiltroConteudo() {
+  const sel = document.getElementById('grid-filter-aula');
+  if (!sel) return;
+
+  const valorAtual = sel.value;
+
+  // Monta lista única de conteúdos (aulas) a partir da agenda carregada
+  const map = new Map(); // key -> label
+  let temCursoInteiro = false;
+
+  (agendaCache || []).forEach(item => {
+    if (!item.aula) {
+      temCursoInteiro = true;
+      return;
+    }
+    const id = String(item.aula.id);
+    const titulo = (item.aula.titulo || '').trim();
+    const ordem = item.aula.ordem ?? '';
+
+    // label (você pode mudar o formato)
+    const label = ordem !== '' && ordem !== null && ordem !== undefined
+      ? `Aula ${ordem}: ${titulo}`
+      : titulo || `Aula ${id}`;
+
+    map.set(id, label);
+  });
+
+  // Recria options
+  sel.innerHTML = `<option value="">Todos Conteúdos</option>`;
+  if (temCursoInteiro) sel.innerHTML += `<option value="__CURSO_INTEIRO__">(Curso Inteiro)</option>`;
+
+  // Ordena por label (ou por ordem se quiser mais exato)
+  [...map.entries()]
+    .sort((a, b) => a[1].localeCompare(b[1], 'pt-BR', { sensitivity: 'base' }))
+    .forEach(([id, label]) => {
+      sel.innerHTML += `<option value="${id}">${label}</option>`;
+    });
+
+  // Mantém seleção anterior se ainda existir
+  if ([...sel.options].some(o => o.value === valorAtual)) {
+    sel.value = valorAtual;
+  }
+}
+
+
+        
         window.renderizarGrid = function() {
             const tbody = document.getElementById('tbody-agenda');
             const termo = document.getElementById('grid-search').value.toLowerCase();
@@ -480,6 +526,7 @@ lista.forEach(item => {
     </script>
 </body>
 </html>
+
 
 
 
